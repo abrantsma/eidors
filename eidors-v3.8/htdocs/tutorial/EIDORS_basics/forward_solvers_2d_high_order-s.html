@@ -1,0 +1,247 @@
+
+
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+   <head>
+<title>EIDORS</title>
+   <style type="text/css">
+        body, td, th {
+        font-family: Verdana, Helvetica, Arial, sans-serif;
+        font-size:80%;
+        }
+        pre, tt {
+        font-family:lucida console, FixedSys, Courier, Terminal, monospaced;
+        font-size:100%;
+        }
+        pre {
+        background-color: #E0F0FE;
+        border-style: groove;
+        border-color: black;
+        border-width: 2px;
+        }
+   </style>
+
+</head>
+
+<body link="#800000"
+      marginwidth=5 marginheight=5 topmargin=5 leftmargin=5 
+      vlink="#400000" >
+<table border="0" cellspacing="0" cellpadding="0">
+<tr height="80"><td valign="middle">
+<img alt="Eidors-logo" src="../../eidors-logo.jpg">&nbsp;&nbsp; &nbsp;
+</td><td>
+<h2>
+    EIDORS:
+    <small><i>Electrical Impedance Tomography and
+    Diffuse Optical Tomography Reconstruction Software</i></small>
+</h2>
+</td></tr></table>
+<table border="0"> <tr>
+<td valign="top" width="100">
+<a href="http://eidors3d.sf.net/" >EIDORS</a>
+(<a href="http://www.sce.carleton.ca/faculty/adler/eidors/index.shtml"
+    >mirror</a>)<br>
+<a href="../../index-s.html"
+>Main</a><br>
+<a href="../../docs-s.html"
+   >Documentation</a><br>
+<a href="../../tutorial/tutorial-s.html"
+   >Tutorials</a><br>
+
+<a href="../../tutorial/image_reconst-s.html"
+      >&minus; Image Reconst</a><br>
+<a href="../../tutorial/data_structures-s.html"
+      >&minus; Data Structures</a><br>
+<a href="../../tutorial/application_examples-s.html"
+      >&minus; Applications</a><br>
+<a href="../../tutorial/netgen-s.html"
+      >&minus; FEM Modelling</a><br>
+<a href="../../tutorial/GREIT-s.html"
+      >&minus; GREIT</a><br>
+<a href="../../tutorial/old-tutorials-s.html"
+      >&minus; Old tutorials</a><br>
+<a href="../../tutorial/workshop-s.html"
+      >&minus; <i>Workshop</i></a><br>
+
+<a href="../../download-s.html"
+   >Install</a><br>
+<a href="../../data_contrib-s.html"
+   >Contrib Data</a><br>
+<a href="../../GREIT/index-s.html"
+   >GREIT</a><br>
+<a href="../../doc/index.html"
+   >Browse Docs</a><br>
+<a href="https://sourceforge.net/p/eidors3d/code/HEAD/tree/trunk/"
+   >Browse SVN</a><br>
+<hr>
+<a href="../../news-s.html">News</a><br>
+<a href="https://lists.sourceforge.net/lists/listinfo/eidors3d-help"
+   >Mailing list</a><br>
+(<a href="https://sourceforge.net/mailarchive/forum.php?forum_name=eidors3d-help"
+   >archive</a>)<br>
+<a href="../../faq-s.html">FAQ</a><br>
+<a href="../../programming/programming-s.html">Developer</a><br>
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+<!-- EIDORS Navigation sidebar
+     $Id: nav-sidebar.shtml 4143 2013-06-05 15:03:01Z philgrant12 $
+  -->
+<p>&nbsp;
+<p>
+<small>Hosted by</small><br>
+<a  href="http://sourceforge.net/projects/eidors3d">
+   <img src="http://sourceforge.net/sflogo.php?group_id=100454&type=4"
+         border="0" alt="SourceForge.net Logo"  />
+</a>
+</td><td>&nbsp;</td><td valign="top">
+
+
+
+
+<h2>EIDORS fwd_models</h2>
+
+<h3> 
+Solving the forward problem for EIT in 2D with higher order finite elements
+</h3>
+
+Create a common model with EIDORS and solve using default solver. Swap the default forward solvers to the higher order solvers, and the element type ('tri3' is linear, 'tri6' is quadratic and 'tri10' is cubic).
+
+<pre>
+%Make an inverse model and extract forward model
+imdl = mk_common_model('c2C0',16);
+fmdl = imdl.fwd_model;
+
+%Default EIDORS solver
+%Make image of unit conductivity
+img0 = mk_image(fmdl,1);
+img0.fwd_solve.get_all_meas = 1; %Internal voltage
+v0=fwd_solve(img0);
+v0e=v0.meas; v0all=v0.volt; 
+
+
+%High-order EIDORS solver
+%Change default eidors solvers
+fmdl.solve = @fwd_solve_higher_order;
+fmdl.system_mat = @system_mat_higher_order;
+
+%Add element type
+fmdl.approx_type    = 'tri3'; % linear
+%Make an image and get voltages using high order solver
+img1 = mk_image(fmdl,1);
+img1.fwd_solve.get_all_meas = 1; %Internal voltage
+v1 = fwd_solve(img1); 
+v1e=v1.meas; v1all=v1.volt;
+
+
+%Plot electrode voltages and difference
+clf;subplot(211); plot([v0e,v1e,[v0e-v1e]*100]);
+legend('0','1','(1-0) x 100'); xlim([1,100]);
+
+print_convert forward_solvers_2d_high_order01a.png
+
+</pre>
+
+<center>
+<img src="forward_solvers_2d_high_order01a.png">
+<br><i> Figure:</i>
+The plot reassuringly shows the two approximations (eidors default and the high order linear solver) both agree at machine precision on the electrodes.
+</center>
+
+<pre>
+%Get internal linear voltage distribution for first stimulation
+v1all = v1.volt; 
+img1n = rmfield(img1,'elem_data');
+img1n.node_data = v1all(1:size(fmdl.nodes,1),1); %add first stim data
+
+%Plot the distribution
+img1n.calc_colours.cb_shrink_move = [0.5,0.5,0];
+clf; subplot(221); show_fem(img1n,1);
+
+%Get internal voltage distribution for difference eidors/high order
+img11n=img1n; 
+img11n.node_data=v1all(1:size(fmdl.nodes,1),1)-v0all(1:size(fmdl.nodes,1),1);
+
+%Plot the difference of two linear approximations
+img11n.calc_colours.cb_shrink_move = [0.5,0.5,0];
+subplot(222); show_fem(img11n,1);
+
+print_convert forward_solvers_2d_high_order02a.png
+
+</pre>
+
+<center>
+<img src = "http://eidors3d.sourceforge.net/tutorial/EIDORS_basics/forward_solvers_2d_high_order02a.png">
+<br><i> Figure:</i>
+The left plot shows the voltage distribution for the first stimulation using the linear high order solver. The right plot shows the difference between the default eidors solver and the linear high order solver, which agree to machine precision.
+</center>
+
+We now solve the forward problem using a quadratic ('tri6') and cubic ('tri10') approximation and look at the electrode voltages and internal voltage distribution.
+
+<pre>
+%Repeat with quadratic and cubic finite elements
+%Quadratic FEM
+fmdl.approx_type    = 'tri6'; %Quadratic
+img2 = mk_image(fmdl,1);
+img2.fwd_solve.get_all_meas = 1; %Internal voltage
+v2 = fwd_solve(img2); 
+v2e=v2.meas; v2all=v2.volt;
+
+%Cubic FEM
+fmdl.approx_type    = 'tri10'; %Cubic
+img3 = mk_image(fmdl,1);
+img3.fwd_solve.get_all_meas = 1; %Internal voltage
+v3 = fwd_solve(img3); 
+v3e=v3.meas; v3all=v3.volt;
+
+%Electrode voltages and difference for linear, quadratic and cubic
+clf;subplot(211); plot([v1e,v2e,v3e,[v2e-v0e,v3e-v0e]*10]);
+legend('1','2','3','(2-0) x 10','(3-0) x 10')
+xlim([1,100]);
+
+print_convert forward_solvers_2d_high_order03a.png
+
+</pre>
+
+<center>
+<img src = "http://eidors3d.sourceforge.net/tutorial/EIDORS_basics/forward_solvers_2d_high_order03a.png">
+<br><i> Figure:</i>
+The electrode voltages for linear, quadratic and cubic approximation. The linear approximation agrees with the high order approximations away from the drive electrodes, but gets worse as we move toward the drive electrodes.
+</center>
+
+<pre>
+%Difference between quadratic and linear approximation internal voltage
+img12n=img1n; 
+img12n.node_data=v2all(1:size(fmdl.nodes,1),1)-v1all(1:size(fmdl.nodes,1),1);
+
+%Plot the difference 
+clf; subplot(221); show_fem(img12n,1);
+
+%Difference between quadratic and linear approximation internal voltage
+img13n=img1n; 
+img13n.node_data=v3all(1:size(fmdl.nodes,1),1)-v1all(1:size(fmdl.nodes,1),1);
+
+%Plot the difference 
+subplot(222); show_fem(img13n,1);
+
+print_convert forward_solvers_2d_high_order04a.png
+
+</pre>
+
+<center>
+<img src = "http://eidors3d.sourceforge.net/tutorial/EIDORS_basics/forward_solvers_2d_high_order04a.png">
+<br><i> Figure:</i>
+The left plot shows the difference between linear and quadratic approximation on the internal voltage distribution and the right plot shows the difference between linear and cubic approximation.
+</center>
+
+
+</td></tr></table>
+<p>
+<small>
+    Last Modified: $Date: 2012-07-01 11:24:25 -0400 (Sun, 01 Jul 2012) $ by $Author: michaelcrabb30 $
+</small>
+</BODY></HTML>
+<!--
+      -->

@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of calc_R_prior</title>
+  <meta name="keywords" content="calc_R_prior">
+  <meta name="description" content="R = calc_R_prior( inv_model, varargin )">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">eidors</a> &gt; <a href="index.html">solvers</a> &gt; calc_R_prior.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/solvers&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>calc_R_prior
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>R = calc_R_prior( inv_model, varargin )</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function R_prior = calc_R_prior( inv_model, varargin ) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> R = calc_R_prior( inv_model, varargin )
+ CALC_R_PRIOR: calculate regularization matrix R
+   The image prior is matrix n_elem x ??? 
+ 
+ calc_R_prior can be called as
+    R_prior= calc_R_prior( inv_model, ... )
+
+ and will call the function inv_model.R_prior
+ parameters to R_prior should be passed in the field
+ inv_model.R_prior_function_name.parameters
+ 
+ If inv_model.R_prior is a matrix, calc_R_prior will return that matrix,
+ possibly correcting for coarse2fine
+
+ R_prior      calculated regularization prior R
+ inv_model    is an inv_model structure</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>	EIDORS_OBJ: 'constructor' to create a eidors structure</li><li><a href="../../eidors/models/mdl_normalize.html" class="code" title="function out = mdl_normalize(mdl, val)">mdl_normalize</a>	MDL_NORMALIZE Check or set the normalize_measurements flag on a model.</li><li><a href="../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>	EIDORS_CACHE Control eidors caching</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/deprecated/ab_tv_lagged_diff.html" class="code" title="function img=ab_tv_lagged_diff( inv_model, data1, data2)">ab_tv_lagged_diff</a>	AB_TV_LAGGED_DIFF Lagged Diffusivity Inverse Solver</li><li><a href="../../eidors/solvers/inverse/inv_solve_TV_irls.html" class="code" title="function img=inv_solve_TV_irls( inv_model, data1, data2)">inv_solve_TV_irls</a>	INV_SOLVE_TV_IRLS Iteratively Reweighted Least Squares inverse solver</li><li><a href="../../eidors/solvers/inverse/inv_solve_abs_pdipm.html" class="code" title="function img=inv_solve_abs_pdipm( inv_model, data);">inv_solve_abs_pdipm</a>	INV_SOLVE_ABS_PDIPM  inverse solver for absolute data using Primal/Dual interior point method</li><li><a href="../../eidors/solvers/inverse/inv_solve_diff_pdipm.html" class="code" title="function img=inv_solve_diff_pdipm( inv_model, data1, data2)">inv_solve_diff_pdipm</a>	INV_SOLVE_DIFF_PDIPM inverse solver for difference data using Primal/Dual interior point method</li><li><a href="../../eidors/solvers/inverse/primaldual_tvrecon_lsearch.html" class="code" title="function [rs,x]=primaldual_tvrecon_lsearch(inv_mdl, vmeas,maxiter,alpha1,alpha2, epsilon, beta, min_change)">primaldual_tvrecon_lsearch</a>	[rs,x]=primaldual_tvrecon_lsearch(inv_mdl, vmeas, ...</li><li><a href="../../eidors/tests/calc_model_prior_test.html" class="code" title="function ok= calc_model_prior_test;">calc_model_prior_test</a>	Verify model prior calcs</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function R_prior = calc_from_RtR_prior(inv_model)</a></li><li><a href="#_sub2" class="code">function inv_model = rec_or_fwd_model( inv_model);</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function R_prior = calc_R_prior( inv_model, varargin )</a>
+0002 <span class="comment">% R = calc_R_prior( inv_model, varargin )</span>
+0003 <span class="comment">% CALC_R_PRIOR: calculate regularization matrix R</span>
+0004 <span class="comment">%   The image prior is matrix n_elem x ???</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% calc_R_prior can be called as</span>
+0007 <span class="comment">%    R_prior= calc_R_prior( inv_model, ... )</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% and will call the function inv_model.R_prior</span>
+0010 <span class="comment">% parameters to R_prior should be passed in the field</span>
+0011 <span class="comment">% inv_model.R_prior_function_name.parameters</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% If inv_model.R_prior is a matrix, calc_R_prior will return that matrix,</span>
+0014 <span class="comment">% possibly correcting for coarse2fine</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% R_prior      calculated regularization prior R</span>
+0017 <span class="comment">% inv_model    is an inv_model structure</span>
+0018 
+0019 <span class="comment">% (C) 2005-2008 Andy Adler. License: GPL version 2 or version 3</span>
+0020 <span class="comment">% $Id: calc_R_prior.m 4832 2015-03-29 21:13:53Z bgrychtol-ipa $</span>
+0021 
+0022 
+0023 inv_model = <a href="#_sub2" class="code" title="subfunction inv_model = rec_or_fwd_model( inv_model);">rec_or_fwd_model</a>( inv_model);
+0024 
+0025 
+0026 <span class="keyword">if</span> isfield(inv_model,<span class="string">'R_prior'</span>)
+0027    <span class="keyword">if</span> isnumeric(inv_model.R_prior)
+0028       R_prior = inv_model.R_prior;
+0029    <span class="keyword">else</span>
+0030       R_prior= <a href="../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>( inv_model.R_prior, inv_model );
+0031    <span class="keyword">end</span>
+0032 <span class="keyword">elseif</span> isfield(inv_model,<span class="string">'RtR_prior'</span>)
+0033    R_prior = <a href="../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(@<a href="#_sub1" class="code" title="subfunction R_prior = calc_from_RtR_prior(inv_model)">calc_from_RtR_prior</a>, inv_model,<span class="string">'calc_R_prior'</span>);
+0034 <span class="keyword">else</span>
+0035    error(<span class="string">'calc_R_prior: neither R_prior or RtR_prior func provided'</span>);
+0036 <span class="keyword">end</span>
+0037 
+0038 <span class="keyword">if</span> isfield(inv_model.fwd_model,<span class="string">'coarse2fine'</span>)
+0039    c2f= inv_model.fwd_model.coarse2fine;
+0040    <span class="keyword">if</span> size(R_prior,1)==size(c2f,1)
+0041 <span class="comment">%     we need to take into account coarse2fine - using a reasonable tol</span>
+0042       R_prior=R_prior*c2f;
+0043    <span class="keyword">end</span>
+0044 <span class="keyword">end</span>
+0045 
+0046 <a name="_sub1" href="#_subfunctions" class="code">function R_prior = calc_from_RtR_prior(inv_model)</a>
+0047    <span class="comment">% The user has provided an RtR prior. We can use this to</span>
+0048    <span class="comment">% get R =RtR^(1/2). Not that this is non unique</span>
+0049    <span class="keyword">if</span> isnumeric(inv_model.RtR_prior)
+0050       RtR_prior = inv_model.RtR_prior;
+0051    <span class="keyword">else</span>
+0052       RtR_prior= <a href="../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>( inv_model.RtR_prior, inv_model );
+0053    <span class="keyword">end</span>
+0054    
+0055    <span class="comment">% chol generates an error for rank deficient RtR_prior</span>
+0056    <span class="comment">%     R_prior = chol (RtR_prior);</span>
+0057    <span class="comment">% Instead we calculate cholinc with a droptol of 1e-5.</span>
+0058    <span class="comment">%  For priors, this should be fine, since exact values</span>
+0059    <span class="comment">%  especially far away, are not necessary</span>
+0060    ver = <a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'interpreter_version'</span>);
+0061    opts.droptol = 1e-5; 
+0062    
+0063    <span class="keyword">if</span> ver.isoctave  || ver.ver &lt; 7.012
+0064       R_prior = cholinc(RtR_prior,opts.droptol);
+0065    <span class="keyword">else</span>
+0066       R_prior = ichol(RtR_prior);
+0067    <span class="keyword">end</span>
+0068 
+0069 <a name="_sub2" href="#_subfunctions" class="code">function inv_model = rec_or_fwd_model( inv_model);</a>
+0070 
+0071    <span class="keyword">if</span> isfield(inv_model,<span class="string">'rec_model'</span>);
+0072       use_rec_model = 1;
+0073       <span class="keyword">try</span> <span class="keyword">if</span> inv_model.prior_use_fwd_not_rec== 1;
+0074          use_rec_model = 0;
+0075       <span class="keyword">end</span>; <span class="keyword">end</span>
+0076 
+0077       <span class="keyword">if</span> use_rec_model
+0078           <span class="comment">% copy the normalize flag from the fwd_model to prevent warnings</span>
+0079          inv_model.rec_model = <a href="../../eidors/models/mdl_normalize.html" class="code" title="function out = mdl_normalize(mdl, val)">mdl_normalize</a>(inv_model.rec_model, <span class="keyword">...</span>
+0080                                        <a href="../../eidors/models/mdl_normalize.html" class="code" title="function out = mdl_normalize(mdl, val)">mdl_normalize</a>(inv_model.fwd_model));
+0081          inv_model.fwd_model= inv_model.rec_model;
+0082          inv_model= rmfield(inv_model,<span class="string">'rec_model'</span>);
+0083       <span class="keyword">end</span>
+0084    <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

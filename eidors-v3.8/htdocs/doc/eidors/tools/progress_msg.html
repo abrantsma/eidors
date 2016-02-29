@@ -1,0 +1,367 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of progress_msg</title>
+  <meta name="keywords" content="progress_msg">
+  <meta name="description" content="PROGRESS_MSG Progress messages and timing.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">eidors</a> &gt; <a href="index.html">tools</a> &gt; progress_msg.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/tools&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>progress_msg
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>PROGRESS_MSG Progress messages and timing.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function progress_msg(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">PROGRESS_MSG Progress messages and timing.
+ 
+ PROGRESS_MSG('msg',I,N,opt) where I = 0 or -1 initilises the messages. 
+   'msg'   [optional] string to print
+   I       [optional] if I=0 initialises and prints '0%', '0/N', or '0'
+                      if I=-1 suppresses the initial progress message and
+                      ignores options of the immediately following 
+                      initialisation message                      
+   N       [optional] if N=0 prints 'I', if N&gt;0 prints 'I/N' 
+                      if absent, prints 'I%' (default)
+   opt     [optional] structure with the following fields and defaults:
+      .log_level = 2        controls verbosity, see EIDORD_MSG for details
+      .final_msg            customises the text of the final message
+                   'Done'   default
+                   ''       last message will not be erased, but time will
+                            be printed
+                   'none'   completely suppress the final message
+      .num_digits = 6       controls the text field width for N=0
+
+ PROGRESS_MSG(I) displays I%
+ PROGRESS_MSG(I,N) displays I/N
+ PROGRESS_MSG(I,0) displays I
+
+ PROGRESS_MSG(Inf) prints the final message, including the time elapsed
+  since initialisation, measured using tic/toc.
+ PROGRESS_MSG('msg',Inf) prints the 'msg' instead of the opt.final_msg
+
+ Example:
+   progress_msg('The big loop:', 0,10);         % prints 0/10
+   for i = 1:10
+       progress_msg(i,10);     % e.g.   3/10
+       pause(.2); % think
+   end
+   progress_msg(Inf)           % final message, e.g. Done (2.015 s)
+
+   opt.final_msg = 'none'                   % suppress final message 
+   progress_msg('Start calculations...',-1);% suppress next initialisation
+   res = function_using_progress_msg;
+   progress_msg(sprintf('Size is %d',numel(res)), Inf);
+
+ SEE ALSO EIDORS_MSG, TIC, TOC</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>	EIDORS_MSG eidors progress and status messages</li><li><a href="eidors_debug.html" class="code" title="function out = eidors_debug(command, fstr)">eidors_debug</a>	EIDORS_DEBUG Global managment of debug flags</li><li><a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>	PROGRESS_MSG Progress messages and timing.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/meshing/distmesh/distmeshnd.html" class="code" title="function [p,t]=distmeshnd(fdist,fh,h,box,fix,varargin)">distmeshnd</a>	DISTMESHND N-D Mesh Generator using Distance Functions.</li><li><a href="../../eidors/models/find_edge2edge_intersections.html" class="code" title="function [pts,FE2CE,FE2pts,CE2pts] = find_edge2edge_intersections(FE,FN,CE,CN, epsilon)">find_edge2edge_intersections</a>	FIND_EDGE2EDGE_INTERSECTIONS intersections between edges of two models</li><li><a href="../../eidors/models/mk_c2f_circ_mapping.html" class="code" title="function [mapping failed] = mk_c2f_circ_mapping( mdl, xyzr );">mk_c2f_circ_mapping</a>	MK_C2F_CIRC_MAPPING: create a mapping matrix from circles/spheres to FEM</li><li><a href="../../eidors/models/mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>	MK_GRID_C2F - calculate a coarse2fine mapping for grid coarse models.</li><li><a href="../../eidors/models/mk_tet_c2f.html" class="code" title="function [c2f] = mk_tet_c2f(fmdl, rmdl, opt)">mk_tet_c2f</a>	MK_TET_C2F - calculate a coarse2fine mapping for two tet-based models.</li><li><a href="../../eidors/models/mk_tri_c2f.html" class="code" title="function c2f = mk_tri_c2f(fmdl,rmdl,opt)">mk_tri_c2f</a>	MK_TRI_C2F</li><li><a href="../../eidors/solvers/inverse/GREIT_desired_img_sigmoid.html" class="code" title="function PSF = GREIT_desired_img_sigmoid(xyz,radius, opt)">GREIT_desired_img_sigmoid</a>	GREIT_DESIRED_IMG_SIGMOID sigmoid-decay desired image function for GREIT</li><li><a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>	PROGRESS_MSG Progress messages and timing.</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function percentmsg(num, first, N)</a></li><li><a href="#_sub2" class="code">function outofmsg(a,b,first,N,T)</a></li><li><a href="#_sub3" class="code">function numbermsg(num, first, T)</a></li><li><a href="#_sub4" class="code">function print_final_msg(msg, N)</a></li><li><a href="#_sub5" class="code">function print_time(pvar)</a></li><li><a href="#_sub6" class="code">function opt = default_opts</a></li><li><a href="#_sub7" class="code">function do_unit_test(N)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function progress_msg(varargin)</a>
+0002 <span class="comment">%PROGRESS_MSG Progress messages and timing.</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% PROGRESS_MSG('msg',I,N,opt) where I = 0 or -1 initilises the messages.</span>
+0005 <span class="comment">%   'msg'   [optional] string to print</span>
+0006 <span class="comment">%   I       [optional] if I=0 initialises and prints '0%', '0/N', or '0'</span>
+0007 <span class="comment">%                      if I=-1 suppresses the initial progress message and</span>
+0008 <span class="comment">%                      ignores options of the immediately following</span>
+0009 <span class="comment">%                      initialisation message</span>
+0010 <span class="comment">%   N       [optional] if N=0 prints 'I', if N&gt;0 prints 'I/N'</span>
+0011 <span class="comment">%                      if absent, prints 'I%' (default)</span>
+0012 <span class="comment">%   opt     [optional] structure with the following fields and defaults:</span>
+0013 <span class="comment">%      .log_level = 2        controls verbosity, see EIDORD_MSG for details</span>
+0014 <span class="comment">%      .final_msg            customises the text of the final message</span>
+0015 <span class="comment">%                   'Done'   default</span>
+0016 <span class="comment">%                   ''       last message will not be erased, but time will</span>
+0017 <span class="comment">%                            be printed</span>
+0018 <span class="comment">%                   'none'   completely suppress the final message</span>
+0019 <span class="comment">%      .num_digits = 6       controls the text field width for N=0</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% PROGRESS_MSG(I) displays I%</span>
+0022 <span class="comment">% PROGRESS_MSG(I,N) displays I/N</span>
+0023 <span class="comment">% PROGRESS_MSG(I,0) displays I</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">% PROGRESS_MSG(Inf) prints the final message, including the time elapsed</span>
+0026 <span class="comment">%  since initialisation, measured using tic/toc.</span>
+0027 <span class="comment">% PROGRESS_MSG('msg',Inf) prints the 'msg' instead of the opt.final_msg</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% Example:</span>
+0030 <span class="comment">%   progress_msg('The big loop:', 0,10);         % prints 0/10</span>
+0031 <span class="comment">%   for i = 1:10</span>
+0032 <span class="comment">%       progress_msg(i,10);     % e.g.   3/10</span>
+0033 <span class="comment">%       pause(.2); % think</span>
+0034 <span class="comment">%   end</span>
+0035 <span class="comment">%   progress_msg(Inf)           % final message, e.g. Done (2.015 s)</span>
+0036 <span class="comment">%</span>
+0037 <span class="comment">%   opt.final_msg = 'none'                   % suppress final message</span>
+0038 <span class="comment">%   progress_msg('Start calculations...',-1);% suppress next initialisation</span>
+0039 <span class="comment">%   res = function_using_progress_msg;</span>
+0040 <span class="comment">%   progress_msg(sprintf('Size is %d',numel(res)), Inf);</span>
+0041 <span class="comment">%</span>
+0042 <span class="comment">% SEE ALSO EIDORS_MSG, TIC, TOC</span>
+0043 
+0044 <span class="comment">% (C) 2015 Bartlomiej Grychtol - all rights reserved Swisstom AG</span>
+0045 <span class="comment">% License: GPL version 2 or 3</span>
+0046 <span class="comment">% $Id: progress_msg.m 4863 2015-04-04 19:47:37Z bgrychtol-ipa $</span>
+0047 
+0048 <span class="comment">% &gt;&gt; SWISSTOM CONTRIBUTION &lt;&lt;</span>
+0049 
+0050 t0 = tic;
+0051 
+0052 <span class="keyword">if</span> nargin &gt; 0 &amp;&amp; ischar(varargin{1}) &amp;&amp; strcmp(varargin{1},<span class="string">'UNIT_TEST'</span>)
+0053     varargin(1) = [];
+0054     <a href="#_sub7" class="code" title="subfunction do_unit_test(N)">do_unit_test</a>(varargin{:});
+0055     <span class="keyword">return</span>
+0056 <span class="keyword">end</span>
+0057 
+0058 <span class="keyword">persistent</span> pvar;
+0059 
+0060 nargs = nargin;
+0061 opt = <a href="#_sub6" class="code" title="subfunction opt = default_opts">default_opts</a>;
+0062 <span class="keyword">if</span> nargs &gt; 0 &amp;&amp; isstruct(varargin{end})
+0063     tmp = varargin{end};
+0064     <span class="keyword">try</span>
+0065         <span class="keyword">if</span> tmp.log_level &gt; <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>)
+0066             <span class="keyword">return</span> <span class="comment">% don't even process options</span>
+0067         <span class="keyword">end</span>
+0068     <span class="keyword">end</span>
+0069     fld = fieldnames(tmp);
+0070     <span class="keyword">for</span> i = 1:numel(fld)
+0071         opt.(fld{i}) = tmp.(fld{i});
+0072     <span class="keyword">end</span>
+0073     nargs = nargs-1;
+0074     varargin(end) = [];
+0075 <span class="keyword">end</span>
+0076 
+0077 
+0078 msg = <span class="string">''</span>;
+0079 <span class="keyword">if</span> nargs &gt; 0 &amp;&amp; ischar(varargin{1})
+0080     <span class="keyword">if</span> nargs &gt; 1 &amp;&amp; isinf(varargin{2})
+0081         msg = varargin{1};
+0082     <span class="keyword">else</span>
+0083         msg = [repmat(<span class="string">' '</span>,1,opt.log_level) varargin{1}];
+0084     <span class="keyword">end</span>
+0085     nargs = nargs-1;
+0086     varargin(1) = [];
+0087 <span class="keyword">end</span>
+0088 
+0089 
+0090 <span class="keyword">if</span> nargs == 0 <span class="comment">% there was only a message</span>
+0091     nargs = 1;
+0092     varargin(1) = {0}; <span class="comment">% starting number</span>
+0093 <span class="keyword">end</span>
+0094 
+0095 first_msg = false;
+0096 ignore = false;
+0097 <span class="keyword">try</span> 
+0098     ignore = pvar.ignore_next;
+0099 <span class="keyword">end</span>
+0100 <span class="keyword">if</span> nargs == 0 || varargin{1} &lt;=0 || isempty(pvar)
+0101     first_msg = true;
+0102     <span class="keyword">if</span> ~ignore
+0103         pvar.log_level = opt.log_level;
+0104     <span class="keyword">end</span>
+0105     <span class="keyword">if</span> pvar.log_level &gt; <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>);
+0106         <span class="keyword">return</span>
+0107     <span class="keyword">end</span>
+0108     <span class="keyword">if</span> ~ignore
+0109         pvar.final_msg = opt.final_msg;
+0110     <span class="keyword">end</span>
+0111     <span class="keyword">if</span> varargin{1} &lt; 0
+0112         pvar.ignore_next = true;
+0113     <span class="keyword">else</span>
+0114         pvar.ignore_next = false;
+0115     <span class="keyword">end</span>
+0116     pvar.timerVal = tic;
+0117     pvar.own_time = 0;
+0118     <span class="keyword">if</span> nargs &lt;= 1
+0119         pvar.nChars = 4;
+0120     <span class="keyword">elseif</span> varargin{2} == 0
+0121         pvar.nChars = opt.num_digits;
+0122     <span class="keyword">else</span>
+0123         pvar.numLength = floor(log10(varargin{2})) + 1;
+0124         pvar.nChars = 2 * pvar.numLength + 1;
+0125     <span class="keyword">end</span>
+0126 <span class="keyword">end</span>
+0127 
+0128 <span class="keyword">if</span> pvar.log_level &gt; <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>);
+0129     <span class="keyword">return</span>
+0130 <span class="keyword">end</span>
+0131 
+0132 <span class="keyword">if</span> ~isempty(msg) &amp;&amp; ~isinf(varargin{1});
+0133     fprintf(<span class="string">'%s '</span>,msg);
+0134 <span class="keyword">end</span>
+0135 
+0136 <span class="keyword">if</span> nargs &gt; 0 &amp;&amp; isinf(varargin{1})
+0137     <span class="keyword">if</span> isempty(msg)
+0138         msg = pvar.final_msg;
+0139     <span class="keyword">end</span>
+0140     <a href="#_sub4" class="code" title="subfunction print_final_msg(msg, N)">print_final_msg</a>(msg, pvar.nChars);
+0141     <span class="keyword">if</span> ~strcmp(msg,<span class="string">'none'</span>)
+0142         <a href="#_sub5" class="code" title="subfunction print_time(pvar)">print_time</a>(pvar);
+0143     <span class="keyword">end</span>
+0144     <span class="keyword">if</span> <a href="eidors_debug.html" class="code" title="function out = eidors_debug(command, fstr)">eidors_debug</a>(<span class="string">'query'</span>,<span class="string">'progress_msg'</span>)
+0145         fprintf(<span class="string">'Self-time: %f\n'</span>,pvar.own_time);
+0146     <span class="keyword">end</span>
+0147     <span class="keyword">return</span>
+0148 <span class="keyword">end</span>
+0149     
+0150 
+0151 <span class="keyword">if</span> nargs == 1
+0152     <a href="#_sub1" class="code" title="subfunction percentmsg(num, first, N)">percentmsg</a>(varargin{1},first_msg, pvar.nChars);
+0153 <span class="keyword">elseif</span> varargin{2} &gt; 0
+0154     <a href="#_sub2" class="code" title="subfunction outofmsg(a,b,first,N,T)">outofmsg</a>(varargin{1},varargin{2},first_msg,<span class="keyword">...</span>
+0155         pvar.numLength, pvar.nChars);
+0156 <span class="keyword">else</span>
+0157     <a href="#_sub3" class="code" title="subfunction numbermsg(num, first, T)">numbermsg</a>(varargin{1},first_msg, pvar.nChars);
+0158 <span class="keyword">end</span>
+0159 
+0160 pvar.own_time = pvar.own_time + toc(t0);
+0161 
+0162 <span class="keyword">end</span>
+0163 
+0164 
+0165 <a name="_sub1" href="#_subfunctions" class="code">function percentmsg(num, first, N)</a>
+0166     <span class="keyword">if</span> first &amp;&amp; num &lt; 0, <span class="keyword">return</span>, <span class="keyword">end</span>
+0167     str = <span class="string">'%3d%%'</span>;
+0168     <span class="keyword">if</span> ~first
+0169         str = [repmat(<span class="string">'\b'</span>,1,N) str ];
+0170     <span class="keyword">end</span>
+0171     fprintf(str, round(100*num));
+0172 <span class="keyword">end</span>
+0173 
+0174 <a name="_sub2" href="#_subfunctions" class="code">function outofmsg(a,b,first,N,T)</a>
+0175     <span class="keyword">if</span> first &amp;&amp; a &lt; 0, <span class="keyword">return</span>, <span class="keyword">end</span>
+0176     str = sprintf(<span class="string">'%%%dd/%%%dd'</span>,N,N);
+0177     <span class="keyword">if</span> ~first
+0178         str = [repmat(<span class="string">'\b'</span>,1,T) str ];
+0179     <span class="keyword">end</span>
+0180     
+0181     fprintf(str,a,b);
+0182 <span class="keyword">end</span>
+0183 
+0184 <a name="_sub3" href="#_subfunctions" class="code">function numbermsg(num, first, T)</a>
+0185     <span class="keyword">if</span> first &amp;&amp; num &lt; 0, <span class="keyword">return</span>, <span class="keyword">end</span>
+0186     str = sprintf(<span class="string">'%%%dd'</span>,T);
+0187     <span class="keyword">if</span> ~first
+0188         str = [repmat(<span class="string">'\b'</span>,1,T) str];
+0189     <span class="keyword">end</span>
+0190     fprintf(str, num);
+0191             
+0192 <span class="keyword">end</span>
+0193 
+0194 <a name="_sub4" href="#_subfunctions" class="code">function print_final_msg(msg, N)</a>
+0195     <span class="keyword">if</span> isempty(msg), <span class="keyword">return</span>, <span class="keyword">end</span>
+0196     str = [repmat(<span class="string">'\b'</span>,1,N) <span class="string">'%s'</span>];
+0197     fprintf(str, msg);
+0198 <span class="keyword">end</span>
+0199 
+0200 <a name="_sub5" href="#_subfunctions" class="code">function print_time(pvar)</a>
+0201     fprintf(<span class="string">' (%.3f s)\n'</span>,<span class="keyword">...</span>
+0202         toc(pvar.timerVal) -  pvar.own_time);
+0203 <span class="keyword">end</span>
+0204 
+0205 <a name="_sub6" href="#_subfunctions" class="code">function opt = default_opts</a>
+0206     opt.final_msg = <span class="string">'Done'</span>;
+0207     opt.log_level = 2;
+0208     opt.num_digits = 6;
+0209 <span class="keyword">end</span>
+0210 
+0211 <a name="_sub7" href="#_subfunctions" class="code">function do_unit_test(N)</a>
+0212     <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,2);
+0213     <a href="eidors_debug.html" class="code" title="function out = eidors_debug(command, fstr)">eidors_debug</a> on <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>
+0214     <span class="keyword">if</span> nargin == 0
+0215         N = 1:35;
+0216     <span class="keyword">end</span>
+0217     <span class="keyword">for</span> n = N
+0218         <span class="keyword">switch</span> n
+0219             <span class="keyword">case</span> 1
+0220                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(0);
+0221 
+0222             <span class="keyword">case</span> 2
+0223                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Test 2'</span>,0);
+0224             <span class="keyword">case</span> 3
+0225                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Test 3'</span>);
+0226             <span class="keyword">case</span> 4
+0227                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>
+0228             <span class="keyword">case</span> 5
+0229                 opt.final_msg = <span class="string">'YUPPIE!'</span>;
+0230                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(opt);
+0231             <span class="keyword">case</span> 6
+0232                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Test 6'</span>, opt);
+0233             <span class="keyword">case</span> 10
+0234                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Test 10'</span>,0,10);
+0235             <span class="keyword">case</span> 11
+0236                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(0,10);
+0237             <span class="keyword">case</span> 20
+0238                 opt.final_msg = <span class="string">'Ready !!!'</span>;
+0239                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Test 20'</span>, 0,10,opt);
+0240             <span class="keyword">case</span> 21
+0241                 <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,1);
+0242                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Test 21'</span>, 0,10,opt);
+0243             <span class="keyword">case</span> 22
+0244                 opt.log_level = 1;
+0245                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Test 22'</span>, 0,10,opt);
+0246             <span class="keyword">case</span> 23
+0247                 opt.log_level = 4;
+0248                 <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,5);
+0249                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Test 23'</span>, 0,10,opt);
+0250             <span class="keyword">case</span> 24
+0251                 <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,2);
+0252                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Test 24'</span>, 0,10);
+0253             <span class="keyword">case</span> 30
+0254                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Test 30'</span>,0,0)
+0255             <span class="keyword">otherwise</span>
+0256                 <span class="keyword">continue</span>
+0257         <span class="keyword">end</span> 
+0258         <span class="keyword">if</span> n &lt; 10
+0259             <span class="keyword">for</span> i = 1:10
+0260                 pause(.2);
+0261                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(i/10);
+0262             <span class="keyword">end</span>
+0263         <span class="keyword">elseif</span> n &gt;= 30
+0264             <span class="keyword">for</span> i = 1:10
+0265                 pause(.2);
+0266                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(i^4,0);
+0267             <span class="keyword">end</span>
+0268         <span class="keyword">else</span>
+0269             <span class="keyword">for</span> i = 1:10
+0270                 pause(.2);
+0271                 <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(i,10);
+0272             <span class="keyword">end</span>
+0273         <span class="keyword">end</span>
+0274         <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(Inf);
+0275 
+0276     <span class="keyword">end</span>
+0277     <a href="eidors_debug.html" class="code" title="function out = eidors_debug(command, fstr)">eidors_debug</a> off <a href="progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>
+0278 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

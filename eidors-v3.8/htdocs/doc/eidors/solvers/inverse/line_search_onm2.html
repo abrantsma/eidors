@@ -1,0 +1,419 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of line_search_onm2</title>
+  <meta name="keywords" content="line_search_onm2">
+  <meta name="description" content="function  [alpha, img, dv, opt] = line_search_onm2(imgk, dx, data1, img1, N, W, hp2RtR, dv0, opt)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">eidors</a> &gt; <a href="../index.html">solvers</a> &gt; <a href="index.html">inverse</a> &gt; line_search_onm2.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/solvers/inverse&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>line_search_onm2
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function  [alpha, img, dv, opt] = line_search_onm2(imgk, dx, data1, img1, N, W, hp2RtR, dv0, opt)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function  [alpha, img, dv, opt] = line_search_onm2(imgk, dx, data1, img1, N, W, hp2RtR, dv0, opt, retry, pf_max) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> function  [alpha, img, dv, opt] = line_search_onm2(imgk, dx, data1, img1, N, W, hp2RtR, dv0, opt)
+ line search function with a fitted polynomial of O(n-2) where n is the number of perturbations
+ (C) 2013 Alistair Boyle
+ License: GPL version 2 or version 3</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="line_search_onm2.html" class="code" title="function  [alpha, img, dv, opt] = line_search_onm2(imgk, dx, data1, img1, N, W, hp2RtR, dv0, opt, retry, pf_max)">line_search_onm2</a>	function  [alpha, img, dv, opt] = line_search_onm2(imgk, dx, data1, img1, N, W, hp2RtR, dv0, opt)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="inv_solve_abs_core.html" class="code" title="function img= inv_solve_abs_core( inv_model, data0);">inv_solve_abs_core</a>	INV_SOLVE_ABS_CORE Absolute solver using a generic iterative algorithm</li><li><a href="line_search_o2.html" class="code" title="function  [alpha, img, dv, opt] = line_search_o2(imgk, dx, data1, img1, N, W, hp2RtR, dv0, opt)">line_search_o2</a>	function  [alpha, img, dv, opt] = line_search_o2(imgk, dx, data1, img1, N, W, hp2RtR, dv0, opt)</li><li><a href="line_search_onm2.html" class="code" title="function  [alpha, img, dv, opt] = line_search_onm2(imgk, dx, data1, img1, N, W, hp2RtR, dv0, opt, retry, pf_max)">line_search_onm2</a>	function  [alpha, img, dv, opt] = line_search_onm2(imgk, dx, data1, img1, N, W, hp2RtR, dv0, opt)</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function perturb = calc_perturb(imgk, dx_in, opt)</a></li><li><a href="#_sub2" class="code">function plot_line_optimize(perturb, mlist, alpha, meas_err, alpha1, meas_err1, FF, pf)</a></li><li><a href="#_sub3" class="code">function x=range(y)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function  [alpha, img, dv, opt] = line_search_onm2(imgk, dx, data1, img1, N, W, hp2RtR, dv0, opt, retry, pf_max)</a>
+0002 <span class="comment">% function  [alpha, img, dv, opt] = line_search_onm2(imgk, dx, data1, img1, N, W, hp2RtR, dv0, opt)</span>
+0003 <span class="comment">% line search function with a fitted polynomial of O(n-2) where n is the number of perturbations</span>
+0004 <span class="comment">% (C) 2013 Alistair Boyle</span>
+0005 <span class="comment">% License: GPL version 2 or version 3</span>
+0006 
+0007 perturb = <a href="#_sub1" class="code" title="subfunction perturb = calc_perturb(imgk, dx_in, opt)">calc_perturb</a>(imgk, dx, opt);
+0008 
+0009 <span class="keyword">if</span> nargin &lt; 11
+0010   retry = 0;
+0011 <span class="keyword">end</span>
+0012 
+0013 <span class="keyword">if</span> nargin &lt; 12
+0014   pf_max = length(perturb)-2;
+0015 <span class="keyword">end</span>
+0016 
+0017 <span class="comment">% fwd_solve is the most expensive part generally, count how many we do</span>
+0018 <span class="keyword">if</span> ~isfield(opt, <span class="string">'fwd_solutions'</span>)
+0019    opt.fwd_solutions = 0;
+0020 <span class="keyword">end</span>
+0021 x = imgk.elem_data;
+0022 
+0023 <span class="keyword">if</span>(perturb(1) ~= 0)
+0024   error(<span class="string">'first perturbation min(inv_model.inv_solve_abs_{GN,CG,core}.line_search.perturb) expects alpha=0'</span>);
+0025 <span class="keyword">end</span>
+0026 
+0027 <span class="comment">% Compute the forward model for each perturbation step</span>
+0028 img = imgk;
+0029 <span class="comment">% mlist is our search result for each alpha value, perturb(i)</span>
+0030 <span class="comment">%  -- NaN: initiailized but not calculated</span>
+0031 <span class="comment">%  -- -Inf: should not occur we have code that converts calculated NaNs and -Inf to +Inf</span>
+0032 <span class="comment">%  -- +Inf: calculated value was bad, ignore it</span>
+0033 <span class="keyword">if</span> opt.verbose &gt; 1
+0034    fprintf(<span class="string">'      i     = '</span>);
+0035    fprintf(<span class="string">' [%d]     \t'</span>, 1:length(perturb));
+0036    fprintf(<span class="string">'\n'</span>);
+0037    fprintf(<span class="string">'      alpha = '</span>);
+0038    fprintf(<span class="string">' %8.3g\t'</span>, perturb);
+0039    fprintf(<span class="string">'\n'</span>);
+0040    fprintf(<span class="string">'              '</span>);
+0041 <span class="keyword">end</span>
+0042 mlist= ones(size(perturb))*NaN; <span class="comment">% init</span>
+0043 <span class="keyword">for</span> i = 1:length(perturb)
+0044    <span class="keyword">if</span> (i == 1) &amp;&amp; (~isempty(dv0))
+0045       <span class="comment">% don't bother simulating when alpha=0 (we already have the measurements)</span>
+0046       dv = dv0; <span class="comment">% @ alpha=0 from the previous line search iteration</span>
+0047    <span class="keyword">else</span>
+0048       <span class="comment">% fwd_solve and then calculate measurement error (dv)</span>
+0049       img.elem_data = x + perturb(i)*dx;
+0050       [dv, opt] = feval(opt.line_search_dv_func, img, data1, N, opt);
+0051    <span class="keyword">end</span>
+0052    <span class="comment">% build de, the change in elem_data from the initial guess</span>
+0053    de = feval(opt.line_search_de_func, img, img1, opt);
+0054    <span class="comment">% we only calculate a new residual if the input data is &quot;sane&quot;</span>
+0055    <span class="keyword">if</span> any(isnan(dv) | isinf(dv))
+0056       warning(sprintf(<span class="string">'%d of %d elements in dv are NaN or Inf'</span>, <span class="keyword">...</span>
+0057                       length(dv), <span class="keyword">...</span>
+0058                       length(find(isnan(dv) | isinf(dv)))));
+0059       mlist(i) = +Inf;
+0060    <span class="keyword">elseif</span> any(isnan(de) | isinf(de))
+0061       warning(sprintf(<span class="string">'%d of %d elements in de are NaN or Inf'</span>, <span class="keyword">...</span>
+0062                       length(de), <span class="keyword">...</span>
+0063                       length(find(isnan(de) | isinf(de)))));
+0064       mlist(i) = +Inf;
+0065    <span class="keyword">else</span>
+0066       <span class="comment">% calculate the residual</span>
+0067       mlist(i) = feval(opt.residual_func, dv, de, W, hp2RtR);
+0068       <span class="keyword">if</span> any(isnan(mlist(i)) | isinf(mlist(i)))
+0069          mlist(i) = +Inf; <span class="comment">% NaN or Inf are converted to Inf, since we use NaN to indicate initialized but not calculated</span>
+0070       <span class="keyword">end</span>
+0071    <span class="keyword">end</span>
+0072    <span class="keyword">if</span> opt.verbose &gt; 1
+0073       fprintf(<span class="string">' %8.3g\t'</span>,mlist(i));
+0074    <span class="keyword">end</span>
+0075 <span class="keyword">end</span>
+0076 <span class="keyword">if</span> opt.verbose &gt; 1
+0077    fprintf(<span class="string">'\n'</span>);
+0078 <span class="keyword">end</span>
+0079 <span class="comment">% drop bad values</span>
+0080 <span class="keyword">if</span> isinf(mlist) <span class="comment">% NaN's from any calculation were converted to Inf's earlier</span>
+0081    warning(<span class="string">'encoutered NaN or +-Inf residuals, something has gone wrong in the line search, converting to large numbers and carrying on'</span>);
+0082 <span class="keyword">end</span>
+0083 
+0084 <span class="comment">% TODO looks like this was quiting when there are still good choices left</span>
+0085 <span class="comment">%if all((mlist/mlist(1)-1) &lt; 1e-4) % &lt; 0.01% change</span>
+0086 <span class="comment">%   % TODO maybe we need to search *larger* perturbations here... for now we just short circuit the repeated retries at the end, when we are not improving</span>
+0087 <span class="comment">%   if opt.verbose &gt; 1</span>
+0088 <span class="comment">%      fprintf('      stopping line search: no further improvements observed\n');</span>
+0089 <span class="comment">%   end</span>
+0090 <span class="comment">%   img = imgk;</span>
+0091 <span class="comment">%   alpha = 0;</span>
+0092 <span class="comment">%   dv = dv0;</span>
+0093 <span class="comment">%   return;</span>
+0094 <span class="comment">%end</span>
+0095 
+0096 <span class="comment">% For our poly fit, we drop all NaN and Inf values</span>
+0097 goodi = find((~isnan(mlist)) &amp; (~isinf(mlist)));
+0098 alpha=perturb(end);
+0099 meas_err = +Inf; <span class="comment">% make sure we grab the min(mlist) if we're not doing a polyfit</span>
+0100 <span class="keyword">if</span> length(goodi) &gt; 2
+0101   <span class="comment">% Select the best fitting step, we scale and</span>
+0102   p_rng = <a href="#_sub3" class="code" title="subfunction x=range(y)">range</a>(perturb(goodi)); <span class="comment">% p_min = 0</span>
+0103   pfx = log10(perturb(goodi)/p_rng);
+0104   pfx(1) = -100; <span class="comment">% log10(0) = -Inf --&gt; -1e100 so that it's finite</span>
+0105   pf= polyfit(pfx, mlist(goodi), length(goodi)-2);
+0106   <span class="comment">% search for the function minima in the range perturb(2:end)</span>
+0107   <span class="comment">%   pf(1)*log10(x).^2+pf(2)*log10(x)+pf(3);</span>
+0108   FF = @(pf, x) polyval(pf, log10(x/p_rng));
+0109   alpha = fminbnd(@(x) FF(pf, x), perturb(min(goodi)), perturb(end));
+0110   <span class="comment">% now check how we did</span>
+0111   img.elem_data = x + alpha*dx;
+0112   [dv, opt] = feval(opt.line_search_dv_func, img, data1, N, opt);
+0113   de = feval(opt.line_search_de_func, img, img1, opt);
+0114   meas_err = feval(opt.residual_func, dv, de, W, hp2RtR);
+0115   <span class="keyword">if</span> opt.verbose &gt; 1
+0116      fprintf(<span class="string">'      step size = %0.3g, misfit = %0.3g, expected = %0.3g\n'</span>, alpha, meas_err, FF(pf, alpha));
+0117   <span class="keyword">end</span>
+0118 
+0119   <span class="comment">% check how close we were to the line fit estimate</span>
+0120   <span class="comment">% suggest stronger regularization if we're way off</span>
+0121   <span class="comment">% (we could automate this update if we wanted to turn on some hueristic behaviour)</span>
+0122   est_err = meas_err / FF(pf, alpha);
+0123   <span class="keyword">if</span> (opt.verbose &gt; 1) &amp;&amp; ((est_err &gt; 1.3) || (est_err &lt; 0.5))
+0124     fprintf(<span class="string">'      step misfit missed estimate (%0.1fx est)\n'</span>, est_err);
+0125     fprintf(<span class="string">'        consider stronger regularization?\n'</span>);
+0126   <span class="keyword">end</span>
+0127 <span class="keyword">else</span> <span class="comment">% only two points</span>
+0128   <span class="comment">% we provide a FF and pf that will work for plot_line_optimize()</span>
+0129   <span class="comment">% this is a straight line between alpha=1 and alpha=1/10</span>
+0130   pf = [];
+0131   FF = @(pf, x)  -(mlist(1) - mlist(end))*0.8*log10(x) + mlist(end);
+0132 <span class="keyword">end</span>
+0133 <span class="comment">% We save our first choice, in case we are plotting the line search</span>
+0134 alpha1 = alpha; <span class="comment">% better guess: minima of the fitted curve</span>
+0135 meas_err1 = meas_err;
+0136 
+0137 <span class="comment">% what if we're making a bad choice?</span>
+0138 <span class="comment">% if our choice sucked, we've already calculated mlist(:) other choices, go with the minimum</span>
+0139 <span class="keyword">if</span> meas_err &gt; min(mlist)
+0140   [meas_err,mi]= min(mlist);
+0141   alpha= perturb(mi);
+0142   img.elem_data = x + alpha*dx;
+0143   <span class="keyword">if</span> (length(goodi) &gt; 2) &amp;&amp; (opt.verbose &gt; 1)
+0144     fprintf(<span class="string">'      did not like our step selection - choose one of perturb values\n'</span>);
+0145   <span class="keyword">end</span>
+0146 <span class="keyword">end</span>
+0147 
+0148 <span class="keyword">if</span> opt.verbose &gt; 1
+0149    max_alpha_str = <span class="string">''</span>;
+0150    <span class="keyword">if</span> alpha &gt; perturb(end)-eps
+0151      max_alpha_str = <span class="string">' (max)'</span>;
+0152    <span class="keyword">end</span>
+0153    fprintf(<span class="string">'      step size = %0.3g%s, misfit = %0.3g selected\n'</span>, alpha, max_alpha_str, meas_err);
+0154 <span class="keyword">end</span>
+0155 
+0156 <span class="comment">% must create plots before changing the perturb values</span>
+0157 <span class="keyword">if</span> opt.line_search_args.plot
+0158    clf;
+0159    <a href="#_sub2" class="code" title="subfunction plot_line_optimize(perturb, mlist, alpha, meas_err, alpha1, meas_err1, FF, pf)">plot_line_optimize</a>(perturb, mlist, alpha, meas_err, alpha1, meas_err1, FF, pf);
+0160    <span class="keyword">if</span> isfield(opt,<span class="string">'fig_prefix'</span>) <span class="comment">% TODO assign from base options if set</span>
+0161       k=1; <span class="comment">% TODO iteration count; TODO retry count</span>
+0162       print(<span class="string">'-dpdf'</span>,sprintf(<span class="string">'%s-ls%d-retry%d'</span>,opt.fig_prefix,k,retry));
+0163       print(<span class="string">'-dpng'</span>,sprintf(<span class="string">'%s-ls%d-retry%d'</span>,opt.fig_prefix,k,retry));
+0164       saveas(gcf,sprintf(<span class="string">'%s-ls%d-retry%d.fig'</span>,opt.fig_prefix,k,retry));
+0165    <span class="keyword">end</span>
+0166 <span class="keyword">end</span>
+0167 
+0168 <span class="comment">% update perturbations</span>
+0169 <span class="keyword">if</span> meas_err &gt;= mlist(1)
+0170     <span class="comment">% this happens when the solution blew up -- the measurement fit was worse than if we did nothing</span>
+0171     <span class="keyword">if</span> opt.verbose &gt; 1
+0172        fprintf(<span class="string">'      reducing perturbations: bad step\n'</span>);
+0173     <span class="keyword">end</span>
+0174     <span class="comment">% try a smaller step next time (10x smaller)</span>
+0175     <span class="comment">% this keeps the log-space distance between sample points</span>
+0176     perturb = perturb/10;
+0177 <span class="keyword">else</span> <span class="comment">% good step</span>
+0178     <span class="keyword">if</span> opt.verbose &gt; 1
+0179        fprintf(<span class="string">'      update perturbations around step = %0.3g\n'</span>, alpha);
+0180     <span class="keyword">end</span>
+0181     <span class="comment">% this keeps the log-space distance between sample points but</span>
+0182     <span class="comment">% re-centres around the most recent alpha</span>
+0183     perturb = perturb*(alpha/perturb(end))*2;
+0184 <span class="keyword">end</span>
+0185 <span class="comment">% jiggle the perturb values by 1% --&gt; if we're stuck in a recursion</span>
+0186 <span class="comment">% of bad perturb values maybe this is enough to break us out</span>
+0187 opt.line_search_args.perturb = perturb .* exp(randn(size(perturb))*0.01);
+0188 
+0189 <span class="comment">% Record the corresponding parameters</span>
+0190 <span class="comment">%img.elem_data= exp(img.logCond);</span>
+0191 
+0192 <span class="comment">% we took a bad step, try again but don't recurse indefinitely</span>
+0193 <span class="keyword">if</span> alpha == 0 &amp;&amp; retry &lt; 5
+0194   <span class="keyword">if</span> opt.verbose &gt; 1
+0195      fprintf(<span class="string">'    retry#%d (attempt with smaller perturbations)\n'</span>, retry+1);
+0196   <span class="keyword">end</span>
+0197   [alpha, img, dv, opt] = <a href="line_search_onm2.html" class="code" title="function  [alpha, img, dv, opt] = line_search_onm2(imgk, dx, data1, img1, N, W, hp2RtR, dv0, opt, retry, pf_max)">line_search_onm2</a>(imgk, dx, data1, img1, N, W, hp2RtR, dv0, opt, retry+1, pf_max);
+0198 <span class="keyword">end</span>
+0199 
+0200 <span class="comment">%%%</span>
+0201 <span class="comment">% calculate search values for \alpha</span>
+0202 <span class="comment">% 1. sort in ascending order</span>
+0203 <span class="comment">% 2. scale to a range within finite precision (don't waste time searching when</span>
+0204 <span class="comment">%    results will be inf/nan)</span>
+0205 <a name="_sub1" href="#_subfunctions" class="code">function perturb = calc_perturb(imgk, dx_in, opt)</a>
+0206 <span class="keyword">if</span> opt.verbose &gt; 1
+0207    disp(<span class="string">'      line search (finite precision) limits'</span>);
+0208 <span class="keyword">end</span>
+0209 <span class="comment">% scale</span>
+0210 <span class="comment">% When log numbers are converted to base numbers, they frequently result in Inf</span>
+0211 <span class="comment">% when dx is large.  We scale 'perturb' here, so that we are line searching</span>
+0212 <span class="comment">% within a numerically stable region for our finite precision numbers.</span>
+0213 <span class="comment">%   log(realmax) = 709.7827</span>
+0214 <span class="comment">% log10(realmax) = 308.2547</span>
+0215 <span class="comment">% - canonicalize the img data, so we don't have to deal with default forms</span>
+0216 <span class="keyword">if</span> ~isfield(imgk, <span class="string">'current_params'</span>)
+0217    imgk.current_params = {<span class="string">'conductivity'</span>};
+0218 <span class="keyword">end</span>
+0219 <span class="keyword">if</span> ~isfield(imgk, <span class="string">'params_sel'</span>)
+0220    imgk.params_sel = {[1:length(imgk.elem_data)]};
+0221 <span class="keyword">end</span>
+0222 <span class="keyword">if</span> ~iscell(imgk.current_params)
+0223    imgk.current_params = {imgk.current_params};
+0224 <span class="keyword">end</span>
+0225 <span class="keyword">if</span> ~iscell(imgk.params_sel)
+0226    imgk.params_sel = {imgk.params_sel};
+0227 <span class="keyword">end</span>
+0228 
+0229 <span class="keyword">if</span> isfield(imgk, <span class="string">'inv_model'</span>) &amp;&amp; isfield(imgk.inv_model, <span class="string">'fwd_model'</span>)
+0230    md = max(<a href="#_sub3" class="code" title="subfunction x=range(y)">range</a>(imgk.inv_model.fwd_model.nodes)); <span class="comment">% model range (coordinates)</span>
+0231 <span class="keyword">end</span>
+0232 
+0233 <span class="comment">% determine the maximum alpha</span>
+0234 max_alpha = +inf;
+0235 min_alpha = +inf;
+0236 <span class="keyword">for</span> i=1:length(imgk.current_params)
+0237    p = imgk.current_params{i};
+0238    s = imgk.params_sel{i};
+0239    x = imgk.elem_data(s);
+0240    dx = dx_in(s);
+0241    <span class="comment">% TODO these could be based on the limits provided as args to inv_solve_abs_GN, instead they are hardcoded here...</span>
+0242    is_mvmt = (length(p) &gt;= 8) &amp;&amp; strcmp(p(end-7:end),<span class="string">'movement'</span>);
+0243    <span class="keyword">if</span> strcmp(p(1:4), <span class="string">'log_'</span>)
+0244       lp = log(realmax/2); <span class="comment">% largest positive floating point number (double): Limit_Positive</span>
+0245       ln = -inf; <span class="comment">% or = log(realmin/2); % largest negative floating point number (double): Limit Negative</span>
+0246       <span class="comment">% for log space, we should have an ln = -inf --&gt; exp(-900) = 0</span>
+0247       <span class="keyword">if</span> is_mvmt
+0248          lp = log(md);
+0249       <span class="keyword">end</span>
+0250    <span class="keyword">elseif</span> strcmp(p(1:6), <span class="string">'log10_'</span>)
+0251       lp = log10(realmax/2); <span class="comment">% largest positive floating point number (double): Limit_Positive</span>
+0252       ln = -inf; <span class="comment">% or = log10(realmin/2); % largest negative floating point number (double): Limit Negative</span>
+0253       <span class="comment">% for log10 space, we should have an ln = -inf --&gt; 10.^-900 = 0</span>
+0254       <span class="keyword">if</span> is_mvmt
+0255          lp = log10(md);
+0256       <span class="keyword">end</span>
+0257    <span class="keyword">else</span>
+0258       lp = +realmax/2;
+0259       ln = -realmax/2;
+0260       <span class="keyword">if</span> is_mvmt
+0261          lp = +md;
+0262          lp = -md;
+0263       <span class="keyword">end</span>
+0264    <span class="keyword">end</span>
+0265    <span class="comment">% lower limit on \alpha prior to x = x + alpha*dx --&gt; +/-inf; % (explodes)</span>
+0266    <span class="comment">%   \alpha_min = ((max or min) - x) / \delta_x</span>
+0267    au=(lp-x)./dx; au(dx&lt;=0)=NaN; au(isnan(au))=+inf; au=min(au);
+0268    a_max = au;
+0269    au=(ln-x)./dx; au(dx&gt;=0)=NaN; au(isnan(au))=+inf; au=min(au);
+0270    <span class="keyword">if</span> (au &lt; a_max)
+0271       a_max = au;
+0272    <span class="keyword">end</span>
+0273    <span class="comment">% lower limit on \alpha prior to x == x + alpha*dx; % (no change)</span>
+0274    <span class="comment">%   \alpha_min = \epsilon / \delta_x</span>
+0275    <span class="keyword">if</span> is_mvmt
+0276       al=1e-3./abs(dx); <span class="comment">% don't care about movement less than 1mm</span>
+0277       <span class="comment">% TODO configurable? 'reconstruction tolerance'?</span>
+0278    <span class="keyword">else</span>
+0279       al=eps(x)./abs(dx);
+0280    <span class="keyword">end</span>
+0281    al(isinf(al))=NaN; al(isnan(al))=realmax; al=min(al);
+0282    <span class="keyword">if</span> isnan(al)
+0283       a_min = 0;
+0284    <span class="keyword">else</span>
+0285       a_min = al;
+0286    <span class="keyword">end</span>
+0287    <span class="keyword">if</span> opt.verbose &gt; 1
+0288       fprintf(<span class="string">'        %s: alpha range = %0.3g -- %0.3g\n'</span>, p, a_min, a_max);
+0289    <span class="keyword">end</span>
+0290    <span class="comment">% adjust global limits</span>
+0291    <span class="keyword">if</span> a_max &lt; max_alpha
+0292       max_alpha = a_max;
+0293    <span class="keyword">end</span>
+0294    <span class="keyword">if</span> a_min &lt; min_alpha
+0295       min_alpha = a_min;
+0296    <span class="keyword">end</span>
+0297 <span class="keyword">end</span>
+0298 
+0299 <span class="comment">% sort</span>
+0300 p=sort(opt.line_search_args.perturb);
+0301 <span class="comment">% scale</span>
+0302 <span class="keyword">if</span> (p(end) &gt; max_alpha) || (p(2) &lt; min_alpha)
+0303    p(p&lt;realmin/2) = [];
+0304    p=log10(p); ap=log10(max_alpha); an=log10(min_alpha);
+0305    <span class="keyword">if</span> <a href="#_sub3" class="code" title="subfunction x=range(y)">range</a>(p) &gt;  ap-an
+0306       p=p*(ap-an)/<a href="#_sub3" class="code" title="subfunction x=range(y)">range</a>(p);
+0307    <span class="keyword">end</span>
+0308    <span class="keyword">if</span> p(end) &gt; ap
+0309       p=p-(max(p)-ap);
+0310    <span class="keyword">elseif</span> p(1) &lt; an
+0311       p=p+(an-min(p));
+0312    <span class="keyword">end</span>
+0313    p=[0 10.^p];
+0314    <span class="keyword">if</span> opt.verbose &gt; 1
+0315       fprintf(<span class="string">'        alpha (before) = '</span>);
+0316       fprintf(<span class="string">'%0.3g '</span>, sort(opt.line_search_args.perturb));
+0317       fprintf(<span class="string">'\n'</span>);
+0318       fprintf(<span class="string">'        alpha (after)  = '</span>);
+0319       fprintf(<span class="string">'%0.3g '</span>, p);
+0320       fprintf(<span class="string">'\n'</span>);
+0321    <span class="keyword">end</span>
+0322 <span class="keyword">else</span>
+0323    <span class="keyword">if</span> opt.verbose &gt; 1
+0324       fprintf(<span class="string">'        alpha (unchanged) = '</span>);
+0325       fprintf(<span class="string">'%0.3g '</span>, p);
+0326       fprintf(<span class="string">'\n'</span>);
+0327    <span class="keyword">end</span>
+0328 <span class="keyword">end</span>
+0329 perturb=p;
+0330 
+0331 
+0332 <span class="comment">%%% plot the line optimization results</span>
+0333 <span class="comment">% 1. search locations</span>
+0334 <span class="comment">% 2. line fit</span>
+0335 <span class="comment">% 3. selected minima and test point result</span>
+0336 <span class="comment">% 4. selected \alpha</span>
+0337 <a name="_sub2" href="#_subfunctions" class="code">function plot_line_optimize(perturb, mlist, alpha, meas_err, alpha1, meas_err1, FF, pf)</a>
+0338 semilogx(perturb(2:end),mlist(2:end),<span class="string">'xk'</span>, <span class="string">'MarkerSize'</span>,10);
+0339 hold on;
+0340 semilogx(alpha, meas_err,<span class="string">'or'</span>, <span class="string">'MarkerSize'</span>,10);
+0341 semilogx(alpha1, FF(pf, alpha1), <span class="string">'ob'</span>, <span class="string">'MarkerSize'</span>,10);
+0342 semilogx(alpha1, meas_err1, <span class="string">'xb'</span>, <span class="string">'MarkerSize'</span>,10);
+0343 <span class="comment">% construct the fitted line for plotting</span>
+0344 <span class="keyword">if</span> isnan(perturb(2))
+0345    perturb(2) = perturb(end)/10;
+0346 <span class="keyword">end</span>
+0347 p= logspace(log10(perturb(2)),log10(perturb(end)),50);
+0348 semilogx(p, FF(pf, p),<span class="string">'k'</span>,<span class="string">'linewidth'</span>,2);
+0349 semilogx(p, p*0+mlist(1),<span class="string">'k--'</span>,<span class="string">'linewidth'</span>,1); <span class="comment">% alpha=0 should be plotted as well</span>
+0350 legend(<span class="string">'perturb'</span>, <span class="string">'selected'</span>, <span class="string">'1st est'</span>, <span class="string">'1st act'</span>, <span class="string">'fit'</span>, <span class="string">'\alpha=0'</span>);
+0351 legend(<span class="string">'Location'</span>, <span class="string">'EastOutside'</span>);
+0352 m = [mlist meas_err meas_err1];
+0353 mi=find(isnan(m) | isinf(m)); m(mi) = []; <span class="comment">% remove bad values</span>
+0354 mr = <a href="#_sub3" class="code" title="subfunction x=range(y)">range</a>(m);
+0355 <span class="keyword">if</span> mr &lt; max(m)*1e-14
+0356    mr = 1e-14;
+0357 <span class="keyword">end</span>
+0358 axis([perturb(2) perturb(end) min(m)-mr*0.2 max(m)+mr*0.2]);
+0359 xlabel(<span class="string">'step size \alpha'</span>); <span class="comment">%,'fontsize',20,'fontname','Times')</span>
+0360 ylabel(<span class="string">'normalized residuals'</span>); <span class="comment">%,'fontsize',20,'fontname','Times')</span>
+0361 title({sprintf(<span class="string">'best alpha = %1.2e'</span>,alpha), <span class="keyword">...</span>
+0362        sprintf(<span class="string">'norm w/o step = %0.4e'</span>,mlist(1))}); <span class="comment">%,'fontsize',30,'fontname','Times')</span>
+0363 <span class="comment">%set(gca,'fontsize',20,'fontname','Times');</span>
+0364 drawnow;
+0365 
+0366 <a name="_sub3" href="#_subfunctions" class="code">function x=range(y)</a>
+0367 x=max(y)-min(y);</pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

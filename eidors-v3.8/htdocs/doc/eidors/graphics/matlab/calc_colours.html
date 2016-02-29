@@ -1,0 +1,842 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of calc_colours</title>
+  <meta name="keywords" content="calc_colours">
+  <meta name="description" content="[colours,scl_data]= calc_colours(img, set_value, do_colourbar)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">eidors</a> &gt; <a href="#">graphics</a> &gt; <a href="index.html">matlab</a> &gt; calc_colours.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/graphics/matlab&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>calc_colours
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>[colours,scl_data]= calc_colours(img, set_value, do_colourbar)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [colours,scl_data]= calc_colours(img, set_value, do_colourbar) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> [colours,scl_data]= calc_colours(img, set_value, do_colourbar)
+ Calculate a colour for each image element 
+
+ Conductive (positive) areas are shown in red
+ Non-Conductive (negative) areas are shown in blue
+
+ PARAMETERS: img
+     - 1) an EIDORS image object, or a Ex1 vector
+     - 2) a 2D image matrix
+
+ Usage #1 (img is a Ex1 vector of element conductivities)
+
+   Cs = calc_colours( img);
+   patch(Xs,Ys,Zs,Cs);
+
+ Cs is Ex1x1 colourmap entries (if mapped_colour&gt;0)
+       Ex1x3 colourmap entries (if mapped_colour==0)
+
+ Usage #2 (rimg is a MxN image matrix of reconstructed pixels):
+           img is an image structure with the image properties
+  
+   c_img = calc_colours( rimg, img);
+   image( c_img );
+
+ c_img is MxN colourmap entries (if mapped_colour&gt;0)
+          MxNx3 colourmap entries (if mapped_colour==0)
+
+ Usage #3 (img is string parameter value)
+  
+   value = calc_colours( 'param' );
+   calc_colours( 'param', value );
+    eg. calc_colours('mapped_colour',127)
+         Use this to allow printing vector eps files to get around
+         a matlab bug with warning 'RGB color data not ...'
+
+   calc_colours( 'component', 'real' ); (DEFAULT real)
+     the other value is 'imag' to show the imaginary component
+
+   The following parameters are accepted
+
+   'greylev'    (DEFAULT -.01): the colour of the ref_level.
+      Negative values indicate white background
+      For almost white, greylev=-.01; Black=&gt; greylev=.01
+   'sat_adj'    (DEFAULT .9): max G,B when R=1
+   'window_range' (DEFAULT .9); window colour range
+      Colour slope outside range is 1/3 of centre slope
+   'backgnd' ( DEFAULT [.5,.5,.15] ): image border colour 
+   'ref_level' (DEFAULT 'auto') conductivity of centre of
+      colour mapping. 'auto' tries to estimate a good level.
+      For complex image data, ref_level should also be complex.
+   'mapped_colour' (DEFAULT 127) number of colourmap entries
+      using mapped_colour allows matlab to print vector graphics to eps
+      setting mapped_colour=0 means to use RGB colours
+   'npoints' (DEFAULT 64) number of points accross the image
+   'transparency_thresh' fraction of maximum value at which colours
+             are rendered transparent for 
+   'clim'    (DEFAULT []) crop colour display of values above clim
+           colour limit. values more different from ref_level are cropped.
+           if not specified or clim==[] =&gt; no limit
+   'cmap_type'  Specify special colours (Default 'blue_red')
+           'blue_red':          default Blue/Red eidors colourmpa
+           'jet':               matlab jet colourmap
+           'jetair':            scaled jet colours
+           'blue_yellow':       Blue/Yellow colours
+           'greyscale':         Greyscale colours (Lungs white)
+           'greyscale-inverse': Greyscale colours (Lungs black)
+           'copper':            Copper colours
+           'blue_white_red':    Blue/White/Red colours
+           'black_red':         Black/Red Colours
+           'blue_black_red':    Blue/Black/Red colours
+           'polar_colours':     &quot;Polar&quot; blue/white/red colours
+           'draeger', 'draeger-difference':
+                                Draegerwerk colourmap (difference)
+           'draeger-2009':      Draegerwerk colourmap (2009)
+           'draeger-tidal':     Draegerwerk colourmap (tidal images)
+           'swisstom'           Swisstom colourmap
+           'timpel'             Timpel colourmap
+           matrix [Nx3]         Use values ([0-1]) as REB colourmap
+   'cb_shrink_move' shrink or move the colorbar. See eidors_colourbar
+           help for details.
+   'image_field', 'image_field_idx', 'image_field_val' 
+           image elements which match _idx are set to _val.
+   'defaults' set to default colours in list above
+
+   'colourmap' Return the current EIDORS colormap. 
+           Use as colormap(calc_colours('colourmap'))
+
+ PARAMETERS CAN BE SPECIFIED IN TWO WAYS
+   1. as an image parameter (ie clim in img.calc_colours.clim)
+   2. a second parameter to ( calc_colours(data, param2 )
+          where param2.calc_colours.clim= ... etc
+   3. parameter to calc_colours('clim')
+
+ Parameters specified as (1) will override (2)
+
+ PARAMETERS: do_colourbar
+    - show a Matlab colorbar with appropriate scaling
+
+  usage: c_img= calc_colours( img, clim );
+         image( c_img );
+         calc_colours( img, clim, 1); %now do colorbar 
+
+ PARAMETERS: ref_lev
+     - if specified, override the global ref_level parameter</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="../../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>	EIDORS_MSG eidors progress and status messages</li><li><a href="../../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>	EIDORS_OBJ: 'constructor' to create a eidors structure</li><li><a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>	[colours,scl_data]= calc_colours(img, set_value, do_colourbar)</li><li><a href="eidors_colourbar.html" class="code" title="function hh= eidors_colourbar(max_scale,ref_lev, cb_shrink_move, greyscale)">eidors_colourbar</a>	EIDORS_COLOURBAR - create an eidors colourbar with scaling to image</li><li><a href="scale_for_display.html" class="code" title="function [elem_data,ref_lev,max_scale] = scale_for_display( elem_data, pp)">scale_for_display</a>	[elem_data,ref_lev,max_scale] = scale_for_display( elem_data, pp)</li><li><a href="../../../eidors/solvers/get_img_data.html" class="code" title="function [img_data, n_images]= get_img_data(img)">get_img_data</a>	GET_IMG_DATA: get parameter data from eidors image object</li><li><a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>	UNIT_TEST_CMP: compare matrices in eidors output</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="../../../eidors/algorithms/calc_posn_resolution.html" class="code" title="function [br,pos]= calc_posn_resolution( img, fwd_model)">calc_posn_resolution</a>	CALC_POSN_RESOLUTION: calculate posn and resolution of a target</li><li><a href="../../../eidors/eidors_startup.html" class="code" title="function eidors_startup( path_array )">eidors_startup</a>	Script to start EIDORS</li><li><a href="../../../eidors/examples/compare_2d_algs.html" class="code" title="function [imgr, img]= compare_2d_algs(option,shape);">compare_2d_algs</a>	Compare different 2D reconstructions</li><li><a href="../../../eidors/examples/compare_3d_algs.html" class="code" title="function imgr= compare_3d_algs( algno )">compare_3d_algs</a>	Compare different 3D reconstructions</li><li><a href="animate_reconstructions.html" class="code" title="function fname_out= animate_reconstructions(fname, imgs);">animate_reconstructions</a>	animate_reconstructions(fname, imgs);</li><li><a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>	[colours,scl_data]= calc_colours(img, set_value, do_colourbar)</li><li><a href="calc_slices.html" class="code" title="function rimg = calc_slices( img, levels );">calc_slices</a>	calc_slices (img, levels, clim  ) show slices at levels of an</li><li><a href="mdl_slice_mesher.html" class="code" title="function [nimg out] = mdl_slice_mesher(fmdl,level,varargin)">mdl_slice_mesher</a>	MDL_SLICE_MESHER A slice of a 3D FEM as a 2D FEM</li><li><a href="repaint_inho.html" class="code" title="function repaint_inho(mat,mat_ref,vtx,simp, thresh, clr_def);">repaint_inho</a>	function repaint_inho(mat,mat_ref,vtx,simp, thresh);</li><li><a href="show_3d_slices.html" class="code" title="function show_3d_slices(img, varargin);">show_3d_slices</a>	show_3d_slices(img, z_cuts, x_cuts, y_cuts, any_cuts)</li><li><a href="show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>	SHOW_FEM: show the EIDORS3D finite element model</li><li><a href="show_fem_enhanced.html" class="code" title="function hh = show_fem(mdl, options)">show_fem_enhanced</a>	SHOW_FEM: show the EIDORS3D finite element model</li><li><a href="show_slices.html" class="code" title="function out_img= show_slices( img, levels )">show_slices</a>	out_img = show_slices (img, levels ) show slices at levels of an</li><li><a href="show_slices_move.html" class="code" title="function show_slices_move( img, move, move_scale )">show_slices_move</a>	SHOW_SLICES_MOVE   Shows planar slices of a 3D FEM with movement vectors</li><li><a href="slicer_plot_n.html" class="code" title="function [fc] = slicer_plot_n(h,sol,vtx,simp,fc);">slicer_plot_n</a>	function [fc] = slicer_plot_n(h,sol,vtx,simp,fc);</li><li><a href="../../../eidors/tests/tutorials_test.html" class="code" title="function [errors warnings] = tutorials_test(directory,tcount)">tutorials_test</a>	TUTORIAL_TEST: Run all tutorials</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function set_colours_defaults;</a></li><li><a href="#_sub2" class="code">function [red,grn,blu] = blu_red_axis( pp, scale_data, backgnd )</a></li><li><a href="#_sub3" class="code">function [red,grn,blu]= blue_red_colours(pp,scale_data);</a></li><li><a href="#_sub4" class="code">function [red,grn,blu]= swisstom_colours(pp,scale_data);</a></li><li><a href="#_sub5" class="code">function [red,grn,blu]= timpel_colours(pp,scale_data)</a></li><li><a href="#_sub6" class="code">function [red,grn,blu] = draeger_colours(pp,scale_data, version);</a></li><li><a href="#_sub7" class="code">function [red,grn,blu] = jet_colours(pp,scale_data);</a></li><li><a href="#_sub8" class="code">function [red,grn,blu] = blue_yellow_colours(pp,scale_data);</a></li><li><a href="#_sub9" class="code">function [red,grn,blu]= greyscale_colours(pp,scale_data);</a></li><li><a href="#_sub10" class="code">function [red,grn,blu]= copper_colours(pp,scale_data);</a></li><li><a href="#_sub11" class="code">function [red,grn,blu]= blue_white_red_colours(pp,scale_data);</a></li><li><a href="#_sub12" class="code">function [red,grn,blu] = black_red_colours(pp,scale_data);</a></li><li><a href="#_sub13" class="code">function [red,grn,blu] = blue_black_red_colours(pp,scale_data);</a></li><li><a href="#_sub14" class="code">function [red,grn,blu] = polar_blue_white_red_colours(pp,scale_data);</a></li><li><a href="#_sub15" class="code">function pp=get_colours( img );</a></li><li><a href="#_sub16" class="code">function BGI= backgndidx;</a></li><li><a href="#_sub17" class="code">function colours=set_mapped_colour(pp, backgnd, img_data)</a></li><li><a href="#_sub18" class="code">function value= get_field(param);</a></li><li><a href="#_sub19" class="code">function value= set_field(param, value);</a></li><li><a href="#_sub20" class="code">function do_unit_test</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)</a>
+0002 <span class="comment">% [colours,scl_data]= calc_colours(img, set_value, do_colourbar)</span>
+0003 <span class="comment">% Calculate a colour for each image element</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Conductive (positive) areas are shown in red</span>
+0006 <span class="comment">% Non-Conductive (negative) areas are shown in blue</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% PARAMETERS: img</span>
+0009 <span class="comment">%     - 1) an EIDORS image object, or a Ex1 vector</span>
+0010 <span class="comment">%     - 2) a 2D image matrix</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% Usage #1 (img is a Ex1 vector of element conductivities)</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%   Cs = calc_colours( img);</span>
+0015 <span class="comment">%   patch(Xs,Ys,Zs,Cs);</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">% Cs is Ex1x1 colourmap entries (if mapped_colour&gt;0)</span>
+0018 <span class="comment">%       Ex1x3 colourmap entries (if mapped_colour==0)</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">% Usage #2 (rimg is a MxN image matrix of reconstructed pixels):</span>
+0021 <span class="comment">%           img is an image structure with the image properties</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%   c_img = calc_colours( rimg, img);</span>
+0024 <span class="comment">%   image( c_img );</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">% c_img is MxN colourmap entries (if mapped_colour&gt;0)</span>
+0027 <span class="comment">%          MxNx3 colourmap entries (if mapped_colour==0)</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% Usage #3 (img is string parameter value)</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">%   value = calc_colours( 'param' );</span>
+0032 <span class="comment">%   calc_colours( 'param', value );</span>
+0033 <span class="comment">%    eg. calc_colours('mapped_colour',127)</span>
+0034 <span class="comment">%         Use this to allow printing vector eps files to get around</span>
+0035 <span class="comment">%         a matlab bug with warning 'RGB color data not ...'</span>
+0036 <span class="comment">%</span>
+0037 <span class="comment">%   calc_colours( 'component', 'real' ); (DEFAULT real)</span>
+0038 <span class="comment">%     the other value is 'imag' to show the imaginary component</span>
+0039 <span class="comment">%</span>
+0040 <span class="comment">%   The following parameters are accepted</span>
+0041 <span class="comment">%</span>
+0042 <span class="comment">%   'greylev'    (DEFAULT -.01): the colour of the ref_level.</span>
+0043 <span class="comment">%      Negative values indicate white background</span>
+0044 <span class="comment">%      For almost white, greylev=-.01; Black=&gt; greylev=.01</span>
+0045 <span class="comment">%   'sat_adj'    (DEFAULT .9): max G,B when R=1</span>
+0046 <span class="comment">%   'window_range' (DEFAULT .9); window colour range</span>
+0047 <span class="comment">%      Colour slope outside range is 1/3 of centre slope</span>
+0048 <span class="comment">%   'backgnd' ( DEFAULT [.5,.5,.15] ): image border colour</span>
+0049 <span class="comment">%   'ref_level' (DEFAULT 'auto') conductivity of centre of</span>
+0050 <span class="comment">%      colour mapping. 'auto' tries to estimate a good level.</span>
+0051 <span class="comment">%      For complex image data, ref_level should also be complex.</span>
+0052 <span class="comment">%   'mapped_colour' (DEFAULT 127) number of colourmap entries</span>
+0053 <span class="comment">%      using mapped_colour allows matlab to print vector graphics to eps</span>
+0054 <span class="comment">%      setting mapped_colour=0 means to use RGB colours</span>
+0055 <span class="comment">%   'npoints' (DEFAULT 64) number of points accross the image</span>
+0056 <span class="comment">%   'transparency_thresh' fraction of maximum value at which colours</span>
+0057 <span class="comment">%             are rendered transparent for</span>
+0058 <span class="comment">%   'clim'    (DEFAULT []) crop colour display of values above clim</span>
+0059 <span class="comment">%           colour limit. values more different from ref_level are cropped.</span>
+0060 <span class="comment">%           if not specified or clim==[] =&gt; no limit</span>
+0061 <span class="comment">%   'cmap_type'  Specify special colours (Default 'blue_red')</span>
+0062 <span class="comment">%           'blue_red':          default Blue/Red eidors colourmpa</span>
+0063 <span class="comment">%           'jet':               matlab jet colourmap</span>
+0064 <span class="comment">%           'jetair':            scaled jet colours</span>
+0065 <span class="comment">%           'blue_yellow':       Blue/Yellow colours</span>
+0066 <span class="comment">%           'greyscale':         Greyscale colours (Lungs white)</span>
+0067 <span class="comment">%           'greyscale-inverse': Greyscale colours (Lungs black)</span>
+0068 <span class="comment">%           'copper':            Copper colours</span>
+0069 <span class="comment">%           'blue_white_red':    Blue/White/Red colours</span>
+0070 <span class="comment">%           'black_red':         Black/Red Colours</span>
+0071 <span class="comment">%           'blue_black_red':    Blue/Black/Red colours</span>
+0072 <span class="comment">%           'polar_colours':     &quot;Polar&quot; blue/white/red colours</span>
+0073 <span class="comment">%           'draeger', 'draeger-difference':</span>
+0074 <span class="comment">%                                Draegerwerk colourmap (difference)</span>
+0075 <span class="comment">%           'draeger-2009':      Draegerwerk colourmap (2009)</span>
+0076 <span class="comment">%           'draeger-tidal':     Draegerwerk colourmap (tidal images)</span>
+0077 <span class="comment">%           'swisstom'           Swisstom colourmap</span>
+0078 <span class="comment">%           'timpel'             Timpel colourmap</span>
+0079 <span class="comment">%           matrix [Nx3]         Use values ([0-1]) as REB colourmap</span>
+0080 <span class="comment">%   'cb_shrink_move' shrink or move the colorbar. See eidors_colourbar</span>
+0081 <span class="comment">%           help for details.</span>
+0082 <span class="comment">%   'image_field', 'image_field_idx', 'image_field_val'</span>
+0083 <span class="comment">%           image elements which match _idx are set to _val.</span>
+0084 <span class="comment">%   'defaults' set to default colours in list above</span>
+0085 <span class="comment">%</span>
+0086 <span class="comment">%   'colourmap' Return the current EIDORS colormap.</span>
+0087 <span class="comment">%           Use as colormap(calc_colours('colourmap'))</span>
+0088 <span class="comment">%</span>
+0089 <span class="comment">% PARAMETERS CAN BE SPECIFIED IN TWO WAYS</span>
+0090 <span class="comment">%   1. as an image parameter (ie clim in img.calc_colours.clim)</span>
+0091 <span class="comment">%   2. a second parameter to ( calc_colours(data, param2 )</span>
+0092 <span class="comment">%          where param2.calc_colours.clim= ... etc</span>
+0093 <span class="comment">%   3. parameter to calc_colours('clim')</span>
+0094 <span class="comment">%</span>
+0095 <span class="comment">% Parameters specified as (1) will override (2)</span>
+0096 <span class="comment">%</span>
+0097 <span class="comment">% PARAMETERS: do_colourbar</span>
+0098 <span class="comment">%    - show a Matlab colorbar with appropriate scaling</span>
+0099 <span class="comment">%</span>
+0100 <span class="comment">%  usage: c_img= calc_colours( img, clim );</span>
+0101 <span class="comment">%         image( c_img );</span>
+0102 <span class="comment">%         calc_colours( img, clim, 1); %now do colorbar</span>
+0103 <span class="comment">%</span>
+0104 <span class="comment">% PARAMETERS: ref_lev</span>
+0105 <span class="comment">%     - if specified, override the global ref_level parameter</span>
+0106 <span class="comment">%</span>
+0107 
+0108 <span class="comment">% (C) 2005-2008 Andy Adler. License: GPL version 2 or version 3</span>
+0109 <span class="comment">% $Id: calc_colours.m 4857 2015-04-02 15:34:49Z aadler $</span>
+0110 
+0111 <span class="comment">% BUGS TO FIX:</span>
+0112 <span class="comment">%  mapped_colour should set the colourmap length for all</span>
+0113 
+0114 <span class="keyword">if</span> nargin==0; error(<span class="string">'calc_colours: expecting argument'</span>); <span class="keyword">end</span>
+0115 <span class="keyword">if</span> isstr(img) &amp;&amp; strcmp(img,<span class="string">'UNIT_TEST'</span>); <a href="#_sub20" class="code" title="subfunction do_unit_test">do_unit_test</a>; <span class="keyword">return</span>; <span class="keyword">end</span>
+0116 
+0117 <span class="keyword">if</span> ischar(img)
+0118     <span class="comment">% called as calc_colours('parameter' ... )</span>
+0119     <span class="keyword">if</span> nargin==1;
+0120        <span class="keyword">if</span> strcmp(img,<span class="string">'defaults'</span>) <span class="comment">% set defaults and return</span>
+0121           set_colours_defaults; <span class="keyword">return</span>
+0122        <span class="keyword">end</span>
+0123        colours= <a href="#_sub18" class="code" title="subfunction value= get_field(param);">get_field</a>(img);
+0124     <span class="keyword">else</span>
+0125        colours= <a href="#_sub19" class="code" title="subfunction value= set_field(param, value);">set_field</a>(img, set_value);
+0126     <span class="keyword">end</span>
+0127     <span class="keyword">return</span>;
+0128 
+0129 <span class="keyword">elseif</span> isfield(img,<span class="string">'type'</span>)
+0130    img_data= <a href="../../../eidors/solvers/get_img_data.html" class="code" title="function [img_data, n_images]= get_img_data(img)">get_img_data</a>( img );
+0131    pp=<a href="#_sub15" class="code" title="subfunction pp=get_colours( img );">get_colours</a>(img(1)) ;
+0132 <span class="keyword">else</span>
+0133    img_data= img;
+0134 
+0135    <span class="keyword">if</span> nargin==1
+0136       pp=<a href="#_sub15" class="code" title="subfunction pp=get_colours( img );">get_colours</a>( [] ); 
+0137    <span class="keyword">else</span>
+0138       pp=<a href="#_sub15" class="code" title="subfunction pp=get_colours( img );">get_colours</a>(set_value); 
+0139    <span class="keyword">end</span>
+0140 <span class="keyword">end</span>
+0141 
+0142 <span class="comment">% Set default parameters</span>
+0143 <span class="keyword">if</span> nargin &lt; 3; do_colourbar = 0;       <span class="keyword">end</span>
+0144 ref_lev = <span class="string">'use_global'</span>;
+0145 
+0146 
+0147 <span class="keyword">if</span> isempty(img_data)
+0148     colours = <span class="string">'k'</span>; <span class="comment">%black</span>
+0149     <span class="keyword">return</span>;
+0150 <span class="keyword">end</span>
+0151 
+0152 m= size(img_data,1); n=size(img_data,2);
+0153 
+0154 <span class="comment">% We can only plot the real part of data</span>
+0155 <span class="comment">% Vectorize img_data here, it gets reshaped later</span>
+0156 [scl_data, ref_lev, max_scale] = <a href="scale_for_display.html" class="code" title="function [elem_data,ref_lev,max_scale] = scale_for_display( elem_data, pp)">scale_for_display</a>( img_data(:), pp);
+0157 
+0158 backgnd= isnan(scl_data);
+0159 scl_data(backgnd)= mean( scl_data(~backgnd));
+0160 
+0161 <span class="keyword">if</span> pp.mapped_colour
+0162    colours=<a href="#_sub17" class="code" title="subfunction colours=set_mapped_colour(pp, backgnd, img_data)">set_mapped_colour</a>(pp, backgnd, scl_data);
+0163    colours= reshape( colours, m,n,[]);
+0164 <span class="keyword">else</span>
+0165    [red,grn,blu] = <a href="#_sub2" class="code" title="subfunction [red,grn,blu] = blu_red_axis( pp, scale_data, backgnd )">blu_red_axis</a>( pp, scl_data, backgnd );
+0166    colours= reshape( [red,grn,blu],m,n,3);
+0167 <span class="keyword">end</span>
+0168 
+0169 <span class="comment">% print colorbar if do_colourbar is specified</span>
+0170 <span class="keyword">if</span> do_colourbar
+0171    <span class="keyword">if</span> ~pp.mapped_colour
+0172        warning(<span class="string">'Colorbar not available without mapped_colour option'</span>);
+0173    <span class="keyword">elseif</span> do_colourbar &lt; 0
+0174         <a href="eidors_colourbar.html" class="code" title="function hh= eidors_colourbar(max_scale,ref_lev, cb_shrink_move, greyscale)">eidors_colourbar</a>(-do_colourbar,max_scale,pp.cb_shrink_move,1)
+0175    <span class="keyword">else</span>
+0176        <a href="eidors_colourbar.html" class="code" title="function hh= eidors_colourbar(max_scale,ref_lev, cb_shrink_move, greyscale)">eidors_colourbar</a>(max_scale,ref_lev,pp.cb_shrink_move)
+0177    <span class="keyword">end</span>
+0178 <span class="keyword">end</span>
+0179 
+0180 
+0181 <a name="_sub1" href="#_subfunctions" class="code">function set_colours_defaults;</a>
+0182    clear -<span class="keyword">global</span> eidors_colours;
+0183 
+0184    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'greylev'</span>,-.001);          <span class="comment">% background colour = white</span>
+0185    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'sat_adj'</span>,.9);             <span class="comment">% saturation of red and blue</span>
+0186    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'window_range'</span>, .7);       <span class="comment">% windowing of colours</span>
+0187    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'backgnd'</span>,[.35,.45,.45]);    <span class="comment">% background colour</span>
+0188    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'mapped_colour'</span>,127);      <span class="comment">% use 127*2+1 colourmap entries</span>
+0189    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'ref_level'</span>,<span class="string">'auto'</span>);       <span class="comment">% auto set background colour</span>
+0190    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'npoints'</span>,64);             <span class="comment">% 64 raster points</span>
+0191    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'clim'</span>,[]);                <span class="comment">% no colour cropping</span>
+0192    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'cb_shrink_move'</span>,[1,1,0]); <span class="comment">% Don't shrink or move colorbar</span>
+0193    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'transparency_thresh'</span>,0.25); <span class="comment">% transparent at .25 of max</span>
+0194    <a href="../../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'Setting Default Colours'</span>,2);
+0195    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'cmap_type'</span>,<span class="string">'blue_red'</span>);   <span class="comment">% default eidors colours</span>
+0196 
+0197 
+0198 <span class="comment">%scaled data must go from -1 to 1</span>
+0199 <a name="_sub2" href="#_subfunctions" class="code">function [red,grn,blu] = blu_red_axis( pp, scale_data, backgnd )</a>
+0200    <span class="keyword">if</span> ~isfield(pp,<span class="string">'cmap_type'</span>)
+0201       pp.cmap_type = <span class="string">'blue_red'</span>;
+0202    <span class="keyword">end</span>; 
+0203 
+0204    <span class="comment">% window data such that slope above w is 1/3 of that below</span>
+0205    <span class="comment">% thus w is mapped to k st k/w = 3(1-k)/(1-w) -&gt; k=3w/(1+2w)</span>
+0206    W= pp.window_range; K= 3*W/(1+2*W);
+0207    scale_data= sign(scale_data) .* ( <span class="keyword">...</span>
+0208      (  K/W*   abs(scale_data)   ) .* (abs(scale_data)&lt;=W) + <span class="keyword">...</span>
+0209      (K+K/W/3*(abs(scale_data)-W)) .* (abs(scale_data)&gt; W) );
+0210 
+0211    <span class="keyword">if</span> isnumeric(pp.cmap_type)
+0212       user_colourmap = pp.cmap_type;
+0213       pp.cmap_type= <span class="string">'user_colourmap'</span>;
+0214    <span class="keyword">end</span>
+0215 
+0216    <span class="keyword">switch</span> pp.cmap_type
+0217      <span class="keyword">case</span> <span class="string">'user_colourmap'</span>
+0218       red = user_colourmap(:,1);
+0219       grn = user_colourmap(:,2);
+0220       blu = user_colourmap(:,3);
+0221      <span class="keyword">case</span> <span class="string">'blue_red'</span>
+0222       [red,grn,blu]= <a href="#_sub3" class="code" title="subfunction [red,grn,blu]= blue_red_colours(pp,scale_data);">blue_red_colours</a>(pp,scale_data);
+0223      <span class="keyword">case</span> {<span class="string">'draeger'</span>, <span class="string">'draeger-difference'</span>}
+0224       [red,grn,blu]= <a href="#_sub6" class="code" title="subfunction [red,grn,blu] = draeger_colours(pp,scale_data, version);">draeger_colours</a>(pp,scale_data, <span class="string">'difference2014'</span>);
+0225      <span class="keyword">case</span> <span class="string">'draeger-2009'</span>,
+0226       [red,grn,blu]= <a href="#_sub6" class="code" title="subfunction [red,grn,blu] = draeger_colours(pp,scale_data, version);">draeger_colours</a>(pp,scale_data, <span class="string">'2009'</span>);
+0227      <span class="keyword">case</span> <span class="string">'draeger-tidal'</span>,
+0228       [red,grn,blu]= <a href="#_sub6" class="code" title="subfunction [red,grn,blu] = draeger_colours(pp,scale_data, version);">draeger_colours</a>(pp,scale_data, <span class="string">'tidal2014'</span>);
+0229      <span class="keyword">case</span> <span class="string">'swisstom'</span>
+0230       [red,grn,blu]= <a href="#_sub4" class="code" title="subfunction [red,grn,blu]= swisstom_colours(pp,scale_data);">swisstom_colours</a>(pp,scale_data);
+0231      <span class="keyword">case</span> <span class="string">'timpel'</span>
+0232       [red,grn,blu]= <a href="#_sub5" class="code" title="subfunction [red,grn,blu]= timpel_colours(pp,scale_data)">timpel_colours</a>(pp,scale_data);
+0233      <span class="keyword">case</span> <span class="string">'jet'</span>
+0234       [red,grn,blu]= <a href="#_sub7" class="code" title="subfunction [red,grn,blu] = jet_colours(pp,scale_data);">jet_colours</a>(pp,scale_data);
+0235      <span class="keyword">case</span> <span class="string">'jetair'</span>
+0236       <span class="comment">% Make most of the range for air -ve</span>
+0237       scd = (scale_data + 0.5)/0.6;
+0238       [red,grn,blu]= <a href="#_sub7" class="code" title="subfunction [red,grn,blu] = jet_colours(pp,scale_data);">jet_colours</a>(pp,scd);
+0239      <span class="keyword">case</span> <span class="string">'blue_yellow'</span>
+0240          [red,grn,blu] = <a href="#_sub8" class="code" title="subfunction [red,grn,blu] = blue_yellow_colours(pp,scale_data);">blue_yellow_colours</a>(pp,scale_data);
+0241      <span class="keyword">case</span> <span class="string">'greyscale'</span>          <span class="comment">% Lungs are white</span>
+0242          [red,grn,blu] = <a href="#_sub9" class="code" title="subfunction [red,grn,blu]= greyscale_colours(pp,scale_data);">greyscale_colours</a>(pp,scale_data);
+0243      <span class="keyword">case</span> <span class="string">'greyscale-inverse'</span>  <span class="comment">% Lungs are black</span>
+0244          [red,grn,blu] = <a href="#_sub9" class="code" title="subfunction [red,grn,blu]= greyscale_colours(pp,scale_data);">greyscale_colours</a>(pp,-scale_data);
+0245      <span class="keyword">case</span> <span class="string">'copper'</span>
+0246          [red,grn,blu] = <a href="#_sub10" class="code" title="subfunction [red,grn,blu]= copper_colours(pp,scale_data);">copper_colours</a>(pp,scale_data);
+0247      <span class="keyword">case</span> <span class="string">'blue_white_red'</span>
+0248          [red,grn,blu]= <a href="#_sub11" class="code" title="subfunction [red,grn,blu]= blue_white_red_colours(pp,scale_data);">blue_white_red_colours</a>(pp,scale_data);
+0249      <span class="keyword">case</span> <span class="string">'black_red'</span>
+0250          [red,grn,blu] = <a href="#_sub12" class="code" title="subfunction [red,grn,blu] = black_red_colours(pp,scale_data);">black_red_colours</a>(pp,scale_data);
+0251      <span class="keyword">case</span> <span class="string">'blue_black_red'</span>
+0252          [red,grn,blu] = <a href="#_sub13" class="code" title="subfunction [red,grn,blu] = blue_black_red_colours(pp,scale_data);">blue_black_red_colours</a>(pp,scale_data);
+0253      <span class="keyword">case</span> <span class="string">'polar_colours'</span>
+0254          [red,grn,blu] = <a href="#_sub14" class="code" title="subfunction [red,grn,blu] = polar_blue_white_red_colours(pp,scale_data);">polar_blue_white_red_colours</a>(pp,scale_data);
+0255 
+0256      <span class="keyword">otherwise</span>
+0257       error([<span class="string">'specified cmap_type not understood:'</span>,pp.cmap_type]);
+0258    <span class="keyword">end</span>
+0259 <span class="comment">% Sometimes this is just slightly &gt; 1</span>
+0260    red(red&gt;1) = 1;
+0261    grn(grn&gt;1) = 1;
+0262    blu(blu&gt;1) = 1;
+0263 
+0264 
+0265    red(backgnd) = pp.backgnd(1);
+0266    grn(backgnd) = pp.backgnd(2);
+0267    blu(backgnd) = pp.backgnd(3);
+0268 
+0269 <span class="comment">%FIXME - come up with a general way to handle blocks in image field</span>
+0270 <span class="keyword">if</span> isfield(pp,<span class="string">'image_field'</span>)
+0271     red(2)=pp.image_field(1);
+0272     grn(2)=pp.image_field(2);
+0273     blu(2)=pp.image_field(3);
+0274 <span class="keyword">end</span>
+0275 
+0276    
+0277 <a name="_sub3" href="#_subfunctions" class="code">function [red,grn,blu]= blue_red_colours(pp,scale_data);</a>
+0278 <span class="keyword">if</span> 0
+0279    D= sign(pp.greylev+eps); <span class="comment">%force 0 to 1</span>
+0280    glev= abs(pp.greylev);
+0281    F= 3*pp.sat_adj;
+0282 
+0283    red= D*F*abs(scale_data+D/F) - D + (D==-1);
+0284    red= red.*(red&gt;0).*(red&lt;1) + (red&gt;=1);
+0285    red= red*(1-glev) + glev;
+0286 <span class="keyword">end</span>
+0287    ofs= (pp.greylev &gt;= 0);   <span class="comment">% 1 if greylev&gt;=0</span>
+0288    glev= abs(pp.greylev);
+0289 
+0290    D= (2*ofs - 1);
+0291    ofs= ofs - 2*(ofs==0);
+0292    F= 3*pp.sat_adj;
+0293    DF= D*F; D_F= D/F;
+0294 
+0295    red= DF*abs(scale_data+D_F) - ofs;
+0296    red= red.*(red&gt;0).*(red&lt;1) + (red&gt;=1);
+0297 
+0298    grn= DF*abs(scale_data    ) - ofs;
+0299    grn= grn.*(grn&gt;0).*(grn&lt;1) + (grn&gt;=1);
+0300 
+0301    blu= DF*abs(scale_data-D_F) - ofs;
+0302    blu= blu.*(blu&gt;0).*(blu&lt;1) + (blu&gt;=1);
+0303 
+0304    <span class="keyword">if</span> pp.greylev &gt;=0 <span class="comment">% Black background</span>
+0305       red= red*(1-glev) + glev;
+0306       grn= grn*(1-glev) + glev;
+0307       blu= blu*(1-glev) + glev;
+0308    <span class="keyword">else</span>
+0309       red= red*(1-glev);
+0310       grn= grn*(1-glev);
+0311       blu= blu*(1-glev);
+0312    <span class="keyword">end</span>
+0313 
+0314 <a name="_sub4" href="#_subfunctions" class="code">function [red,grn,blu]= swisstom_colours(pp,scale_data);</a>
+0315    backgnd =  hex2dec([<span class="string">'59'</span>;<span class="string">'59'</span>;<span class="string">'59'</span>]);
+0316    alphapts = [-255,32,160,255]/255;
+0317    alphaval = [0, 0, 1, 1];
+0318    alp = interp1(alphapts, alphaval, -scale_data, <span class="string">'linear'</span>);
+0319 
+0320    hexcolours = [<span class="string">'3E4A50'</span>;
+0321                  <span class="string">'2F4D58'</span>;
+0322                  <span class="string">'357892'</span>;
+0323                  <span class="string">'2AB1DF'</span>;
+0324                  <span class="string">'61D1FB'</span>;
+0325                  <span class="string">'CFF0FE'</span>];
+0326    redpts = hex2dec(hexcolours(:,1:2));
+0327    grnpts = hex2dec(hexcolours(:,3:4));
+0328    blupts = hex2dec(hexcolours(:,5:6));
+0329    interppts = linspace(0,1, size(hexcolours,1));
+0330 <span class="comment">% add for +ve changes</span>
+0331    redpts = redpts([1,1:end]);
+0332    grnpts = grnpts([1,1:end]);
+0333    blupts = blupts([1,1:end]);
+0334    interppts = [-1,interppts];
+0335 
+0336    red = interp1(interppts, redpts,-scale_data, <span class="string">'linear'</span>);
+0337    grn = interp1(interppts, grnpts,-scale_data, <span class="string">'linear'</span>);
+0338    blu = interp1(interppts, blupts,-scale_data, <span class="string">'linear'</span>);
+0339 
+0340    red = red.*alp + backgnd(1)*(1-alp);
+0341    grn = grn.*alp + backgnd(2)*(1-alp);
+0342    blu = blu.*alp + backgnd(3)*(1-alp);
+0343           
+0344    red = red/255;
+0345    grn = grn/255;
+0346    blu = blu/255;
+0347 
+0348 <a name="_sub5" href="#_subfunctions" class="code">function [red,grn,blu]= timpel_colours(pp,scale_data)</a>
+0349    sd  = -scale_data*100;
+0350    P00 = (sd&lt;  9);
+0351    p09 = (sd&gt;= 9) .* (sd&lt;10) .* (sd- 9) / (10- 9); P09 = p09 &gt;0;
+0352    p10 = (sd&gt;=10) .* (sd&lt;17) .* (sd-10) / (17-10); P10 = p10 &gt;0;
+0353    p17 = (sd&gt;=17) .* (sd&lt;30) .* (sd-17) / (30-17); P17 = p17 &gt;0;
+0354    p30 = (sd&gt;=30) .* (sd&lt;60) .* (sd-30) / (60-30); P30 = p30 &gt;0;
+0355    p60 = (sd&gt;=60) .* (sd&lt;85) .* (sd-60) / (85-60); P60 = p60 &gt;0;
+0356    p85 = (sd&gt;=85)            .* (sd-85) /(100-85); P85 = p85 &gt;0;
+0357 
+0358 
+0359    red =  150*P00 + 198*p85;
+0360    grn =  150*P00 +       88 *P09 + <span class="keyword">...</span>
+0361            88*P10 +  (99- 88)*p10 + <span class="keyword">...</span>
+0362            99*P17 + (121- 99)*p17 + <span class="keyword">...</span>
+0363           121*P30 + (190-121)*p30 + <span class="keyword">...</span>
+0364           190*P60 + (243-190)*p60 + <span class="keyword">...</span>
+0365           243*P85 + (251-243)*p85;
+0366    blu =  150*P00 +      159 *P09 + <span class="keyword">...</span>
+0367           180*P10 + (180-159)*p10 + <span class="keyword">...</span>
+0368           255*P17 + <span class="keyword">...</span>
+0369           255*P30 + <span class="keyword">...</span>
+0370           255*P60 + <span class="keyword">...</span>
+0371           255*P85 ;
+0372           
+0373    red = red/255;
+0374    grn = grn/255;
+0375    blu = blu/255;
+0376 
+0377 <span class="comment">% From Vinicius Torsani</span>
+0378 <span class="comment">%These are the color codes from range of 0 to 1:</span>
+0379 <span class="comment">%</span>
+0380 <span class="comment">%         R       G       B</span>
+0381 <span class="comment">% 0 to 0,09       150     150     150</span>
+0382 <span class="comment">% to 0,1  0       88      159</span>
+0383 <span class="comment">% to 0,17         0       99      180</span>
+0384 <span class="comment">% to 0,3  0       121     255</span>
+0385 <span class="comment">% to 0,6  0       190     255</span>
+0386 <span class="comment">% to 0,85         0       243     255</span>
+0387 <span class="comment">% to 1    198     251     255</span>
+0388 
+0389 
+0390 
+0391 
+0392 <a name="_sub6" href="#_subfunctions" class="code">function [red,grn,blu] = draeger_colours(pp,scale_data, version);</a>
+0393    <span class="keyword">switch</span> version
+0394      <span class="keyword">case</span> <span class="string">'2009'</span>
+0395        grn=      (-scale_data&gt;0.2) .* (-scale_data - 0.2)/0.8;
+0396        red=grn + ( scale_data&gt;0.2) .* ( scale_data - 0.2)/0.8*2/3;
+0397        
+0398        blu=      (-scale_data&gt;0.1) .* (-scale_data - 0.1)/0.1;
+0399        blu(-scale_data&gt;0.2) = 1;
+0400        blu=blu + ( scale_data&gt;0.2) .* ( scale_data - 0.2)/0.8*2/3;
+0401      <span class="keyword">case</span> <span class="string">'tidal2014'</span>
+0402        sd  = -scale_data*100;
+0403        p20 = (sd&gt; 20) .* (sd&lt;= 100) .* (sd - 20) / (100-20);
+0404        P20 = (p20&gt;0);
+0405        p10 = (sd&gt; 10) .* (sd&lt;=  20) .* (sd - 10) / ( 20-10);
+0406        n20 = (sd&lt;-20) .* (sd&gt;=-100) .* (sd + 20) /-(100-20);
+0407        red = 255*p20 + 170*n20;
+0408        grn = 255*p20;
+0409        blu = 255*P20 + 255*p10 + 170*n20;
+0410 
+0411        red = red/255;
+0412        grn = grn/255;
+0413        blu = blu/255;
+0414 
+0415      <span class="keyword">case</span> <span class="string">'difference2014'</span>;
+0416        sd  = -scale_data*100;
+0417        p40 = (sd&gt; 40) .* (sd&lt;= 100) .* (sd - 40) / (100-40);
+0418        P40 = (p40&gt;0);
+0419        p10 = (sd&gt; 10) .* (sd&lt;=  40) .* (sd - 10) / ( 40-10);
+0420        n10 = (sd&lt;-10) .* (sd&gt;=- 40) .* (sd + 10) /-( 40-10);
+0421        n40 = (sd&lt;-40) .* (sd&gt;=-100) .* (sd + 40) /-(100-40);
+0422        N40 = (n40&gt;0);
+0423        red =  132*p40  + 255*n10  + 255*N40;
+0424        grn =  153*p10  + 153*P40 + (240-153)*P40 + <span class="keyword">...</span>
+0425               153*n10  + 153*N40 + (240-153)*n40;
+0426        blu =  153*n40  + 255*p10 +  255*P40;
+0427 
+0428        red = red/255;
+0429        grn = grn/255;
+0430        blu = blu/255;
+0431      <span class="keyword">otherwise</span>; error(<span class="string">'version &quot;%s&quot; not recognized'</span>, version);
+0432    <span class="keyword">end</span>
+0433 
+0434 
+0435 <a name="_sub7" href="#_subfunctions" class="code">function [red,grn,blu] = jet_colours(pp,scale_data);</a>
+0436    grn = 2*(3/4 - abs(scale_data));
+0437    grn(grn&gt;1) = 1; grn(grn&lt;0) = 0;
+0438 
+0439    red = 1.5 - 2*abs(scale_data + 0.5);
+0440    red(red&gt;1) = 1; red(red&lt;0) = 0;
+0441 
+0442    blu = 1.5 - 2*abs(scale_data - 0.5);
+0443    blu(blu&gt;1) = 1; blu(blu&lt;0) = 0;
+0444 
+0445 <span class="comment">% TODO: only works with mapped_colours, fix to use scale_data</span>
+0446 <a name="_sub8" href="#_subfunctions" class="code">function [red,grn,blu] = blue_yellow_colours(pp,scale_data);</a>
+0447    <span class="comment">% Inpired by</span>
+0448    <span class="comment">% FIREICE LightCyan-Cyan-Blue-Black-Red-Yellow-LightYellow Colormap</span>
+0449    <span class="comment">% by: Joseph Kirk %  jdkirk630@gmail.com</span>
+0450    clrs = flipud([0.75 1 1; 0 1 1; 0 0 1;<span class="keyword">...</span>
+0451        0 0 0; 1 0 0; 1 1 0; 1 1 0.75]);
+0452 
+0453    y = linspace(-1,1,size(clrs,1));
+0454    cc = interp2(1:3,y,clrs,1:3,scale_data);
+0455    red = cc(:,1);
+0456    grn = cc(:,2);
+0457    blu = cc(:,3);
+0458 
+0459 
+0460 <span class="comment">% TODO: only works with mapped_colours, fix to use scale_data</span>
+0461 <a name="_sub9" href="#_subfunctions" class="code">function [red,grn,blu]= greyscale_colours(pp,scale_data);</a>
+0462    cc= 0.5 - scale_data/2;
+0463    red = cc;
+0464    grn = cc;
+0465    blu = cc;
+0466 
+0467    
+0468 
+0469 <span class="comment">% TODO: only works with mapped_colours, fix to use scale_data</span>
+0470 <a name="_sub10" href="#_subfunctions" class="code">function [red,grn,blu]= copper_colours(pp,scale_data);</a>
+0471 <span class="comment">% Constants from the copper.m function</span>
+0472    cc= 0.5 + scale_data/2;
+0473    red = min(cc * 1.2500,1);
+0474    grn = cc * 0.7812;
+0475    blu = cc * 0.4975;
+0476 
+0477 <a name="_sub11" href="#_subfunctions" class="code">function [red,grn,blu]= blue_white_red_colours(pp,scale_data);</a>
+0478    <span class="comment">% bluewhitered Colormap</span>
+0479    <span class="comment">% Based on FIREICE from Joseph Kirk jdkirk630@gmail.com</span>
+0480    clrs = flipud([0 0 1; 1 1 1; 1 0 0]);
+0481 
+0482    y = linspace(-1,1,size(clrs,1));
+0483    cc = interp2(1:3,y,clrs,1:3,scale_data);
+0484    red = cc(:,1);
+0485    grn = cc(:,2);
+0486    blu = cc(:,3);
+0487 
+0488 
+0489 
+0490 <a name="_sub12" href="#_subfunctions" class="code">function [red,grn,blu] = black_red_colours(pp,scale_data);</a>
+0491    red = 0.5 + scale_data/2;
+0492    blu = 0*scale_data;
+0493    grn = blu;
+0494 
+0495 <span class="comment">% TODO: only works with mapped_colours, fix to use scale_data</span>
+0496 <a name="_sub13" href="#_subfunctions" class="code">function [red,grn,blu] = blue_black_red_colours(pp,scale_data);</a>
+0497    red =-min(0,scale_data);
+0498    blu = max(0,scale_data);
+0499    grn = 0*scale_data;
+0500 
+0501 <span class="comment">% TODO: only works with mapped_colours, fix to use scale_data</span>
+0502 <span class="comment">% Ideas for this colourmap, and a few lines of code are from</span>
+0503 <span class="comment">% (C) 2011, Francois Beauducel, IPGP in polarmap.m</span>
+0504 <a name="_sub14" href="#_subfunctions" class="code">function [red,grn,blu] = polar_blue_white_red_colours(pp,scale_data);</a>
+0505 <span class="comment">%  0   0   1</span>
+0506 <span class="comment">%  .5  .5  1</span>
+0507 <span class="comment">%  1   1   1</span>
+0508 <span class="comment">%  1   .5  .5</span>
+0509 <span class="comment">%  1   0   0</span>
+0510    red = min(1, 1 + scale_data);
+0511    grn = 1 - abs(scale_data);
+0512    blu = min(1, 1 - scale_data);
+0513 
+0514 
+0515 <a name="_sub15" href="#_subfunctions" class="code">function pp=get_colours( img );</a>
+0516    <span class="keyword">global</span> eidors_colours;
+0517    pp= eidors_colours;
+0518 
+0519    pp.component = <span class="string">'real'</span>; <span class="comment">% Don't get from globals</span>
+0520 
+0521 <span class="comment">% override global if calc.colours specified</span>
+0522    <span class="keyword">try</span>
+0523 <span class="comment">% DAMN Matlab should have syntax for this loop</span>
+0524       fds= fieldnames(img(1).calc_colours);<span class="comment">%assume all are the same!</span>
+0525       <span class="keyword">for</span> fdn= fds(:)';
+0526          fdn= fdn{1};
+0527          pp.( fdn ) = img(1).calc_colours.(fdn);
+0528       <span class="keyword">end</span>
+0529    <span class="keyword">end</span>
+0530 
+0531 <a name="_sub16" href="#_subfunctions" class="code">function BGI= backgndidx;</a>
+0532   BGI= 1;
+0533 
+0534 <a name="_sub17" href="#_subfunctions" class="code">function colours=set_mapped_colour(pp, backgnd, img_data)</a>
+0535    <span class="comment">% need to generate a colourmap with pp.mapped_colour+1 elements</span>
+0536    <span class="comment">% background pixel will be at entry #1. Thus for</span>
+0537    <span class="comment">% mapped_colour= 3. CMAP = [backgnd,[-1 -.5  0 .5 1]</span>
+0538    <span class="comment">%</span>
+0539    <span class="comment">% Note: ensure patch uses 'direct' CDataMapping</span>
+0540    ncol= pp.mapped_colour;
+0541    [red,grn,blu] = <a href="#_sub2" class="code" title="subfunction [red,grn,blu] = blu_red_axis( pp, scale_data, backgnd )">blu_red_axis</a>( pp, <span class="keyword">...</span>
+0542           [-1,linspace(-1,1,2*ncol - 1)]', backgndidx );
+0543    colormap([red,grn,blu]);
+0544 
+0545    <span class="comment">%FIXME - come up with a general way to handle blocks in image field</span>
+0546    <span class="keyword">if</span> isfield(pp,<span class="string">'image_field'</span>)
+0547       warning([<span class="string">'calc_colours: image_field is an experimental feature'</span> <span class="keyword">...</span>
+0548                               <span class="string">'and will be re-implemented'</span>]);
+0549       infmask = isinf(img_data);
+0550       mindata = min(img_data(~infmask));
+0551       colours = fix( (img_data-mindata) * (ncol-1))' + 3;
+0552       colours(backgnd)= backgndidx;
+0553       colours(pp.image_field_idx)=2;
+0554       <span class="keyword">return</span>
+0555    <span class="keyword">end</span>
+0556 
+0557 <span class="comment">% This is the line I wan't to write. However, matlab seems to waste</span>
+0558 <span class="comment">%  lots of memory to do it. Instead we break it into pieces</span>
+0559 <span class="comment">%  colours = fix( img_data * (ncol-1))' + ncol + 1;</span>
+0560    colours = img_data'; colours = colours * (ncol-1);
+0561    colours = fix ( colours ); colours = colours + ncol + 1;
+0562    colours(backgnd)= backgndidx;
+0563 
+0564 <a name="_sub18" href="#_subfunctions" class="code">function value= get_field(param);</a>
+0565    <span class="keyword">global</span> eidors_colours;
+0566    <span class="keyword">if</span> strcmp(param,<span class="string">'colourmap'</span>)
+0567       ncol= eidors_colours.mapped_colour;
+0568       [red,grn,blu] = <a href="#_sub2" class="code" title="subfunction [red,grn,blu] = blu_red_axis( pp, scale_data, backgnd )">blu_red_axis</a>( eidors_colours, <span class="keyword">...</span>
+0569              [-1,linspace(-1,1,2*ncol - 1)]', backgndidx );
+0570       value= [red,grn,blu];
+0571    <span class="keyword">else</span>
+0572       value = getfield(eidors_colours, param);
+0573    <span class="keyword">end</span>
+0574 
+0575 <a name="_sub19" href="#_subfunctions" class="code">function value= set_field(param, value);</a>
+0576    <span class="keyword">global</span> eidors_colours;
+0577    eidors_colours = setfield(eidors_colours, param, value);
+0578    value= eidors_colours;
+0579 
+0580 <span class="comment">% TESTS:</span>
+0581 <a name="_sub20" href="#_subfunctions" class="code">function do_unit_test</a>
+0582    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'defaults'</span>);
+0583 
+0584    img = <a href="../../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'image'</span>,<span class="string">'test'</span>); 
+0585 
+0586    img.calc_colours.mapped_colour = 127;
+0587    img.calc_colours.ref_level = <span class="string">'auto'</span>;
+0588    img.calc_colours.sat_adj = 0.9;
+0589    img.calc_colours.window_range = 0.9;
+0590    img.calc_colours.greylev = -0.01;
+0591  
+0592    img.elem_data = [-2;0;0;0;1;3];
+0593    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'cc01a'</span>, <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(img), [44; 128; 128; 128; 170; 254]);
+0594 
+0595    imgk(1) = img; imgk(2) = img;
+0596    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'cc01b'</span>, <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(imgk), [44; 128; 128; 128; 170; 254]*[1,1]);
+0597    img.calc_colours.ref_level = 0;
+0598    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'cc01c'</span>, <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(img), [44; 128; 128; 128; 170; 254]);
+0599 
+0600    img.calc_colours.ref_level = 1;
+0601    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'cc02'</span>, <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(img), [ 2;  86;  86;  86; 128; 212]);
+0602 
+0603    img.calc_colours.greylev = -.1;
+0604    img.calc_colours.mapped_colour = 0;
+0605    img.elem_data = [-2;1;3];
+0606    cm= reshape([ 0, 0.9, 0.9; 0, 0.9, 0.0643; 0.27, 0.9, 0]',[3,1,3]);
+0607    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'cc03'</span>, <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(img), cm,1e-3)
+0608 
+0609    img.calc_colours.greylev =  .1;
+0610    cm= reshape([ 0.73, 1.0, 1.0; 0.1, 0.1, 0.1; 1.0, 0.9357, 0.1],[3,1,3]);
+0611    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'cc04'</span>, <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(img), cm,1e-3)
+0612 
+0613    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'greylev'</span>,0);
+0614    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'sat_adj'</span>,1);
+0615    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'mapped_colour'</span>,4);
+0616    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'backgnd'</span>,[0.5,0.5,0.5]);
+0617    cc= <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'colourmap'</span>);
+0618    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'cc05'</span>,cc, <span class="keyword">...</span>
+0619       [2,2,2;4,4,4;2,4,4;0,1,4;0,0,0;4,1,0;4,4,2;4,4,4]/4,1e-10);
+0620 
+0621    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'greylev'</span>,-.01);
+0622    cc= <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'colourmap'</span>);
+0623    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'cc06'</span>,cc, [200,200,200;0,0,0;0,0,198; <span class="keyword">...</span>
+0624         0,297,396;396,396,396;396,297,0;198,0,0;0,0,0]/400,1e-10);
+0625 
+0626    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'greylev'</span>,0);
+0627    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'sat_adj'</span>,.5);
+0628    cc= <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'colourmap'</span>);
+0629    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'sa01'</span>,cc(2,:), [0,5,10]/10,1e-10);
+0630 
+0631    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'sat_adj'</span>,.8);
+0632    cc= <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'colourmap'</span>);
+0633    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'sa02'</span>,cc(2,:), [4,10,10]/10,1e-10);
+0634 
+0635    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'sat_adj'</span>,1 );
+0636    cc= <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'colourmap'</span>);
+0637    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'sa03'</span>,cc(2,:), [10,10,10]/10,1e-10);
+0638 
+0639 <span class="comment">%   'window_range' (DEFAULT .9)</span>
+0640    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'bg01'</span>,cc(1,:), [50,50,50]/100, 1e-10);
+0641    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'defaults'</span>);
+0642    cc= <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'colourmap'</span>);
+0643 <span class="comment">%  unit_test_cmp('bg01',cc(1,:), [50,50,15]/100, 1e-10); %EIDORS 3.6</span>
+0644 <span class="comment">%  unit_test_cmp('bg02',cc(1,:), [20,40,40]/100, 1e-10); %EIDORS 3.7</span>
+0645    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'bg02'</span>,cc(1,:), [35,45,45]/100, 1e-10); <span class="comment">%EIDORS 3.8</span>
+0646 
+0647    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'mc01'</span>,size(cc), [127*2,3]);
+0648    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'mapped_colour'</span>,4);
+0649    cc= <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'colourmap'</span>);
+0650    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'mc02'</span>,size(cc), [4*2,3]);
+0651 <span class="comment">%   'ref_level' (DEFAULT 'auto')</span>
+0652 <span class="comment">%   'clim'    (DEFAULT [])</span>
+0653 <span class="comment">%   'cmap_type'  (Default blue-red)</span>
+0654 
+0655    test.blue_red = [0,0,2997; 9990,9990,9990; 2997,0,0]/1e4;
+0656 <span class="comment">%  test.draeger  = [10000,10000,10000;0,0,0;6667,0,6667]/1e4; % OLD 2009!</span>
+0657    test.draeger  = [5176,9412,10000;0,0,0;10000,9412,6000]/1e4; <span class="comment">% 2014</span>
+0658    test.timpel   = [7765,9843,10000;5882,5882,5882;5882,5882,5882]/1e4;
+0659    test.jet      = [5000,0,0;5000,10000,5000;0,0,5000]/1e4;
+0660    test.jetair   = [8333,0,0; 0,0,8333;0,0,0]/1e4;
+0661    test.blue_yellow = [10000,10000,7500; 0,0,0;7500,10000,10000]/1e4;
+0662    test.greyscale = flipud([0,0,0;5000,5000,5000;10000,10000,10000])/1e4;
+0663    test.copper = [0,0,0;6250,3906,2487;10000,7812,4975]/1e4;
+0664    test.blue_white_red = [10000,0,0;10000,10000,10000;0,0,10000]/1e4;
+0665    test.black_red = [0,0,0;5000,0,0;10000,0,0]/1e4;
+0666    test.blue_black_red = [10000,0,0;0,0,0;0,0,10000]/1e4;
+0667    test.polar_colours = [0,0,10000;10000,10000,10000;10000,0,0]/1e4;
+0668 
+0669    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'defaults'</span>);
+0670    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'mapped_colour'</span>,4);
+0671    <span class="keyword">for</span> ct = fieldnames(test)'
+0672       ct = ct{1};
+0673       tname = sprintf(<span class="string">'ctm4(%s)'</span>,ct);
+0674       <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'cmap_type'</span>, ct);
+0675       cc= <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'colourmap'</span>);
+0676       <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(tname,cc([2,5,8],:), test.( ct ), 1e-4);
+0677    <span class="keyword">end</span>
+0678 
+0679    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'defaults'</span>);
+0680    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'mapped_colour'</span>,0);
+0681    <span class="keyword">for</span> ct = fieldnames(test)'
+0682       ct = ct{1};
+0683       tname = sprintf(<span class="string">'ctm0(%s)'</span>,ct);
+0684       <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'cmap_type'</span>, ct);
+0685 
+0686       cc= <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(linspace(-1,1,7)); cc= squeeze(cc);
+0687       <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(tname,cc([1,4,7],:), test.( ct ), 1e-4);
+0688    <span class="keyword">end</span>
+0689 
+0690    <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'defaults'</span>);</pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

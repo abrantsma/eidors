@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of left_divide</title>
+  <meta name="keywords" content="left_divide">
+  <meta name="description" content="[V] = left_divide(E,I,tol,pp,V);">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">eidors</a> &gt; <a href="index.html">algorithms</a> &gt; left_divide.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/algorithms&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>left_divide
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>[V] = left_divide(E,I,tol,pp,V);</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [V] = left_divide(E,I,tol,pp,V) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">[V] = left_divide(E,I,tol,pp,V);
+
+ Implements left division and overcomes many small inefficiencies
+ of matlab's left division. Also uses conjugate gradients (for large problems). 
+
+E   = The full rank system matrix 
+I   = The currents matrix (RHS) 
+tol = The tolerance in the forward solution, e.g. 1e-5
+
+ pp,V are old options from previous solver</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>	EIDORS_MSG eidors progress and status messages</li><li><a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>	EIDORS_OBJ: 'constructor' to create a eidors structure</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/examples/demo_complex.html" class="code" title="">demo_complex</a>	This demo function shows how the EIT problem can be formulated in a complex</li><li><a href="../../eidors/examples/eidors2d_demo1.html" class="code" title="">eidors2d_demo1</a>	EidorsDemo1 Demonstrates the use of 2D EIT Package with linear basis</li><li><a href="../../eidors/solvers/forward/fwd_solve_1st_order.html" class="code" title="function data =fwd_solve_1st_order(fwd_model, img)">fwd_solve_1st_order</a>	FWD_SOLVE_1ST_ORDER: data= fwd_solve_1st_order( img)</li><li><a href="../../eidors/solvers/forward/fwd_solve_higher_order.html" class="code" title="function[data] = fwd_solve_higher_order(fwd_model,img)">fwd_solve_higher_order</a>	Solve for voltages (nodes/electrodes) for a forward model.</li><li><a href="../../eidors/solvers/forward/jacobian_adjoint.html" class="code" title="function J= jacobian_adjoint( fwd_model, img)">jacobian_adjoint</a>	JACOBIAN_ADJOINT: J= jacobian_adjoint( img )</li><li><a href="../../eidors/solvers/forward/jacobian_adjoint_higher_order.html" class="code" title="function J = jacobian_adjoint_higher_order(fwd_model,img)">jacobian_adjoint_higher_order</a>	Find the Jacobian associated with an image (and forward model)</li><li><a href="../../eidors/solvers/inverse/calc_GREIT_RM.html" class="code" title="function [RM, PJt, M] = calc_GREIT_RM(vh,vi, xyc, radius, weight, options)">calc_GREIT_RM</a>	CALCULATE GREIT reconstruction matrix</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [V] = left_divide(E,I,tol,pp,V)</a>
+0002 <span class="comment">%[V] = left_divide(E,I,tol,pp,V);</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Implements left division and overcomes many small inefficiencies</span>
+0005 <span class="comment">% of matlab's left division. Also uses conjugate gradients (for large problems).</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%E   = The full rank system matrix</span>
+0008 <span class="comment">%I   = The currents matrix (RHS)</span>
+0009 <span class="comment">%tol = The tolerance in the forward solution, e.g. 1e-5</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% pp,V are old options from previous solver</span>
+0012 
+0013 <span class="comment">% (c) N. Polydorides 2003 % Copying permitted under terms of GNU GPL</span>
+0014 <span class="comment">% $Id: left_divide.m 3486 2012-07-04 09:02:48Z aadler $</span>
+0015 
+0016 <span class="keyword">if</span> ~exist(<span class="string">'tol'</span>); tol = 1e-8; <span class="keyword">end</span>
+0017 
+0018 [n_nodes,n_stims] = size(I);
+0019 
+0020 <span class="keyword">try</span>
+0021 <span class="comment">% V= E\I;</span>
+0022 <span class="comment">% This takes MUCH longer when you have  more vectors in I,</span>
+0023 <span class="comment">%  even if they are repeated. There must be some way to simplify</span>
+0024 <span class="comment">%  this to speed it up. Matlab's sparse operators really should</span>
+0025 <span class="comment">%  do this for you.</span>
+0026 
+0027 <span class="comment">% TODO, Q&amp;R should be cached somewhere</span>
+0028    [Q,R] = qr(I,0);
+0029    rnotzeros = any(R~=0,2);
+0030    Q= Q(:,rnotzeros);
+0031    R= R(rnotzeros,:);
+0032    V= (E \ Q)*R;
+0033 
+0034 <span class="comment">% TODO: Iteratively refine</span>
+0035 <span class="comment">%  From GH Scott: &quot;once we have</span>
+0036 <span class="comment">%   computed the approximate solution x, we perform one step</span>
+0037 <span class="comment">%   of iterative refinement by computing the residual: r = Ax - b</span>
+0038 <span class="comment">%   and then recalling the solve routine to solve</span>
+0039 <span class="comment">%   Adx = r for the correction dx.</span>
+0040 <span class="comment">% However, we don't want to repeat the '\', so we implement</span>
+0041 <span class="comment">%   the underlying algorithm:</span>
+0042 <span class="comment">%   If A is sparse, then MATLAB software uses CHOLMOD (after 7.2) to compute X.</span>
+0043 <span class="comment">%    The computations result in  P'*A*P = R'*R</span>
+0044 <span class="comment">%   where P is a permutation matrix generated by amd, and R is</span>
+0045 <span class="comment">%   an upper triangular matrix. In this case, X = P*(R\(R'\(P'*B)))</span>
+0046 <span class="comment">%</span>
+0047 <span class="comment">% See also:</span>
+0048 <span class="comment">% http://www.cs.berkeley.edu/~wkahan/MxMulEps.pdf</span>
+0049 <span class="comment">% especially page 15 where it discusses the value of iterative refinement</span>
+0050 <span class="comment">%  without extra precision bits.  ALso, we need to enable</span>
+0051 
+0052 
+0053 <span class="keyword">catch</span> 
+0054    [lasterr_str,lasterr_id]= lasterr;
+0055    <span class="keyword">if</span> ~strcmp(lasterr_id , <span class="string">'MATLAB:nomem'</span>)
+0056       error(lasterr_str); <span class="comment">% rethrow error</span>
+0057    <span class="keyword">end</span>
+0058 
+0059    <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'Memory exhausted for inverse. Trying PCG'</span>,2);
+0060 
+0061    <span class="keyword">if</span> nargin &lt; 5
+0062       sz= [size(E,1),n_stims];
+0063       V = <a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'get-cache'</span>, sz, <span class="string">'left_divide_V'</span>);
+0064       <span class="keyword">if</span> isempty(V); V= zeros(sz); <span class="keyword">end</span>
+0065    <span class="keyword">end</span>
+0066 
+0067    <span class="keyword">if</span> isreal(E)
+0068       U = cholinc(E,tol*100); L = U'; 
+0069       cgsolver = @pcg;
+0070    <span class="keyword">else</span> <span class="comment">%Complex</span>
+0071       [L,U] = luinc(E,tol/10);
+0072       cgsolver = @bicgstab;
+0073    <span class="keyword">end</span>
+0074 
+0075    <span class="keyword">for</span> i=1:n_stims
+0076       [V(:,i),flag] = feval( cgsolver, E,I(:,i), <span class="keyword">...</span>
+0077                tol*norm(I(:,i)),n_nodes,L,U,V(:,i));
+0078    <span class="keyword">end</span> 
+0079       <a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'set-cache'</span>, sz, <span class="string">'left_divide_V'</span>, V);
+0080 <span class="keyword">end</span>
+0081 
+0082 
+0083 <span class="comment">%%% OLD CODE</span>
+0084    <span class="comment">% Cholesky solver. Gives poor results matching others</span>
+0085    <span class="comment">% so we no longer use it</span>
+0086    <span class="keyword">if</span> 0 
+0087        <span class="comment">%Permute the rows and columns to make the factors sparser</span>
+0088        E = E(pp,pp);
+0089        In = I(pp,:);
+0090        rr(pp)=1:max(size(pp));  <span class="comment">% this should be done only Once!</span>
+0091                                 <span class="comment">% actually much better just to do the</span>
+0092                                 <span class="comment">% renumbering when the mesh is generated!</span>
+0093        U = chol(E);
+0094        q_c =  U' \ In;  
+0095        Vn = U \ q_c;
+0096        <span class="comment">%De-permute the result for Cholesky</span>
+0097        V = Vn(rr,:);
+0098    <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

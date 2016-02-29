@@ -1,0 +1,240 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of np_fwd_parameters</title>
+  <meta name="keywords" content="np_fwd_parameters">
+  <meta name="description" content="NP_FWD_PARAMETERS: data= np_fwd_solve( fwd_model )">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">eidors</a> &gt; <a href="index.html">deprecated</a> &gt; np_fwd_parameters.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/deprecated&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>np_fwd_parameters
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>NP_FWD_PARAMETERS: data= np_fwd_solve( fwd_model )</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function param = np_fwd_parameters( fwd_model ) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> NP_FWD_PARAMETERS: data= np_fwd_solve( fwd_model )
+ Extract parameters from a 'fwd_model' struct which are 
+ appropriate for Nick Polydorides EIDORS3D code
+   param.n_elem   =&gt; number of elements
+   param.n_elec   =&gt; number of electrodes
+   param.n_node   =&gt; number of nodes (vertices)
+   param.n_stim   =&gt; number of current stimulation patterns
+   param.n_meas   =&gt; number of measurements (total)
+   param.vtx      =&gt; vertex matrix
+   param.simp     =&gt; connection matrix
+   param.srf      =&gt; boundary triangles
+   param.df       =&gt; vector of measurements for each current pattern
+   param.elec     =&gt; nodes attached to each electrode
+   param.zc       =&gt; vector of contact impedances
+   param.indH     =&gt; electrodes used for each measurement
+   param.I        =&gt; RHS (current term) for FEM solution
+   param.Ib       =&gt; Current for electrodes
+   param.perm_sym =&gt; 'sym' parameter
+   param.gnd_ind  =&gt; node attached to ground
+   param.normalize  =&gt; difference measurements normalized?</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>	EIDORS_MSG eidors progress and status messages</li><li><a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>	EIDORS_OBJ: 'constructor' to create a eidors structure</li><li><a href="../../eidors/solvers/forward/find_boundary.html" class="code" title="function [srf, idx] = find_boundary(simp);">find_boundary</a>	[srf, idx] = find_boundary(simp);</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="inv_solve_dual_mesh.html" class="code" title="function img= inv_solve_dual_mesh( inv_model, voltage)">inv_solve_dual_mesh</a>	INV_SOLVE_DUAL_MESH using a coarse and fine mesh</li><li><a href="np_calc_3d_fields.html" class="code" title="function v_f= np_calc_3d_fields( fwd_model, img)">np_calc_3d_fields</a>	NP_CALC_3D_FIELDS: J= np_calc_3d_fields( fwd_model, img)</li><li><a href="np_calc_jacobian.html" class="code" title="function J= np_calc_jacobian( fwd_model, img)">np_calc_jacobian</a>	NP_CALC_JACOBIAN: J= np_calc_jacobian( fwd_model, img)</li><li><a href="np_calc_system_mat.html" class="code" title="function s_mat= np_calc_system_mat( fwd_model, img)">np_calc_system_mat</a>	NP_CALC_SYSTEM_MAT: s_mat= np_calc_system_mat( fwd_model, img)</li><li><a href="np_fwd_solve.html" class="code" title="function data= np_fwd_solve( fwd_model, img)">np_fwd_solve</a>	NP_FWD_SOLVE: data= np_fwd_solve( fwd_model, img)</li><li><a href="../../eidors/graphics/matlab/show_stim_meas_pattern.html" class="code" title="function show_stim_meas_pattern(fwd_model,disp_meas,offset,elec_pp);">show_stim_meas_pattern</a>	SHOW_STIM_MEAS_PATTERN: show the stim and meas pattern graphically</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function param= calc_param( fwd_model );</a></li><li><a href="#_sub2" class="code">function e_bdy  = bdy_with_nodes(bdy,  elec_nodes );</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function param = np_fwd_parameters( fwd_model )</a>
+0002 <span class="comment">% NP_FWD_PARAMETERS: data= np_fwd_solve( fwd_model )</span>
+0003 <span class="comment">% Extract parameters from a 'fwd_model' struct which are</span>
+0004 <span class="comment">% appropriate for Nick Polydorides EIDORS3D code</span>
+0005 <span class="comment">%   param.n_elem   =&gt; number of elements</span>
+0006 <span class="comment">%   param.n_elec   =&gt; number of electrodes</span>
+0007 <span class="comment">%   param.n_node   =&gt; number of nodes (vertices)</span>
+0008 <span class="comment">%   param.n_stim   =&gt; number of current stimulation patterns</span>
+0009 <span class="comment">%   param.n_meas   =&gt; number of measurements (total)</span>
+0010 <span class="comment">%   param.vtx      =&gt; vertex matrix</span>
+0011 <span class="comment">%   param.simp     =&gt; connection matrix</span>
+0012 <span class="comment">%   param.srf      =&gt; boundary triangles</span>
+0013 <span class="comment">%   param.df       =&gt; vector of measurements for each current pattern</span>
+0014 <span class="comment">%   param.elec     =&gt; nodes attached to each electrode</span>
+0015 <span class="comment">%   param.zc       =&gt; vector of contact impedances</span>
+0016 <span class="comment">%   param.indH     =&gt; electrodes used for each measurement</span>
+0017 <span class="comment">%   param.I        =&gt; RHS (current term) for FEM solution</span>
+0018 <span class="comment">%   param.Ib       =&gt; Current for electrodes</span>
+0019 <span class="comment">%   param.perm_sym =&gt; 'sym' parameter</span>
+0020 <span class="comment">%   param.gnd_ind  =&gt; node attached to ground</span>
+0021 <span class="comment">%   param.normalize  =&gt; difference measurements normalized?</span>
+0022 
+0023 
+0024 <span class="comment">% (C) 2005 Andy Adler. License: GPL version 2 or version 3</span>
+0025 <span class="comment">% $Id: np_fwd_parameters.m 4452 2014-03-06 15:46:13Z elektrickser $</span>
+0026 
+0027 warning(<span class="string">'EIDORS:deprecated'</span>,<span class="string">'NP_FWD_PARAMETERS is deprecated as of 07-Jun-2012. '</span>);
+0028 
+0029 param = <a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'get-cache'</span>, fwd_model, <span class="string">'np_fwd_parameters'</span>);
+0030 
+0031 <span class="keyword">if</span> ~isempty(param)
+0032    <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'np_fwd_parameters: using cached value'</span>, 3);
+0033    <span class="keyword">return</span>
+0034 <span class="keyword">end</span>
+0035 
+0036 param = <a href="#_sub1" class="code" title="subfunction param= calc_param( fwd_model );">calc_param</a>( fwd_model );
+0037 
+0038 <a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'set-cache'</span>, fwd_model, <span class="string">'np_fwd_parameters'</span>, param);
+0039 <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'np_fwd_parameters: setting cached value'</span>, 3);
+0040 
+0041 <span class="comment">% perform actual parameter calculation</span>
+0042 <a name="_sub1" href="#_subfunctions" class="code">function param= calc_param( fwd_model );</a>
+0043 
+0044 vtx= fwd_model.nodes;
+0045 simp= fwd_model.elems;
+0046 <span class="comment">% calc num electrodes, nodes, stim_patterns</span>
+0047 n_elem= size(simp,1);
+0048 n_elec=  length(fwd_model.electrode );
+0049 n_node = size(fwd_model.nodes,1);
+0050 n_stim = length(fwd_model.stimulation );
+0051 n_meas = 0;
+0052 
+0053 <span class="comment">% Recreate 'df' from fwd_model.stimulation</span>
+0054 df= zeros(n_stim,1);
+0055 <span class="keyword">for</span> i=1:n_stim;
+0056     <span class="comment">% Fixed by Steffen Kaufmann 06.03.2014 - should now work with non full</span>
+0057     <span class="comment">% rank pattern</span>
+0058     <span class="comment">% df(i) = size(fwd_model.stimulation(i).meas_pattern ,1);</span>
+0059     df(i) = sum(sum(abs(full(fwd_model.stimulation(i).meas_pattern)))) / 2;
+0060     n_meas = n_meas + df(i);
+0061 <span class="keyword">end</span>
+0062 
+0063 elec= [];
+0064 zc  = zeros(n_elec, 1);
+0065 
+0066 <span class="keyword">if</span> isfield(fwd_model,<span class="string">'boundary'</span>)
+0067     srf = fwd_model.boundary;
+0068 <span class="keyword">else</span>
+0069     srf= <a href="../../eidors/solvers/forward/find_boundary.html" class="code" title="function [srf, idx] = find_boundary(simp);">find_boundary</a>(simp);
+0070 <span class="keyword">end</span>
+0071 
+0072 max_elec_nodes=0;
+0073 <span class="comment">% get electrode parameters</span>
+0074 <span class="keyword">for</span> i=1:n_elec
+0075     elec_nodes= fwd_model.electrode(i).nodes;
+0076     <span class="keyword">if</span> length(elec_nodes)&gt;1
+0077        e_bdy  = <a href="#_sub2" class="code" title="subfunction e_bdy  = bdy_with_nodes(bdy,  elec_nodes );">bdy_with_nodes</a>(srf,  elec_nodes );
+0078        n_bdy  = srf(e_bdy,:)';
+0079     <span class="keyword">else</span>
+0080        n_bdy= elec_nodes;
+0081     <span class="keyword">end</span>
+0082 <span class="comment">% elec is a series of nodes matching bdy faces</span>
+0083     en_list{i}= n_bdy(:)';
+0084     <span class="keyword">if</span> length(n_bdy) &gt; max_elec_nodes
+0085         max_elec_nodes = length(n_bdy);
+0086     <span class="keyword">end</span>
+0087 
+0088 <span class="comment">% contact impedance</span>
+0089     zc(i)    = fwd_model.electrode(i).z_contact;
+0090 <span class="keyword">end</span>
+0091 
+0092 elec= zeros(n_elec, max_elec_nodes);
+0093 <span class="keyword">for</span> i=1:n_elec
+0094     en= en_list{i};
+0095     elec(i,1:length(en)) = en;
+0096 <span class="keyword">end</span>
+0097 
+0098 <span class="comment">% Recreate 'indH' from fwd_model.stimulation</span>
+0099 indH= zeros(n_stim, 2);
+0100 idx=0;
+0101 <span class="keyword">for</span> i=1:n_stim
+0102    meas_pat= fwd_model.stimulation(i).meas_pattern';
+0103 
+0104    sourcepos= find(meas_pat(:)== 1);
+0105    sourcepos= rem( sourcepos-1 , n_elec) + 1;
+0106 
+0107    sinkpos  = find(meas_pat(:)==-1);
+0108    sinkpos  = rem( sinkpos  -1 , n_elec) + 1;
+0109 
+0110    indH( idx+(1:df(i)) , : ) = [sourcepos, sinkpos];
+0111    idx= idx+ df(i);
+0112 <span class="keyword">end</span>
+0113 
+0114 <span class="comment">% calculate FEM RHS matrix, i.e., the current patterns padded with zeroes</span>
+0115 I = zeros( n_elec + n_node, n_stim );
+0116 idx=0;
+0117 <span class="keyword">for</span> i=1:n_stim
+0118    I( n_node + (1:n_elec), i ) = <span class="keyword">...</span>
+0119          fwd_model.stimulation(i).stim_pattern;
+0120 <span class="keyword">end</span>
+0121 I(fwd_model.gnd_node,:) = 0;
+0122 Ib= I( n_node + (1:n_elec), : );
+0123 
+0124 <span class="comment">% pack into a parameter return list</span>
+0125 param.n_elem   = n_elem;
+0126 param.n_elec   = n_elec;
+0127 param.n_node   = n_node;
+0128 param.n_stim   = n_stim;
+0129 param.n_meas   = n_meas;
+0130 param.vtx      = vtx;
+0131 param.simp     = simp;
+0132 param.srf      = srf;
+0133 param.df       = df;
+0134 param.elec     = elec;
+0135 param.zc       = zc;
+0136 param.indH     = indH;
+0137 param.I        = I;
+0138 param.Ib       = Ib;
+0139 <span class="keyword">try</span>
+0140    param.perm_sym = fwd_model.np_fwd_solve.perm_sym;
+0141 <span class="keyword">catch</span>
+0142    param.perm_sym = <span class="string">'{n}'</span>;
+0143 <span class="keyword">end</span>
+0144 param.gnd_ind  = fwd_model.gnd_node;
+0145 
+0146 <span class="keyword">if</span> isfield(fwd_model,<span class="string">'normalize_measurements'</span>)
+0147    param.normalize = fwd_model.normalize_measurements;
+0148 <span class="keyword">else</span>
+0149    param.normalize = 0;
+0150 <span class="keyword">end</span>
+0151 
+0152 
+0153 
+0154 <span class="comment">% get boundary faces which match nodes</span>
+0155 <a name="_sub2" href="#_subfunctions" class="code">function e_bdy  = bdy_with_nodes(bdy,  elec_nodes );</a>
+0156    mbdy= zeros(size(bdy));
+0157    <span class="keyword">for</span> n= elec_nodes(:)'
+0158       mbdy= mbdy + (bdy == n); 
+0159    <span class="keyword">end</span> 
+0160    e_bdy = find( all(mbdy') );
+0161 
+0162 <span class="comment">% get boundary faces which match any node</span>
+0163 <span class="comment">% Use this for point electrodes where there are no bdy faces</span>
+0164 <span class="comment">% This is sort of an abuse of the model, but at least it can</span>
+0165 <span class="comment">% produce a reasonable result for pt electrode mdls.</span>
+0166 
+0167    <span class="keyword">if</span> isempty(e_bdy)
+0168       e_bdy = find( sum(mbdy')&gt;=2 );
+0169    <span class="keyword">end</span>
+0170    <span class="keyword">if</span> isempty(e_bdy)
+0171       e_bdy = find( any(mbdy') );
+0172    <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,548 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of calc_noise_figure</title>
+  <meta name="keywords" content="calc_noise_figure">
+  <meta name="description" content="CALC_NOISE_FIGURE: calculate the noise amplification (NF) of an algorithm">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">eidors</a> &gt; <a href="../index.html">solvers</a> &gt; <a href="index.html">inverse</a> &gt; calc_noise_figure.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/solvers/inverse&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>calc_noise_figure
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>CALC_NOISE_FIGURE: calculate the noise amplification (NF) of an algorithm</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [NF,SE] = calc_noise_figure( inv_model, hp, iterations) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> CALC_NOISE_FIGURE: calculate the noise amplification (NF) of an algorithm
+ [NF,SE] = calc_noise_figure( inv_model, hp, iterations)
+    inv_model  =&gt; inverse model object
+    hp         =&gt; value of hyperparameter to use (if not spec
+         then use the value of inv_model.hyperparameter.value)
+    iterations =&gt; number of iterations (default 10)
+       (for calculation of noise figure using random noise)
+    if hp is [] =&gt; use the hp on the inv_model
+  NF = calculated NF. SE = standard error on NF
+
+ hp is specified, it will be used for the hyperparameter.
+    Otherwise the inv_model.hyperparameter will be used.
+
+ Noise Figure must be defined for a specific measurement
+ In order to specify data, use
+     inv_model.hyperparameter.tgt_data.meas_t1
+     inv_model.hyperparameter.tgt_data.meas_t2
+   to use a temporal solver (or the Kalman filter), the
+   measurement to perform the NF calc must also be specified,
+   using:
+     inv_model.hyperparameter.tgt_data.meas_select
+   otherwise, the middle measurement will be used
+
+ In order to automatically simulate data, specify tgt_elems,
+   containing a vector of elements to use
+ 
+     inv_model.hyperparameter.tgt_elems
+
+ [NF,SE] = calc_noise_figure( inv_model, vh, vi)
+    interface provided for compatibility with the deprecated
+    calc_noise_params</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="../../../eidors/deprecated/calc_noise_params.html" class="code" title="function params = calc_noise_params(imdl, vh, vi )">calc_noise_params</a>	params = GREIT_noise_params(imdl, homg_voltage, sig_voltage)</li><li><a href="../../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>	EIDORS_MSG eidors progress and status messages</li><li><a href="../../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>	EIDORS_OBJ: 'constructor' to create a eidors structure</li><li><a href="../../../eidors/models/data_mapper.html" class="code" title="function img = data_mapper(img, reverse)">data_mapper</a>	DATA_MAPPER maps img.params data to elem or node data</li><li><a href="../../../eidors/models/elem_select.html" class="code" title="function memb_frac = elem_select( fmdl, select_fcn )">elem_select</a>	ELEM_SELECT: select element fractions inside a function</li><li><a href="../../../eidors/models/get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>	GET_ELEM_VOLUME: VOL = get_elem_volume(fwd_model, map_node )</li><li><a href="../../../eidors/models/mdl_normalize.html" class="code" title="function out = mdl_normalize(mdl, val)">mdl_normalize</a>	MDL_NORMALIZE Check or set the normalize_measurements flag on a model.</li><li><a href="../../../eidors/models/mk_GREIT_model.html" class="code" title="function [imdl, weight]= mk_GREIT_model( fmdl, radius, weight, options )">mk_GREIT_model</a>	MK_GREIT_MODEL: make EIDORS inverse models using the GREIT approach</li><li><a href="../../../eidors/models/mk_common_model.html" class="code" title="function inv_mdl= mk_common_model( str, n_elec, varargin )">mk_common_model</a>	MK_COMMON_MODEL: make common EIT models</li><li><a href="../../../eidors/models/mk_image.html" class="code" title="function img= mk_image(mdl, elem_data, params, name)">mk_image</a>	MK_IMAGE: create eidors image object</li><li><a href="../../../eidors/models/mk_library_model.html" class="code" title="function out = mk_library_model(shape,elec_pos,elec_shape,maxsz,nfft,scale)">mk_library_model</a>	MK_LIBRARY_MODEL - FEM models based on library shapes</li><li><a href="../../../eidors/models/mk_stim_patterns.html" class="code" title="function [stim, meas_sel]= mk_stim_patterns(n_elec, n_rings, inj, meas, options, amplitude)">mk_stim_patterns</a>	MK_STIM_PATTERNS: create an EIDORS stimulation pattern structure</li><li><a href="../../../eidors/solvers/calc_difference_data.html" class="code" title="function dva = calc_difference_data( data1, data2, fwd_model)">calc_difference_data</a>	CALC_DIFFERENCE_DATA: calculate difference data between</li><li><a href="../../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>	FWD_SOLVE: calculate data from a fwd_model object and an image</li><li><a href="../../../eidors/solvers/inv_solve.html" class="code" title="function img = inv_solve( inv_model, data1, data2)">inv_solve</a>	INV_SOLVE: calculate imag from an inv_model and data</li><li><a href="calc_noise_figure.html" class="code" title="function [NF,SE] = calc_noise_figure( inv_model, hp, iterations)">calc_noise_figure</a>	CALC_NOISE_FIGURE: calculate the noise amplification (NF) of an algorithm</li><li><a href="../../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>	EIDORS_CACHE Control eidors caching</li><li><a href="../../../eidors/tools/eidors_default.html" class="code" title="function varargout = eidors_default(varargin)">eidors_default</a>	EIDORS_DEFAULT Default function handler.</li><li><a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>	UNIT_TEST_CMP: compare matrices in eidors output</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="../../../eidors/deprecated/calc_noise_params.html" class="code" title="function params = calc_noise_params(imdl, vh, vi )">calc_noise_params</a>	params = GREIT_noise_params(imdl, homg_voltage, sig_voltage)</li><li><a href="../../../eidors/models/mk_GREIT_model.html" class="code" title="function [imdl, weight]= mk_GREIT_model( fmdl, radius, weight, options )">mk_GREIT_model</a>	MK_GREIT_MODEL: make EIDORS inverse models using the GREIT approach</li><li><a href="calc_noise_figure.html" class="code" title="function [NF,SE] = calc_noise_figure( inv_model, hp, iterations)">calc_noise_figure</a>	CALC_NOISE_FIGURE: calculate the noise amplification (NF) of an algorithm</li><li><a href="choose_noise_figure.html" class="code" title="function HP= choose_noise_figure( inv_model );">choose_noise_figure</a>	CHOOSE_NOISE_FIGURE: choose hyperparameter based on NF calculation</li><li><a href="../../../eidors/tools/test_performance.html" class="code" title="function [r, params] =  test_performance( imdls, fmdl );">test_performance</a>	TEST_PERFORMANCE: test of difference reconstruction algorithms</li><li><a href="../../../eidors/tools/test_performance_img.html" class="code" title="function [params_img] =  test_performance_img( imdls, fmdl );">test_performance_img</a>	TEST_PERFORMANCE: test of difference reconstruction algorithms</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [inv_model, h_data, c_data] = process_parameters( inv_model );</a></li><li><a href="#_sub2" class="code">function params = nf_calc_linear(imdl, vh, vi )</a></li><li><a href="#_sub3" class="code">function NF= nf_calc_use_matrix( inv_model, h_data, c_data)</a></li><li><a href="#_sub4" class="code">function [h_data, c_data]= simulate_targets( fwd_model, ctr_elems)</a></li><li><a href="#_sub5" class="code">function [img0, img0n] = get_images( inv_model, h_data, c_data,</a></li><li><a href="#_sub6" class="code">function NF= nf_calc_iterate( inv_model, h_data, c_data);</a></li><li><a href="#_sub7" class="code">function [NF,SE]= nf_calc_random( rec, vh, vi, N_RUNS);</a></li><li><a href="#_sub8" class="code">function noise= addnoise( vh, vi, SNR);</a></li><li><a href="#_sub9" class="code">function do_unit_test</a></li><li><a href="#_sub10" class="code">function test1</a></li><li><a href="#_sub11" class="code">function test2(imdl)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [NF,SE] = calc_noise_figure( inv_model, hp, iterations)</a>
+0002 <span class="comment">% CALC_NOISE_FIGURE: calculate the noise amplification (NF) of an algorithm</span>
+0003 <span class="comment">% [NF,SE] = calc_noise_figure( inv_model, hp, iterations)</span>
+0004 <span class="comment">%    inv_model  =&gt; inverse model object</span>
+0005 <span class="comment">%    hp         =&gt; value of hyperparameter to use (if not spec</span>
+0006 <span class="comment">%         then use the value of inv_model.hyperparameter.value)</span>
+0007 <span class="comment">%    iterations =&gt; number of iterations (default 10)</span>
+0008 <span class="comment">%       (for calculation of noise figure using random noise)</span>
+0009 <span class="comment">%    if hp is [] =&gt; use the hp on the inv_model</span>
+0010 <span class="comment">%  NF = calculated NF. SE = standard error on NF</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% hp is specified, it will be used for the hyperparameter.</span>
+0013 <span class="comment">%    Otherwise the inv_model.hyperparameter will be used.</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% Noise Figure must be defined for a specific measurement</span>
+0016 <span class="comment">% In order to specify data, use</span>
+0017 <span class="comment">%     inv_model.hyperparameter.tgt_data.meas_t1</span>
+0018 <span class="comment">%     inv_model.hyperparameter.tgt_data.meas_t2</span>
+0019 <span class="comment">%   to use a temporal solver (or the Kalman filter), the</span>
+0020 <span class="comment">%   measurement to perform the NF calc must also be specified,</span>
+0021 <span class="comment">%   using:</span>
+0022 <span class="comment">%     inv_model.hyperparameter.tgt_data.meas_select</span>
+0023 <span class="comment">%   otherwise, the middle measurement will be used</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">% In order to automatically simulate data, specify tgt_elems,</span>
+0026 <span class="comment">%   containing a vector of elements to use</span>
+0027 <span class="comment">%</span>
+0028 <span class="comment">%     inv_model.hyperparameter.tgt_elems</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">% [NF,SE] = calc_noise_figure( inv_model, vh, vi)</span>
+0031 <span class="comment">%    interface provided for compatibility with the deprecated</span>
+0032 <span class="comment">%    calc_noise_params</span>
+0033 
+0034 <span class="comment">% (C) 2005 Andy Adler. License: GPL version 2 or version 3</span>
+0035 <span class="comment">% $Id: calc_noise_figure.m 4838 2015-03-30 07:41:23Z aadler $</span>
+0036 
+0037 <span class="comment">% A normal definition of noise power is based on power:</span>
+0038 <span class="comment">%      NF = SNR_z / SNR_x</span>
+0039 <span class="comment">%    SNR_z = sumsq(z0) / var(z) = sum(z0.^2) / trace(Rn)</span>
+0040 <span class="comment">%    SNR_x = sumsq(x0) / var(x) = sum(x0.^2) / trace(ABRnB'A')</span>
+0041 <span class="comment">% but his doesn't work, because the signal spreads like</span>
+0042 <span class="comment">% the amplitude, not like the power, thus</span>
+0043 <span class="comment">%      NF = SNR_z / SNR_x</span>
+0044 <span class="comment">%    SNR_z = sum(|z0|/len_z) / std(z/len_z)</span>
+0045 <span class="comment">%    SNR_x = sum(|x0|/len_x) / std(x/len_x)</span>
+0046 
+0047 <span class="keyword">if</span> ischar(inv_model) &amp;&amp; strcmp(inv_model,<span class="string">'UNIT_TEST'</span>), <a href="#_sub9" class="code" title="subfunction do_unit_test">do_unit_test</a>, <span class="keyword">return</span>, <span class="keyword">end</span>
+0048 
+0049 <span class="keyword">if</span> nargin&gt;=2 &amp;&amp; numel(hp) == 1
+0050    inv_model.hyperparameter.value= hp;
+0051 <span class="comment">% Remove function parameter because it will recurse</span>
+0052    <span class="keyword">try</span>; inv_model.hyperparameter = rmfield(inv_model.hyperparameter,<span class="string">'func'</span>); <span class="keyword">end</span>
+0053 <span class="keyword">end</span>
+0054 <span class="keyword">if</span> nargin == 3 &amp;&amp; numel(hp) &gt; 1
+0055     h_data = hp;
+0056     c_data = iterations;
+0057 <span class="keyword">else</span>
+0058     [inv_model, h_data, c_data] = <a href="#_sub1" class="code" title="subfunction [inv_model, h_data, c_data] = process_parameters( inv_model );">process_parameters</a>( inv_model );
+0059 <span class="keyword">end</span>
+0060 
+0061 <span class="comment">% disable solution checking (slow)</span>
+0062 inv_model.inv_solve.calc_solution_error = false;
+0063 
+0064 <span class="comment">%NF= nf_calc_use_matrix( inv_model, h_data, c_data);</span>
+0065 <span class="comment">%NF= nf_calc_iterate( inv_model, h_data, c_data);</span>
+0066 <span class="keyword">if</span> nargin&lt;3; iterations= 10; <span class="keyword">end</span>
+0067 solver = inv_model.solve;
+0068 <span class="keyword">if</span> isstr(solver) &amp;&amp; strcmp(solver, <span class="string">'eidors_default'</span>)
+0069     solver = <a href="../../../eidors/tools/eidors_default.html" class="code" title="function varargout = eidors_default(varargin)">eidors_default</a>(<span class="string">'get'</span>,<span class="string">'inv_solve'</span>);
+0070 <span class="keyword">end</span>
+0071 <span class="keyword">if</span> isa(solver,<span class="string">'function_handle'</span>)
+0072     solver = func2str(solver);
+0073 <span class="keyword">end</span>
+0074 <span class="keyword">switch</span> solver
+0075     <span class="keyword">case</span> {<span class="string">'inv_solve_backproj'</span>
+0076             <span class="string">'inv_solve_conj_grad'</span>
+0077             <span class="string">'inv_solve_diff_GN_one_step'</span>
+0078             <span class="string">'inv_solve_trunc_iterative'</span>
+0079             <span class="string">'inv_solve_TSVD'</span>
+0080             <span class="string">'solve_use_matrix'</span>}
+0081         NF = <a href="#_sub2" class="code" title="subfunction params = nf_calc_linear(imdl, vh, vi )">nf_calc_linear</a>( inv_model, h_data, c_data);
+0082         SE = 0;
+0083     <span class="keyword">otherwise</span>
+0084         [NF,SE]= <a href="#_sub7" class="code" title="subfunction [NF,SE]= nf_calc_random( rec, vh, vi, N_RUNS);">nf_calc_random</a>( inv_model, h_data, c_data, iterations);
+0085 <span class="keyword">end</span>
+0086 <a href="../../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'@@ NF= %f'</span>, NF, 2);
+0087 
+0088 <a name="_sub1" href="#_subfunctions" class="code">function [inv_model, h_data, c_data] = process_parameters( inv_model );</a>
+0089 
+0090    <span class="keyword">if</span>     isfield(inv_model.hyperparameter,<span class="string">'tgt_elems'</span>)
+0091       [h_data, c_data]= <a href="#_sub4" class="code" title="subfunction [h_data, c_data]= simulate_targets( fwd_model, ctr_elems)">simulate_targets</a>( inv_model.fwd_model, <span class="keyword">...</span>
+0092            inv_model.hyperparameter.tgt_elems);
+0093    <span class="keyword">elseif</span> isfield(inv_model.hyperparameter,<span class="string">'tgt_data'</span>)
+0094       tgt_data= inv_model.hyperparameter.tgt_data;
+0095       h_data= tgt_data.meas_t1;
+0096       c_data= tgt_data.meas_t2;
+0097    <span class="keyword">else</span>
+0098       error(<span class="string">'unsure how to get data to measure signal'</span>);
+0099    <span class="keyword">end</span>
+0100 
+0101    <span class="comment">% if hp is specified, then use that value</span>
+0102 
+0103    <span class="keyword">if</span> isfield(inv_model.hyperparameter,<span class="string">'func'</span>)
+0104       funcname= inv_model.hyperparameter.func;
+0105       <span class="keyword">if</span> strcmp( class(funcname), <span class="string">'function_handle'</span>)
+0106          funcname= func2str(funcname);
+0107       <span class="keyword">end</span>
+0108 
+0109       <span class="keyword">if</span> strcmp(funcname, <span class="string">'choose_noise_figure'</span>)
+0110          error(<span class="string">'specifying inv_model.hp.func = choose_noise_figure will recurse'</span>);
+0111       <span class="keyword">end</span>
+0112    <span class="keyword">end</span>
+0113 
+0114 <a name="_sub2" href="#_subfunctions" class="code">function params = nf_calc_linear(imdl, vh, vi )</a>
+0115 <span class="comment">% params = GREIT_noise_params(imdl, homg_voltage, sig_voltage)</span>
+0116 <span class="comment">%  params(1,:) = Noise Figure = SNR(image) / SNR(data)</span>
+0117 <span class="comment">%</span>
+0118 <span class="comment">%  see also: eval_GREIT_fig_merit or using test_performance</span>
+0119 
+0120 <span class="comment">% (C) 2008 Andy Adler. Licensed under GPL v2 or v3</span>
+0121 <span class="comment">% $Id: calc_noise_figure.m 4838 2015-03-30 07:41:23Z aadler $</span>
+0122 
+0123 <span class="comment">% NOTE THAT WE ASSUME A LINEAR ALGORITHM FOR THIS MEASURE</span>
+0124 
+0125 <span class="keyword">if</span> 0 <span class="comment">% old code with random noise</span>
+0126      <span class="comment">% Keep this to validate while we test it</span>
+0127    Nnoise = 1000;
+0128    noise = 0.01*std(vh)*randn(size(vh,1),Nnoise);
+0129    vhn= vh*ones(1,Nnoise) + noise;
+0130 <span class="keyword">else</span> <span class="comment">% use independent noise model on each channel</span>
+0131    noise = 0.01*std(vh)*speye(size(vh,1));
+0132    vhn= vh*ones(1,size(vh,1)) + noise;
+0133 <span class="keyword">end</span>
+0134 
+0135 signal_y = <a href="../../../eidors/solvers/calc_difference_data.html" class="code" title="function dva = calc_difference_data( data1, data2, fwd_model)">calc_difference_data</a>( vh, vi,  imdl.fwd_model);
+0136 noise_y  = <a href="../../../eidors/solvers/calc_difference_data.html" class="code" title="function dva = calc_difference_data( data1, data2, fwd_model)">calc_difference_data</a>( vh, vhn, imdl.fwd_model);
+0137 
+0138 signal_x = <a href="../../../eidors/solvers/inv_solve.html" class="code" title="function img = inv_solve( inv_model, data1, data2)">inv_solve</a>(imdl, vh, vi);  
+0139 signal_x = <a href="../../../eidors/models/data_mapper.html" class="code" title="function img = data_mapper(img, reverse)">data_mapper</a>(signal_x); signal_x = signal_x.elem_data;
+0140 noise_x  = <a href="../../../eidors/solvers/inv_solve.html" class="code" title="function img = inv_solve( inv_model, data1, data2)">inv_solve</a>(imdl, vh, vhn); 
+0141 noise_x  = <a href="../../../eidors/models/data_mapper.html" class="code" title="function img = data_mapper(img, reverse)">data_mapper</a>(noise_x);  noise_x  = noise_x.elem_data;
+0142 
+0143 use_rec = 1;
+0144 <span class="keyword">try</span> 
+0145    use_rec = ~imdl.prior_use_fwd_not_rec;
+0146 <span class="keyword">end</span>
+0147 <span class="keyword">if</span> use_rec
+0148    <span class="keyword">try</span>
+0149       VOL = <a href="../../../eidors/models/get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>(imdl.rec_model);
+0150    <span class="keyword">catch</span>
+0151       VOL = <a href="../../../eidors/models/get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>(imdl.fwd_model);
+0152    <span class="keyword">end</span>
+0153 <span class="keyword">else</span>
+0154    VOL = <a href="../../../eidors/models/get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>(imdl.fwd_model);
+0155 <span class="keyword">end</span>
+0156 VOL = spdiags(VOL,0, length(VOL), length(VOL));
+0157 
+0158 signal_x = VOL*signal_x;
+0159 noise_x = VOL*noise_x;
+0160 
+0161 signal_x = mean(abs(signal_x),1);
+0162 noise_x  = mean(std(noise_x));
+0163 snr_x = signal_x / noise_x;
+0164 
+0165 signal_y = mean(abs(signal_y),1);
+0166 noise_y  = mean(std(noise_y)); 
+0167 snr_y = signal_y / noise_y;
+0168 
+0169 params= [snr_y(:)./snr_x(:)]';
+0170 
+0171 <span class="keyword">try</span>
+0172 <a href="../../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'@@ NF= %f (hp=%e)'</span>, NF, imdl.hyperparameter.value, 2);
+0173 <span class="keyword">end</span>
+0174 
+0175 
+0176 <span class="comment">% NOTES on the calculations: AA - Feb 20, 2012</span>
+0177 <span class="comment">% SNR = mean(abs(x)); VAR =</span>
+0178 <span class="comment">% ym= E[y]</span>
+0179 <span class="comment">% Sy= E[(y-ym)*(y-ym)'] = E[y*y'] - ym*ym'</span>
+0180 <span class="comment">% ny = sqrt(trace(Sy))</span>
+0181 <span class="comment">% xm= E[x]  = E[R*y] = R*E[y] = R*ym</span>
+0182 <span class="comment">% Sx= E[(x-xm)*(x-xm)'] = E[x*x'] - xm*xm'</span>
+0183 <span class="comment">%   = E[R*ym*ym'*R'] = R*E[ym*ym']*R' = R*Sy*R'</span>
+0184 <span class="comment">% nx = sqrt(trace(Sx))</span>
+0185 <span class="comment">%</span>
+0186 <span class="comment">% signal = mean(abs(x));</span>
+0187 <span class="comment">%</span>
+0188 <span class="comment">% In this case, these are exactly the same:</span>
+0189 <span class="comment">%    noise_x  = mean(std(noise_x));</span>
+0190 <span class="comment">%    noise_x  = sqrt(mean(noise_x.^2,2));</span>
+0191    
+0192    
+0193 <a name="_sub3" href="#_subfunctions" class="code">function NF= nf_calc_use_matrix( inv_model, h_data, c_data)</a>
+0194 <span class="comment">% To model std(z) we use z=z0+n</span>
+0195 <span class="comment">% so that std(z) = sqrt(var(z)) = sqrt(1/L * E[n'*n])</span>
+0196 <span class="comment">% we know a priori that the mean noise is zero, thus</span>
+0197 <span class="comment">% we do not need to divide by L-1 in the variance</span>
+0198 <span class="comment">% E[n'*n] = E[ trace(n*n') ] = trace( cov_N )</span>
+0199 <span class="comment">% Thus, std(z) = sqrt( trace( cov_N )/L )</span>
+0200 <span class="comment">%              = sqrt( mean( diag( cov_N )))</span>
+0201 <span class="comment">% And,  std(x) = sqrt( mean( diag( cov_X )))</span>
+0202 <span class="comment">%</span>
+0203 <span class="comment">% To model cov_N, we consider independant noise</span>
+0204 <span class="comment">%  on each channel, cov_N= N*N', N=diag( sigma_i )</span>
+0205 <span class="comment">% And,              cov_X= X*X', X=reconst(N)</span>
+0206 <span class="comment">% where X= reconst(mdl, z0,z0+N)</span>
+0207 <span class="comment">%</span>
+0208 <span class="comment">% To run efficiently mean(diag(cov_N))=mean(sum(N.^2,2))</span>
+0209 <span class="comment">% The sum over X is actually weighted by the volume of</span>
+0210 <span class="comment">%  each element, so VOL.^2*(sum(X.^2,2)</span>
+0211    <span class="keyword">try</span> 
+0212        VOL = <a href="../../../eidors/models/get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>(inv_model.rec_model)';
+0213    <span class="keyword">catch</span>
+0214        VOL = <a href="../../../eidors/models/get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>(inv_model.fwd_model)';
+0215    <span class="keyword">end</span>
+0216 
+0217    <span class="comment">% calculate signal</span>
+0218    d_len   = size(h_data,1);
+0219    delta   = 1e-2* mean(h_data);
+0220    c_noise = c_data*ones(1,d_len) + eye(d_len);
+0221    h_full  = h_data*ones(1,d_len);
+0222 
+0223    sig_data = mean(abs( <span class="keyword">...</span>
+0224          <a href="../../../eidors/solvers/calc_difference_data.html" class="code" title="function dva = calc_difference_data( data1, data2, fwd_model)">calc_difference_data</a>( h_data, c_data , inv_model.fwd_model ) <span class="keyword">...</span>
+0225                        ));
+0226    var_data = mean(sum( <span class="keyword">...</span>
+0227          <a href="../../../eidors/solvers/calc_difference_data.html" class="code" title="function dva = calc_difference_data( data1, data2, fwd_model)">calc_difference_data</a>( h_full, c_noise, inv_model.fwd_model ) <span class="keyword">...</span>
+0228                        .^2, 2)); 
+0229                       
+0230 
+0231    <span class="comment">% calculate image</span>
+0232    <span class="comment">% Note, this won't work if the algorithm output is not zero biased</span>
+0233    [img0, img0n] = <a href="#_sub5" class="code" title="subfunction [img0, img0n] = get_images( inv_model, h_data, c_data, ">get_images</a>( inv_model, h_data, c_data, <span class="keyword">...</span>
+0234                                h_full, c_noise);
+0235 
+0236    i_len = length(img0);
+0237    sig_img= VOL*abs(img0) / i_len;;
+0238    var_img= VOL.^2*sum(img0n.^2 ,2) / i_len;
+0239    
+0240    NF = ( sig_data/ sqrt(var_data) ) / ( sig_img / sqrt(var_img)  );
+0241 
+0242    <span class="comment">% For the record, the expression for var_img is derived as:</span>
+0243    <span class="comment">% Equiv expresssions for var_img % given: A= diag(pp.VOLUME);</span>
+0244    <span class="comment">% var_img= trace(A*RM*diag(Rn.^2)*RM'*A');</span>
+0245    <span class="comment">% vv=A*RM*diag(Rn);var_img=trace(vv*vv'); var_img= sum(sum(vv.^2));</span>
+0246    <span class="comment">% var_img= VOL2* (RM*diag(Rn)).^2</span>
+0247    <span class="comment">% var_img= VOL2* RM.^2 * Rn.^2</span>
+0248 
+0249    
+0250 <span class="comment">% simulate homg data and a small target in centre</span>
+0251 <a name="_sub4" href="#_subfunctions" class="code">function [h_data, c_data]= simulate_targets( fwd_model, ctr_elems)</a>
+0252 
+0253    homg= 1; <span class="comment">% homogeneous conductivity level is 1</span>
+0254 
+0255    <span class="comment">%Step 1: homogeneous image</span>
+0256    sigma= homg*ones( size(fwd_model.elems,1) ,1);
+0257 
+0258    img= <a href="../../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'image'</span>, <span class="string">'homogeneous image'</span>, <span class="keyword">...</span>
+0259                    <span class="string">'elem_data'</span>, sigma, <span class="keyword">...</span>
+0260                    <span class="string">'fwd_model'</span>, fwd_model );
+0261    h_data=<a href="../../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>( img );
+0262    h_data= h_data.meas;
+0263 
+0264    <span class="comment">%Step 1: inhomogeneous image with contrast in centre</span>
+0265    delta = 1e-2;
+0266    sigma(ctr_elems) = homg*(1 + delta);
+0267    img.elem_data = sigma;
+0268    c_data=<a href="../../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>( img );
+0269    c_data= c_data.meas;
+0270 
+0271 <a name="_sub5" href="#_subfunctions" class="code">function [img0, img0n] = get_images( inv_model, h_data, c_data, </a><span class="keyword">...</span>
+0272                                h_full, c_noise);
+0273    <span class="keyword">if</span> isa(inv_model.solve,<span class="string">'function_handle'</span>)
+0274       solve= func2str(inv_model.solve);
+0275    <span class="keyword">else</span>
+0276       solve= inv_model.solve;
+0277    <span class="keyword">end</span>
+0278 
+0279 <span class="comment">% Test for special functions and solve them specially</span>
+0280    <span class="keyword">switch</span> solve
+0281    <span class="keyword">case</span> <span class="string">'ab_tv_diff_solve'</span>
+0282       error(<span class="string">'Dont know how to calculate TV noise figure'</span>)
+0283 
+0284    <span class="keyword">case</span> <span class="string">'inv_solve_diff_kalman'</span>
+0285       inv_model.inv_solve_diff_kalman.keep_K_k1= 1;
+0286       stablize = 6;
+0287       img0 = <a href="../../../eidors/solvers/inv_solve.html" class="code" title="function img = inv_solve( inv_model, data1, data2)">inv_solve</a>( inv_model, h_data, <span class="keyword">...</span>
+0288                                    c_data*ones(1,stablize) );
+0289       K= img0.inv_solve_diff_kalman.K_k1;
+0290       img0.elem_data = K*<a href="../../../eidors/solvers/calc_difference_data.html" class="code" title="function dva = calc_difference_data( data1, data2, fwd_model)">calc_difference_data</a>( h_data , c_data , inv_model.fwd_model);
+0291       img0n.elem_data= K*<a href="../../../eidors/solvers/calc_difference_data.html" class="code" title="function dva = calc_difference_data( data1, data2, fwd_model)">calc_difference_data</a>( h_full , c_noise, inv_model.fwd_model);
+0292 
+0293    <span class="keyword">otherwise</span>
+0294       img0 = <a href="../../../eidors/solvers/inv_solve.html" class="code" title="function img = inv_solve( inv_model, data1, data2)">inv_solve</a>( inv_model, h_data, c_data);
+0295       <span class="keyword">if</span> nargin&gt;4
+0296       img0n= <a href="../../../eidors/solvers/inv_solve.html" class="code" title="function img = inv_solve( inv_model, data1, data2)">inv_solve</a>( inv_model, h_full, c_noise);
+0297       <span class="keyword">end</span>
+0298    <span class="keyword">end</span>
+0299 
+0300    <span class="comment">% Need elem or nodal data</span>
+0301    <span class="keyword">if</span> isfield(img0,<span class="string">'node_data'</span>);
+0302       img0 = img0.node_data;
+0303    <span class="keyword">else</span>
+0304       img0 = img0.elem_data;
+0305    <span class="keyword">end</span>
+0306 
+0307    <span class="keyword">if</span> isfield(img0n,<span class="string">'node_data'</span>);
+0308       img0n = img0n.node_data;
+0309    <span class="keyword">else</span>
+0310       img0n = img0n.elem_data;
+0311    <span class="keyword">end</span>
+0312 
+0313 <span class="comment">% OLD CODE - iterate</span>
+0314 <a name="_sub6" href="#_subfunctions" class="code">function NF= nf_calc_iterate( inv_model, h_data, c_data);</a>
+0315    <span class="keyword">try</span> 
+0316        VOL = <a href="../../../eidors/models/get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>(inv_model.rec_model)';
+0317    <span class="keyword">catch</span>
+0318        VOL = <a href="../../../eidors/models/get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>(inv_model.fwd_model)';
+0319    <span class="keyword">end</span>
+0320    <span class="comment">% calculate signal</span>
+0321    d_len   = size(h_data,1);
+0322    delta   = 1e-2* mean(h_data);
+0323    sig_data = mean(abs( <span class="keyword">...</span>
+0324          <a href="../../../eidors/solvers/calc_difference_data.html" class="code" title="function dva = calc_difference_data( data1, data2, fwd_model)">calc_difference_data</a>( h_data, c_data , inv_model.fwd_model ) <span class="keyword">...</span>
+0325                        ));
+0326    <span class="comment">% calculate image</span>
+0327    <span class="comment">% Note, this won't work if the algorithm output is not zero biased</span>
+0328 
+0329    [img0] = <a href="#_sub5" class="code" title="subfunction [img0, img0n] = get_images( inv_model, h_data, c_data, ">get_images</a>( inv_model, h_data, c_data);
+0330 <span class="comment">%  sig_img= mean(VOL'.*abs(img0.elem_data));</span>
+0331    sig_img= VOL*abs(img0) / length(img0);
+0332 
+0333    <span class="comment">% Now do noise</span>
+0334    var_data= 0;
+0335    var_img = 0;
+0336    <span class="keyword">for</span> i=1:d_len
+0337       this_noise = -ones(d_len, size(c_data,2))/(d_len-1);
+0338       this_noise(i,:) = 1;
+0339       c_noise = c_data + this_noise;
+0340       [imgn] = <a href="#_sub5" class="code" title="subfunction [img0, img0n] = get_images( inv_model, h_data, c_data, ">get_images</a>( inv_model, h_data, c_noise);
+0341       <span class="keyword">if</span> 1
+0342          var_data = var_data + mean(sum( <span class="keyword">...</span>
+0343             <a href="../../../eidors/solvers/calc_difference_data.html" class="code" title="function dva = calc_difference_data( data1, data2, fwd_model)">calc_difference_data</a>( h_data, c_noise, inv_model.fwd_model ) <span class="keyword">...</span>
+0344                           .^2, 2)); 
+0345 <span class="comment">%        var_img= var_img +  mean( (VOL'.*imgn.elem_data).^2 );</span>
+0346          var_img= var_img +  (VOL.^2)*sum(imgn.elem_data.^2,2 ) / length(imgn.elem_data); 
+0347       <span class="keyword">else</span>
+0348          <span class="comment">% OLD APPROACH BASED ON variance, rather than matrix calcs</span>
+0349          var_data = var_data + var( <span class="keyword">...</span>
+0350             <a href="../../../eidors/solvers/calc_difference_data.html" class="code" title="function dva = calc_difference_data( data1, data2, fwd_model)">calc_difference_data</a>( h_data, c_noise, inv_model.fwd_model ) <span class="keyword">...</span>
+0351                                  ); 
+0352          var_img= var_img + var( VOL'.*imgn.elem_data ); 
+0353       <span class="keyword">end</span>
+0354    <span class="keyword">end</span>
+0355    var_data = var_data / d_len;
+0356    var_img  = var_img  / d_len;
+0357    NF = ( sig_data/ sqrt(var_data) ) / ( sig_img / sqrt(var_img)  );
+0358 
+0359 <a name="_sub7" href="#_subfunctions" class="code">function [NF,SE]= nf_calc_random( rec, vh, vi, N_RUNS);</a>
+0360    <a href="../../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'boost_priority'</span>,-2); <span class="comment">% low priority values</span>
+0361 
+0362    imgr= <a href="../../../eidors/solvers/inv_solve.html" class="code" title="function img = inv_solve( inv_model, data1, data2)">inv_solve</a>(rec, vh, vi);
+0363 
+0364    <span class="keyword">if</span> isfield(imgr,<span class="string">'node_data'</span>);
+0365       img0 = imgr.node_data;
+0366       <span class="keyword">try</span>
+0367           VOL = <a href="../../../eidors/models/get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>(rec.rec_model, 1);
+0368       <span class="keyword">catch</span>
+0369           VOL = <a href="../../../eidors/models/get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>(rec.fwd_model, 1);
+0370       <span class="keyword">end</span>
+0371    <span class="keyword">else</span>
+0372       n_els = length(rec.fwd_model);
+0373       img0 = imgr.elem_data(1:n_els); <span class="comment">% elem_data can also contain movement</span>
+0374       <span class="keyword">try</span>
+0375           VOL = <a href="../../../eidors/models/get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>(rec.rec_model, 0);
+0376       <span class="keyword">catch</span>
+0377           VOL = <a href="../../../eidors/models/get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>(rec.fwd_model, 0);
+0378       <span class="keyword">end</span>
+0379    <span class="keyword">end</span>
+0380 
+0381    sig_ampl = mean( abs( VOL .* img0 )) / <span class="keyword">...</span>
+0382               mean( abs( <a href="../../../eidors/solvers/calc_difference_data.html" class="code" title="function dva = calc_difference_data( data1, data2, fwd_model)">calc_difference_data</a>( vh, vi, rec.fwd_model )));
+0383 
+0384 <span class="comment">% Estimate Signal Amplitude</span>
+0385    <span class="keyword">for</span> i=1:N_RUNS
+0386       vn= <a href="#_sub8" class="code" title="subfunction noise= addnoise( vh, vi, SNR);">addnoise</a>(vh, vi, 1.0);
+0387 
+0388       imgr= <a href="../../../eidors/solvers/inv_solve.html" class="code" title="function img = inv_solve( inv_model, data1, data2)">inv_solve</a>(rec, vh, vn);
+0389 
+0390       <span class="keyword">if</span> isfield(imgr,<span class="string">'node_data'</span>); img0 = imgr.node_data;
+0391       <span class="keyword">else</span>;                         img0 = imgr.elem_data(1:n_els);
+0392       <span class="keyword">end</span>
+0393 
+0394       noi_imag(i) = std( VOL .* img0 );
+0395       noi_sgnl(i) = std( <a href="../../../eidors/solvers/calc_difference_data.html" class="code" title="function dva = calc_difference_data( data1, data2, fwd_model)">calc_difference_data</a>( vh, vn, rec.fwd_model ));
+0396    <span class="keyword">end</span>
+0397 
+0398    noi_ampl = noi_imag./noi_sgnl;
+0399    NF =  mean(noi_ampl/sig_ampl);
+0400    SE =  std(noi_ampl/sig_ampl)/sqrt(N_RUNS);
+0401    <a href="../../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'NF= %f+/-%f'</span>, NF, SE, 3);
+0402 
+0403    <a href="../../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'boost_priority'</span>,2);
+0404 
+0405 <a name="_sub8" href="#_subfunctions" class="code">function noise= addnoise( vh, vi, SNR);</a>
+0406       <span class="keyword">if</span> isstruct(vh); vh= vh.meas; <span class="keyword">end</span>
+0407       <span class="keyword">if</span> isstruct(vi); vi= vi.meas; <span class="keyword">end</span>
+0408       noise = randn(size(vh));
+0409       noise = noise*std(vh-vi)/std(noise);
+0410       noise = vh + SNR*noise;
+0411 
+0412 <a name="_sub9" href="#_subfunctions" class="code">function do_unit_test</a>
+0413     ll = <a href="../../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,1);
+0414     <a href="#_sub10" class="code" title="subfunction test1">test1</a>; <span class="comment">% can we deal with c2f ?</span>
+0415     imdl = <a href="../../../eidors/models/mk_common_model.html" class="code" title="function inv_mdl= mk_common_model( str, n_elec, varargin )">mk_common_model</a>(<span class="string">'a2t2'</span>,16); <a href="#_sub11" class="code" title="subfunction test2(imdl)">test2</a>(imdl);
+0416     imdl = <a href="../../../eidors/models/mk_common_model.html" class="code" title="function inv_mdl= mk_common_model( str, n_elec, varargin )">mk_common_model</a>(<span class="string">'d2t2'</span>,16); <a href="#_sub11" class="code" title="subfunction test2(imdl)">test2</a>(imdl);
+0417     imdl = <a href="../../../eidors/models/mk_common_model.html" class="code" title="function inv_mdl= mk_common_model( str, n_elec, varargin )">mk_common_model</a>(<span class="string">'a2c2'</span>,16); <a href="#_sub11" class="code" title="subfunction test2(imdl)">test2</a>(imdl);
+0418     imdl = <a href="../../../eidors/models/mk_common_model.html" class="code" title="function inv_mdl= mk_common_model( str, n_elec, varargin )">mk_common_model</a>(<span class="string">'d2c2'</span>,16); <a href="#_sub11" class="code" title="subfunction test2(imdl)">test2</a>(imdl);
+0419     ll = <a href="../../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,ll);
+0420 
+0421 <a name="_sub10" href="#_subfunctions" class="code">function test1</a>
+0422     <span class="comment">% big model with c2f and supposedly an NF of 0.5</span>
+0423     fmdl = <a href="../../../eidors/models/mk_library_model.html" class="code" title="function out = mk_library_model(shape,elec_pos,elec_shape,maxsz,nfft,scale)">mk_library_model</a>(<span class="string">'pig_23kg_16el'</span>);
+0424     [fmdl.stimulation fmdl.meas_select] = <a href="../../../eidors/models/mk_stim_patterns.html" class="code" title="function [stim, meas_sel]= mk_stim_patterns(n_elec, n_rings, inj, meas, options, amplitude)">mk_stim_patterns</a>(16,1,<span class="string">'{ad}'</span>,<span class="string">'{ad}'</span>);
+0425     fmdl = <a href="../../../eidors/models/mdl_normalize.html" class="code" title="function out = mdl_normalize(mdl, val)">mdl_normalize</a>(fmdl, 1);  <span class="comment">% Use normalized difference imaging</span>
+0426     opt.noise_figure = 0.5; opt.imgsz = [64 64];
+0427     imdl = <a href="../../../eidors/models/mk_GREIT_model.html" class="code" title="function [imdl, weight]= mk_GREIT_model( fmdl, radius, weight, options )">mk_GREIT_model</a>(fmdl, 0.25, [], opt);
+0428     <span class="comment">% homogeneous measurement</span>
+0429     img = <a href="../../../eidors/models/mk_image.html" class="code" title="function img= mk_image(mdl, elem_data, params, name)">mk_image</a>(fmdl,1);
+0430     vh = <a href="../../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>(img);
+0431     <span class="comment">% inhomogeneous measurement</span>
+0432     select_fcn = inline(<span class="string">'(x-0).^2+(y-0).^2+(z-0.5).^2&lt;0.1^2'</span>,<span class="string">'x'</span>,<span class="string">'y'</span>,<span class="string">'z'</span>);
+0433     mfrac = <a href="../../../eidors/models/elem_select.html" class="code" title="function memb_frac = elem_select( fmdl, select_fcn )">elem_select</a>(fmdl, select_fcn);
+0434     img.elem_data = img.elem_data + mfrac*0.1;
+0435     vi = <a href="../../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>(img);
+0436     
+0437     nf1 = <a href="../../../eidors/deprecated/calc_noise_params.html" class="code" title="function params = calc_noise_params(imdl, vh, vi )">calc_noise_params</a>(imdl, vh.meas, vi.meas);
+0438     
+0439     <span class="comment">% We use different measurements so naturally we don't get 0.5 here</span>
+0440     imdl.hyperparameter.tgt_data.meas_t1 = vh.meas;
+0441     imdl.hyperparameter.tgt_data.meas_t2 = vi.meas;
+0442     <span class="keyword">try</span>
+0443         <span class="comment">% calc_noise_figure doens't support dual models</span>
+0444         nf2 = <a href="calc_noise_figure.html" class="code" title="function [NF,SE] = calc_noise_figure( inv_model, hp, iterations)">calc_noise_figure</a>(imdl);
+0445     <span class="keyword">catch</span>
+0446         nf2 = 0;
+0447     <span class="keyword">end</span>
+0448     <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'Noise fig implementations'</span>,nf1, nf2, 1e-2);
+0449 
+0450 <a name="_sub11" href="#_subfunctions" class="code">function test2(imdl)</a>
+0451     fmdl = imdl.fwd_model;
+0452     <span class="comment">% homogeneous measurement</span>
+0453     img = <a href="../../../eidors/models/mk_image.html" class="code" title="function img= mk_image(mdl, elem_data, params, name)">mk_image</a>(fmdl,1);
+0454     vh = <a href="../../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>(img);
+0455     <span class="comment">% inhomogeneous measurement</span>
+0456     select_fcn = inline(<span class="string">'(x-0).^2+(y-0).^2.^2&lt;15^2'</span>,<span class="string">'x'</span>,<span class="string">'y'</span>,<span class="string">'z'</span>);
+0457     mfrac = <a href="../../../eidors/models/elem_select.html" class="code" title="function memb_frac = elem_select( fmdl, select_fcn )">elem_select</a>(fmdl, select_fcn);
+0458     img.elem_data = img.elem_data + mfrac*0.1;
+0459     vi = <a href="../../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>(img);
+0460 
+0461     nf1 = <a href="../../../eidors/deprecated/calc_noise_params.html" class="code" title="function params = calc_noise_params(imdl, vh, vi )">calc_noise_params</a>(imdl, vh.meas, vi.meas);
+0462     <a href="../../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(nf1,0);
+0463 
+0464 imdl.hyperparameter.tgt_data.meas_t1 = vh.meas;
+0465 imdl.hyperparameter.tgt_data.meas_t2 = vi.meas;
+0466 <span class="comment">% calc_noise_figure doens't support dual models</span>
+0467 nf2 = <a href="calc_noise_figure.html" class="code" title="function [NF,SE] = calc_noise_figure( inv_model, hp, iterations)">calc_noise_figure</a>(imdl,[],1000);
+0468 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'Noise fig implementations'</span>,nf1, nf2, 1e-2);
+0469</pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

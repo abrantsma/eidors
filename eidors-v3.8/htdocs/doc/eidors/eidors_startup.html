@@ -1,0 +1,354 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of eidors_startup</title>
+  <meta name="keywords" content="eidors_startup">
+  <meta name="description" content="Script to start EIDORS">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">eidors</a> &gt; eidors_startup.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>eidors_startup
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Script to start EIDORS</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function eidors_startup( path_array ) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Script to start EIDORS
+ Set path and variables correctly
+ USAGE:
+   startup - setup basic eidors usage functions
+   startup( { dev directory paths })</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>	EIDORS_MSG eidors progress and status messages</li><li><a href="eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>	EIDORS_OBJ: 'constructor' to create a eidors structure</li><li><a href="../eidors/graphics/matlab/calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>	[colours,scl_data]= calc_colours(img, set_value, do_colourbar)</li><li><a href="../eidors/interface/system_cmd.html" class="code" title="function [status,result] = system_cmd( cmd )">system_cmd</a>	SYSTEM_CMD: issue system commands, and try to compensate for</li><li><a href="../eidors/models/mk_library_model.html" class="code" title="function out = mk_library_model(shape,elec_pos,elec_shape,maxsz,nfft,scale)">mk_library_model</a>	MK_LIBRARY_MODEL - FEM models based on library shapes</li><li><a href="../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>	EIDORS_CACHE Control eidors caching</li><li><a href="../eidors/tools/eidors_default.html" class="code" title="function varargout = eidors_default(varargin)">eidors_default</a>	EIDORS_DEFAULT Default function handler.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="startup.html" class="code" title="">startup</a>	CUSTOM EIDORS STARTUP FILE</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function set_defaults(HOMEDIR)</a></li><li><a href="#_sub2" class="code">function ver = version_check</a></li><li><a href="#_sub3" class="code">function archdir = set_paths(HOMEDIR, ver,path_array)</a></li><li><a href="#_sub4" class="code">function compile_mex(HOMEDIR,archdir, ver)</a></li><li><a href="#_sub5" class="code">function print_welcome(HOMEDIR,archdir,ver)</a></li><li><a href="#_sub6" class="code">function ok = eidors_var_id_ok;</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function eidors_startup( path_array )</a>
+0002 <span class="comment">% Script to start EIDORS</span>
+0003 <span class="comment">% Set path and variables correctly</span>
+0004 <span class="comment">% USAGE:</span>
+0005 <span class="comment">%   startup - setup basic eidors usage functions</span>
+0006 <span class="comment">%   startup( { dev directory paths })</span>
+0007 
+0008 <span class="comment">% NOTE: this is a function, so that we don't put variables into the</span>
+0009 <span class="comment">% workspace</span>
+0010 
+0011 <span class="comment">% (C) 2005 Andy Adler. License: GPL version 2 or version 3</span>
+0012 <span class="comment">% $Id: eidors_startup.m 4826 2015-03-29 15:32:45Z bgrychtol-ipa $</span>
+0013 
+0014 <span class="keyword">if</span> nargin == 0
+0015     path_array = {};
+0016 <span class="keyword">end</span>
+0017 
+0018 HOMEDIR=strrep(pwd,<span class="string">'\'</span>,<span class="string">'/'</span>);
+0019 ver = <a href="#_sub2" class="code" title="subfunction ver = version_check">version_check</a>;
+0020 archdir = <a href="#_sub3" class="code" title="subfunction archdir = set_paths(HOMEDIR, ver,path_array)">set_paths</a>(HOMEDIR,ver, path_array);
+0021 <a href="../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'init'</span>);
+0022 <span class="comment">% make EIDORS more verbose by default, this should lead to better questions</span>
+0023 <span class="comment">% on the mailing list</span>
+0024 <a href="eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>, 3); 
+0025 <a href="#_sub1" class="code" title="subfunction set_defaults(HOMEDIR)">set_defaults</a>(HOMEDIR);
+0026 <a href="#_sub5" class="code" title="subfunction print_welcome(HOMEDIR,archdir,ver)">print_welcome</a>(HOMEDIR,archdir, ver);
+0027 
+0028 <a name="_sub1" href="#_subfunctions" class="code">function set_defaults(HOMEDIR)</a>
+0029     <span class="comment">% default functions</span>
+0030     <a href="../eidors/tools/eidors_default.html" class="code" title="function varargout = eidors_default(varargin)">eidors_default</a>(<span class="string">'set'</span>,<span class="string">'fwd_solve'</span>,<span class="string">'fwd_solve_1st_order'</span>);
+0031     <a href="../eidors/tools/eidors_default.html" class="code" title="function varargout = eidors_default(varargin)">eidors_default</a>(<span class="string">'set'</span>,<span class="string">'calc_system_mat'</span>,<span class="string">'system_mat_1st_order'</span>);
+0032     <a href="../eidors/tools/eidors_default.html" class="code" title="function varargout = eidors_default(varargin)">eidors_default</a>(<span class="string">'set'</span>,<span class="string">'calc_jacobian'</span>,<span class="string">'jacobian_adjoint'</span>);
+0033     <a href="../eidors/tools/eidors_default.html" class="code" title="function varargout = eidors_default(varargin)">eidors_default</a>(<span class="string">'set'</span>,<span class="string">'inv_solve'</span>,<span class="string">'inv_solve_diff_GN_one_step'</span>);
+0034     <a href="../eidors/tools/eidors_default.html" class="code" title="function varargout = eidors_default(varargin)">eidors_default</a>(<span class="string">'set'</span>,<span class="string">'calc_RtR_prior'</span>,<span class="string">'prior_laplace'</span>);
+0035     <a href="../eidors/tools/eidors_default.html" class="code" title="function varargout = eidors_default(varargin)">eidors_default</a>(<span class="string">'set'</span>,<span class="string">'calc_R_prior'</span>,<span class="string">'prior_laplace'</span>);
+0036     <a href="../eidors/tools/eidors_default.html" class="code" title="function varargout = eidors_default(varargin)">eidors_default</a>(<span class="string">'set'</span>,<span class="string">'fwd_solve'</span>,<span class="string">'fwd_solve_1st_order'</span>);
+0037     <a href="../eidors/tools/eidors_default.html" class="code" title="function varargout = eidors_default(varargin)">eidors_default</a>(<span class="string">'set'</span>,<span class="string">'GREIT_desired_img'</span>,<span class="string">'GREIT_desired_img_sigmoid'</span>);
+0038     <span class="comment">%models are NOT normalized by default</span>
+0039     <a href="../eidors/tools/eidors_default.html" class="code" title="function varargout = eidors_default(varargin)">eidors_default</a>(<span class="string">'set'</span>,<span class="string">'mdl_normalize'</span>,@(x) 0); 
+0040 
+0041     <a href="../eidors/graphics/matlab/calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'defaults'</span>); <span class="comment">% default calc_colours</span>
+0042 
+0043     <span class="comment">%  Set max cache size. Not completely sure about this</span>
+0044     <span class="comment">%  but 1GB should be available in most modern machines</span>
+0045     <a href="../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'cache_size'</span>, 1024^3 );
+0046     <a href="../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'boost_priority'</span>, 0 ); <span class="comment">% set default priority</span>
+0047 
+0048     <span class="comment">% Set default model cache location</span>
+0049     <a href="../eidors/models/mk_library_model.html" class="code" title="function out = mk_library_model(shape,elec_pos,elec_shape,maxsz,nfft,scale)">mk_library_model</a>(<span class="string">'LIBRARY_PATH'</span>,[HOMEDIR, <span class="string">'/models/cache'</span>]);
+0050     <a href="../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'cache_path'</span>,[HOMEDIR, <span class="string">'/models/cache'</span>]);
+0051 
+0052     <a href="../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'eidors_path'</span>,HOMEDIR);
+0053 
+0054 
+0055 <a name="_sub2" href="#_subfunctions" class="code">function ver = version_check</a>
+0056     ver= <a href="eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'interpreter_version'</span>);
+0057 
+0058     <span class="keyword">if</span> ver.isoctave
+0059         <span class="keyword">if</span> ver.ver &lt; 3.002
+0060             warning([<span class="string">'EIDORS REQUIRES AT LEAST OCTAVE V3.2.0\n'</span> <span class="keyword">...</span>
+0061                 <span class="string">'Several functions may not work with your version'</span>]);
+0062         <span class="keyword">end</span>
+0063     <span class="keyword">else</span>
+0064         <span class="keyword">if</span> ver.ver &lt; 7.000
+0065             warning([<span class="string">'EIDORS REQUIRES AT LEAST MATLAB V7.0.\n'</span> <span class="keyword">...</span>
+0066                 <span class="string">'Several functions may not work with your version'</span>]);
+0067         <span class="keyword">end</span>
+0068     <span class="keyword">end</span>
+0069 
+0070 <a name="_sub3" href="#_subfunctions" class="code">function archdir = set_paths(HOMEDIR, ver,path_array)</a>
+0071 
+0072     
+0073     addpath( HOMEDIR );
+0074     addpath([HOMEDIR, <span class="string">'/solvers'</span>]);
+0075     addpath([HOMEDIR, <span class="string">'/solvers/inverse'</span>]);
+0076     addpath([HOMEDIR, <span class="string">'/solvers/forward'</span>]);
+0077     addpath([HOMEDIR, <span class="string">'/algorithms'</span>]);
+0078     addpath([HOMEDIR, <span class="string">'/interface'</span>]);
+0079     addpath([HOMEDIR, <span class="string">'/models'</span>]);
+0080     addpath([HOMEDIR, <span class="string">'/meshing'</span>]);
+0081     addpath([HOMEDIR, <span class="string">'/meshing/netgen'</span>]);
+0082     addpath([HOMEDIR, <span class="string">'/meshing/distmesh'</span>]);
+0083     addpath([HOMEDIR, <span class="string">'/meshing/gmsh'</span>]);
+0084     addpath([HOMEDIR, <span class="string">'/meshing/stl'</span>]);
+0085     addpath([HOMEDIR, <span class="string">'/sample_data'</span>]);
+0086     addpath([HOMEDIR, <span class="string">'/examples'</span>]);
+0087     addpath([HOMEDIR, <span class="string">'/tools'</span>]);
+0088     addpath([HOMEDIR, <span class="string">'/graphics/matlab'</span>]);
+0089     addpath([HOMEDIR, <span class="string">'/graphics/vtk'</span>]);
+0090     addpath(genpath([HOMEDIR, <span class="string">'/external'</span>])); <span class="comment">%add subdirectories</span>
+0091     addpath([HOMEDIR, <span class="string">'/deprecated'</span>]);
+0092     <span class="comment">% we will be overloading built-in functions. Disable the warning.</span>
+0093     warning off MATLAB:dispatcher:nameConflict
+0094     addpath([HOMEDIR, <span class="string">'/overloads'</span>]);
+0095     warning on MATLAB:dispatcher:nameConflict
+0096 
+0097     <span class="comment">%addpath([HOMEDIR, '/tests']);</span>
+0098 
+0099     DEVDIR = [HOMEDIR(1:find(HOMEDIR == <span class="string">'/'</span>,1,<span class="string">'last'</span>)-1) <span class="string">'/dev'</span>];
+0100     <span class="keyword">for</span> i = 1:length(path_array)
+0101         p = genpath([DEVDIR, <span class="string">'/'</span>, path_array{i}]);
+0102         addpath(p);
+0103     <span class="keyword">end</span>
+0104     <span class="comment">% addpath([DEVDIR, '/a_adler']);</span>
+0105     <span class="comment">% addpath([DEVDIR, '/b_grychtol']);</span>
+0106 
+0107     <span class="comment">% We need to add an architecture specific directory for mex files</span>
+0108     <span class="keyword">if</span> ver.isoctave
+0109         archdir= strcat(<span class="string">'/arch/octave/'</span>,computer);
+0110     <span class="keyword">else</span>
+0111         <span class="comment">% I don't know when matlab stopped using DLL as the extension</span>
+0112         <span class="comment">% for WIN32 mex files. Last I know of is 7.3</span>
+0113         <span class="keyword">if</span> any(findstr(computer,<span class="string">'PCWIN'</span>)) &amp;&amp; ( ver.ver &lt; 7.003 )
+0114             archdir= <span class="string">'/arch/matlab/dll'</span>;
+0115         <span class="keyword">elseif</span> ver.ver &lt;  7.012
+0116             archdir= <span class="string">'/arch/matlab/7.011'</span>;
+0117         <span class="keyword">else</span>
+0118             archdir= <span class="string">'/arch/matlab'</span>;
+0119         <span class="keyword">end</span>
+0120     <span class="keyword">end</span>
+0121     addpath([HOMEDIR, archdir]);
+0122     fname = [HOMEDIR, archdir, <span class="string">'/eidors_var_id.'</span>, mexext];
+0123     
+0124     <span class="keyword">if</span> ~exist(fname, <span class="string">'file'</span>)
+0125        <a href="eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'STARTUP: missing a required, pre-compiled mex file: eidors_var_id'</span>, 1);
+0126        <a href="#_sub4" class="code" title="subfunction compile_mex(HOMEDIR,archdir, ver)">compile_mex</a>(HOMEDIR,archdir,ver);
+0127     <span class="keyword">end</span>
+0128 
+0129     <span class="comment">% check that the compiled mex file is newer than the source file</span>
+0130     srcf = strcat(HOMEDIR,<span class="string">'/arch/eidors_var_id.cpp'</span>);
+0131     mexf = strcat(fname);
+0132     <span class="keyword">if</span> exist(srcf) == 2 &amp;&amp; exist(mexf) == 3
+0133         srcd=dir(srcf);
+0134         mexd=dir(mexf);
+0135 
+0136 
+0137         <span class="comment">% We thank MATLAB for their version issues</span>
+0138         newer_src = false;
+0139         <span class="keyword">try</span> newer_src = datenum(srcd.date) &gt; datenum(mexd.date);
+0140         <span class="keyword">catch</span>
+0141            newer_src = srcd.datenum &gt; mexd.datenum;
+0142         <span class="keyword">end</span>
+0143 
+0144         <span class="keyword">if</span> newer_src
+0145            warning(<span class="string">'eidors_var_id.mex file is older than source file and should be recompiled.'</span>);
+0146         <span class="keyword">end</span>
+0147 
+0148         ok = eidors_var_id_ok;
+0149         <span class="keyword">if</span> newer_src || ~ok
+0150            <span class="keyword">while</span> 1
+0151               <span class="keyword">if</span> ~ok
+0152                  resp = input(<span class="string">'Would you like to compile now? [Y/n]: '</span>,<span class="string">'s'</span>);
+0153               <span class="keyword">else</span>
+0154                  resp = input(<span class="string">'Would you like to compile now? [y/N]: '</span>,<span class="string">'s'</span>);
+0155                  <span class="keyword">if</span> isempty(resp)
+0156                     resp = <span class="string">'n'</span>;
+0157                  <span class="keyword">end</span>
+0158               <span class="keyword">end</span>
+0159               
+0160               <span class="keyword">switch</span> lower(resp)
+0161                  <span class="keyword">case</span> {<span class="string">'n'</span>, <span class="string">'no'</span>}
+0162                     <span class="keyword">if</span> ver.isoctave
+0163                        <a href="eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>([<span class="keyword">...</span>
+0164                           <span class="string">'  Please compile it using:\n'</span><span class="keyword">...</span>
+0165                           <span class="string">'    cd '</span>,HOMEDIR,<span class="string">'/arch\n'</span><span class="keyword">...</span>
+0166                           <span class="string">'    mkoctfile -v --mex eidors_var_id.cpp\n'</span><span class="keyword">...</span>
+0167                           <span class="string">'    mkdir -p ..'</span>,archdir,<span class="string">'\n'</span><span class="keyword">...</span>
+0168                           <span class="string">'    mv *.mex ..'</span>,archdir <span class="keyword">...</span>
+0169                           ],1);
+0170                     <span class="keyword">else</span>
+0171                        <a href="eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>([ <span class="keyword">...</span>
+0172                           <span class="string">'  Please compile it using:\n'</span><span class="keyword">...</span>
+0173                           <span class="string">'     cd '</span>,HOMEDIR,<span class="string">'/arch\n'</span><span class="keyword">...</span>
+0174                           <span class="string">'     mex &quot;'</span>,HOMEDIR,<span class="string">'/arch/eidors_var_id.cpp&quot;\n'</span><span class="keyword">...</span>
+0175                           <span class="string">'     mv *.mex* '</span>,HOMEDIR,<span class="string">'/arch/matlab\n'</span> <span class="keyword">...</span>
+0176                           <span class="string">'If you have a 64 bit machine, please use &quot;mex -largeArrayDims ...&quot;'</span> <span class="keyword">...</span>
+0177                           ],1);
+0178                     <span class="keyword">end</span>
+0179                     <span class="keyword">break</span>;
+0180                  <span class="keyword">case</span> {<span class="string">''</span>,<span class="string">'y'</span>,<span class="string">'yes'</span>}
+0181                    <a href="#_sub4" class="code" title="subfunction compile_mex(HOMEDIR,archdir, ver)">compile_mex</a>(HOMEDIR,archdir,ver);
+0182                    <span class="keyword">break</span>;
+0183               <span class="keyword">end</span>
+0184            <span class="keyword">end</span>
+0185         <span class="keyword">end</span>
+0186     <span class="keyword">end</span>
+0187 
+0188 <a name="_sub4" href="#_subfunctions" class="code">function compile_mex(HOMEDIR,archdir, ver)</a>
+0189     <a href="eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'Attempting to compile eidors_var_id'</span>,2);
+0190     c = computer;
+0191     flags = [];
+0192 
+0193     <span class="keyword">if</span> ver.isoctave
+0194          curdir = cd;
+0195          cd(sprintf(<span class="string">'%s/arch'</span>,HOMEDIR));
+0196          mkoctfile -v --mex eidors_var_id.cpp
+0197          eval(sprintf(<span class="string">'mkdir -p ..%s'</span>,archdir));
+0198          movefile(sprintf(<span class="string">'%s/arch/*.mex'</span>,HOMEDIR), <span class="keyword">...</span>
+0199                   sprintf(<span class="string">'%s%s'</span>,HOMEDIR,archdir));
+0200          cd(curdir)
+0201          <span class="keyword">return</span>
+0202     <span class="keyword">end</span>
+0203     
+0204     <span class="keyword">if</span> strcmp(c(end-1:end),<span class="string">'64'</span>)
+0205        flags = <span class="string">'-largeArrayDims'</span>;
+0206     <span class="keyword">end</span>  
+0207     cmd = sprintf(<span class="string">'mex %s &quot;%s/arch/eidors_var_id.cpp&quot;'</span>, flags, HOMEDIR);
+0208 <span class="comment">% it seems to be better to use matlabs mex, especially since</span>
+0209 <span class="comment">% there is a latex derivative called mex to interfere with us</span>
+0210 <span class="keyword">if</span> 0
+0211     tmppath= getenv(<span class="string">'PATH'</span>);
+0212     setenv(<span class="string">'PATH'</span>,[tmppath,pathsep,matlabroot,<span class="string">'/bin'</span>]); <span class="comment">% add matlab to path if required</span>
+0213     <a href="../eidors/interface/system_cmd.html" class="code" title="function [status,result] = system_cmd( cmd )">system_cmd</a>(cmd);
+0214     setenv(<span class="string">'PATH'</span>,tmppath); <span class="comment">% restore path</span>
+0215 <span class="keyword">else</span>
+0216     eval(cmd);
+0217 <span class="keyword">end</span>
+0218 <span class="comment">% the assholes at matlab don&quot;t respect the 'f' flag in their own</span>
+0219 <span class="comment">% documentation. this means we need to rewrite the whole file move.</span>
+0220 <span class="comment">% after 60 years of pcs you would think that copying files is</span>
+0221 <span class="comment">% understood technology!</span>
+0222     targ = sprintf(<span class="string">'%s%s/eidors_var_id.%s'</span>,HOMEDIR,archdir,mexext);
+0223     <span class="keyword">try</span>
+0224     delete( targ );
+0225     <span class="keyword">end</span>
+0226     movefile(sprintf(<span class="string">'%s/eidors_var_id.%s'</span>,HOMEDIR, mexext), targ)
+0227 
+0228     ok = eidors_var_id_ok; <span class="comment">% test it</span>
+0229     <span class="keyword">if</span> ~ok
+0230        fprintf([ <span class="keyword">...</span>
+0231     <span class="string">'After compilation, eidors_var_id does not seem to be working.'</span> <span class="keyword">...</span>
+0232     <span class="string">'Sorry, you will need to debug this yourself. Some ideas are:\n\n'</span> <span class="keyword">...</span>
+0233     <span class="string">'On windows, try &quot;mex -setup&quot;. You may need to install a compiler.'</span> <span class="keyword">...</span>
+0234     <span class="string">'For your matlab version (ie R2013a), see:'</span> <span class="keyword">...</span>
+0235     <span class="string">'http://www.mathworks.com/support/compilers/R2013a\n\n'</span> <span class="keyword">...</span>
+0236     <span class="string">'On linux, you may need to install older compilers like gcc-4.4.'</span> <span class="keyword">...</span>
+0237     <span class="string">'These can be used by writing\n'</span> <span class="keyword">...</span>
+0238     <span class="string">'   mex CC=gcc-4.4 CXX=g++-4.4 -largeArrayDims eidors_var_id.cpp\n'</span>]);
+0239     <span class="keyword">end</span>
+0240 
+0241 <a name="_sub5" href="#_subfunctions" class="code">function print_welcome(HOMEDIR,archdir,ver)</a>
+0242     eidors_ver = <a href="eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'eidors_version'</span>);
+0243     <span class="keyword">if</span> eidors_ver(end) == <span class="string">'+'</span> <span class="comment">% post release version</span>
+0244        <span class="comment">% THIS IS HORRIBLE, HORRIBLE CRAP IN SVN. LOTS OF USERS WANT GlobalRev</span>
+0245        <span class="comment">% BUT THE ARROGANT SVN AUTHORS REFUSE TO PROVIDE IT!!!!</span>
+0246        [status, result] = system(<span class="string">'svnversion'</span>);
+0247        <span class="keyword">if</span> status==0;
+0248           eidors_ver = [eidors_ver, <span class="string">' SVN_ID='</span>, result(1:end-1)];
+0249        <span class="keyword">end</span>
+0250     <span class="keyword">end</span>
+0251     <a href="eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'Installed EIDORS (Ver: %s)'</span>, eidors_ver,1);
+0252 
+0253     <a href="eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'Parameter: cache_size=%.0f MB'</span>,<a href="../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'cache_size'</span>)/(1024*1024),1);
+0254     <a href="eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'Parameter: mapped_colour=%d'</span>,<a href="../eidors/graphics/matlab/calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'mapped_colour'</span>),1);
+0255     <span class="keyword">if</span> <a href="../eidors/graphics/matlab/calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'greylev'</span>)&gt;=0
+0256         <a href="eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'Default background colour: black'</span>,1);
+0257     <span class="keyword">else</span>
+0258         <a href="eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'Default background colour: white'</span>,1);
+0259     <span class="keyword">end</span>
+0260     <a href="eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'EIDORS mex folder: %s%s'</span>,HOMEDIR,archdir,1);
+0261     <a href="eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'EIDORS cache folder: %s (must be writable)'</span>, <span class="keyword">...</span>
+0262          <a href="../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'cache_path'</span>),1);
+0263     <a href="eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'EIDORS model cache: %s'</span>, <a href="../eidors/models/mk_library_model.html" class="code" title="function out = mk_library_model(shape,elec_pos,elec_shape,maxsz,nfft,scale)">mk_library_model</a>(<span class="string">'LIBRARY_PATH'</span>),1);
+0264 
+0265 
+0266     <span class="comment">% helpful messages</span>
+0267     <span class="comment">% TODO: test if desktop is available</span>
+0268     <span class="keyword">if</span> ver.isoctave
+0269         canwritehtml=0;
+0270     <span class="keyword">else</span> <span class="keyword">try</span>
+0271             mf = com.mathworks.mde.desk.MLDesktop.getInstance.getMainFrame;
+0272             <span class="keyword">if</span> isempty(mf)
+0273                 canwritehtml=0;
+0274             <span class="keyword">else</span>
+0275                 canwritehtml=1;
+0276             <span class="keyword">end</span>
+0277         <span class="keyword">catch</span>
+0278             canwritehtml=0;
+0279         <span class="keyword">end</span>
+0280     <span class="keyword">end</span>
+0281     <span class="keyword">if</span> canwritehtml
+0282         tutorials = <span class="string">'&lt;a href=&quot;http://eidors3d.sf.net/tutorial/tutorial.shtml&quot;&gt;Tutorials&lt;/a&gt;'</span>;
+0283     <span class="keyword">else</span>
+0284         tutorials = <span class="string">'Tutorials'</span>;
+0285     <span class="keyword">end</span>
+0286     <a href="eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>([<span class="string">'New to EIDORS? Have a look at the '</span>,tutorials,<span class="string">'.'</span>],1);
+0287 
+0288 <a name="_sub6" href="#_subfunctions" class="code">function ok = eidors_var_id_ok;</a>
+0289     id0 = <span class="string">''</span>;
+0290     <span class="keyword">try</span> id0 = eidors_var_id([]); <span class="keyword">end</span>
+0291     <span class="keyword">if</span> strcmp(id0, <span class="keyword">...</span>
+0292       <span class="string">'id_DA39A3EE5E6B4B0D3255BFEF95601890AFD80709'</span>)  <span class="comment">% SHA1 of nothing</span>
+0293        ok = 1;
+0294     <span class="keyword">else</span>
+0295        ok = 0;
+0296     <span class="keyword">end</span>
+0297     <span class="keyword">if</span> ok==0
+0298        warning(<span class="string">'caching (function eidors_var_id) is not working'</span>);
+0299     <span class="keyword">else</span>
+0300        <a href="eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'tested function eidors_var_id: OK'</span>,1);
+0301     <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of gmsh_read_mesh</title>
+  <meta name="keywords" content="gmsh_read_mesh">
+  <meta name="description" content="[srf,vtx,fc,bc,simp,edg,mat_ind,phys_names] = gmsh_read_mesh(filename)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">eidors</a> &gt; <a href="../index.html">meshing</a> &gt; <a href="index.html">gmsh</a> &gt; gmsh_read_mesh.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/meshing/gmsh&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>gmsh_read_mesh
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>[srf,vtx,fc,bc,simp,edg,mat_ind,phys_names] = gmsh_read_mesh(filename)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function[srf,vtx,fc,bc,simp,edg,mat_ind,phys_names] = gmsh_read_mesh(filename) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">[srf,vtx,fc,bc,simp,edg,mat_ind,phys_names] = gmsh_read_mesh(filename)
+ Function to read in a mesh model from Gmsh and saves it in
+ five arrays; surface (srf), veritices (vtx), face no. (fc)
+ volume (simp) and edges (edg)
+
+ srf        = The surfaces indices into vtx
+ simp       = The volume indices into vtx
+ vtx        = The vertices matrix
+ fc         = A one column matrix containing the face numbers
+ edg        = Edge segment information
+ filename   = Name of file containing NetGen .vol information
+ mat_ind    = Material index
+ phys_names = Structure of &quot;Physical&quot; entities in the mesh
+              .dim   = dimension
+              .name  = name (string)
+              .tag   = physical tag
+              .nodes = N-x-dim array of indices into vtx</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="create_circle_mesh_gmsh.html" class="code" title="function mdl = create_circle_mesh_gmsh(basename, center, rad, elem_size )">create_circle_mesh_gmsh</a>	Create a 2D Circular FEM using GMSH</li><li><a href="gmsh_mk_fwd_model.html" class="code" title="function [fwd_mdl, mat_indices]=gmsh_mk_fwd_model( vol_filename, name, eprefix,stim_pattern, z_contact)">gmsh_mk_fwd_model</a>	GMSH_MK_FWD_MODEL: create a fwd_model object from a Gmsh file</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function mat = get_lines_with_nodes( fid )</a></li><li><a href="#_sub2" class="code">function names = parse_names( fid )</a></li><li><a href="#_sub3" class="code">function elements = parse_elements( fid )</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function[srf,vtx,fc,bc,simp,edg,mat_ind,phys_names] = gmsh_read_mesh(filename)</a>
+0002 <span class="comment">%[srf,vtx,fc,bc,simp,edg,mat_ind,phys_names] = gmsh_read_mesh(filename)</span>
+0003 <span class="comment">% Function to read in a mesh model from Gmsh and saves it in</span>
+0004 <span class="comment">% five arrays; surface (srf), veritices (vtx), face no. (fc)</span>
+0005 <span class="comment">% volume (simp) and edges (edg)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% srf        = The surfaces indices into vtx</span>
+0008 <span class="comment">% simp       = The volume indices into vtx</span>
+0009 <span class="comment">% vtx        = The vertices matrix</span>
+0010 <span class="comment">% fc         = A one column matrix containing the face numbers</span>
+0011 <span class="comment">% edg        = Edge segment information</span>
+0012 <span class="comment">% filename   = Name of file containing NetGen .vol information</span>
+0013 <span class="comment">% mat_ind    = Material index</span>
+0014 <span class="comment">% phys_names = Structure of &quot;Physical&quot; entities in the mesh</span>
+0015 <span class="comment">%              .dim   = dimension</span>
+0016 <span class="comment">%              .name  = name (string)</span>
+0017 <span class="comment">%              .tag   = physical tag</span>
+0018 <span class="comment">%              .nodes = N-x-dim array of indices into vtx</span>
+0019 
+0020 <span class="comment">% $Id: gmsh_read_mesh.m 3260 2012-06-30 14:40:10Z bgrychtol $</span>
+0021 <span class="comment">% (C) 2009 Bartosz Sawicki. Licensed under GPL V2</span>
+0022 <span class="comment">% Modified by James Snyder &lt;jbsnyder@fanplastic.org&gt;</span>
+0023 
+0024 fid = fopen(filename,<span class="string">'r'</span>);
+0025 phys_names = [];
+0026 <span class="keyword">while</span> 1
+0027     tline = fgetl(fid);
+0028     <span class="keyword">if</span> ~ischar(tline); fclose(fid); <span class="keyword">break</span>; <span class="keyword">end</span>
+0029 
+0030     <span class="keyword">if</span> strcmp(tline,<span class="string">'$Elements'</span>)
+0031        elements= <a href="#_sub3" class="code" title="subfunction elements = parse_elements( fid )">parse_elements</a>( fid );
+0032     <span class="keyword">elseif</span> strcmp(tline,<span class="string">'$Nodes'</span>)
+0033        nodes= <a href="#_sub1" class="code" title="subfunction mat = get_lines_with_nodes( fid )">get_lines_with_nodes</a>( fid );
+0034     <span class="keyword">elseif</span> strcmp(tline,<span class="string">'$PhysicalNames'</span>)
+0035        phys_names= <a href="#_sub2" class="code" title="subfunction names = parse_names( fid )">parse_names</a>( fid );
+0036     <span class="keyword">end</span>
+0037 <span class="keyword">end</span>
+0038 
+0039 <span class="keyword">if</span> ~isempty(phys_names)
+0040     <span class="keyword">for</span> i = 1:length(phys_names)
+0041         tmpelements = find(arrayfun(@(x)x.phys_tag==phys_names(i).tag,elements));
+0042         phys_names(i).nodes = cat(1,elements(tmpelements).simp);
+0043     <span class="keyword">end</span>
+0044 <span class="keyword">end</span>
+0045 
+0046 edg = [];
+0047 bc = [];
+0048 mat_ind = [];
+0049 
+0050 <span class="comment">% Select 2d vs 3d model by checking if Z is all the same</span>
+0051 <span class="keyword">if</span> length( unique( nodes(:,4) ) ) &gt; 1 
+0052     vtx = nodes(:,2:4);
+0053     <span class="comment">% Type 2: 3-node triangle</span>
+0054     tri = find(arrayfun(@(x)x.type==2,elements));
+0055     <span class="comment">% Type 4: 4-node tetrahedron</span>
+0056     tet = find(arrayfun(@(x)x.type==4,elements));
+0057     simp = cat(1,elements(tet).simp);
+0058     srf = cat(1,elements(tri).simp);
+0059 <span class="keyword">else</span>
+0060     vtx = nodes(:,2:3);
+0061     tri = find(arrayfun(@(x)x.type==2,elements));
+0062     simp = cat(1,elements(tri).simp);
+0063     srf = [];
+0064 <span class="keyword">end</span>
+0065 
+0066 elemtags = cat(1,elements.phys_tag);
+0067 fc = elemtags(tri,1);
+0068 <span class="keyword">end</span>
+0069 
+0070 
+0071 <a name="_sub1" href="#_subfunctions" class="code">function mat = get_lines_with_nodes( fid )</a>
+0072 <span class="comment">% Line Format:</span>
+0073 <span class="comment">% node-number x-coord y-coord z-coord</span>
+0074 tline = fgetl(fid);
+0075 n_rows = sscanf(tline,<span class="string">'%d'</span>);
+0076 mat= fscanf(fid,<span class="string">'%f'</span>,[4,n_rows])';
+0077 <span class="keyword">end</span>
+0078 
+0079 <a name="_sub2" href="#_subfunctions" class="code">function names = parse_names( fid )</a>
+0080 <span class="comment">% Line Format:</span>
+0081 <span class="comment">% physical-dimension physical-number &quot;physical-name&quot;</span>
+0082 tline = fgetl(fid);
+0083 n_rows = sscanf(tline,<span class="string">'%d'</span>);
+0084 names = struct(<span class="string">'tag'</span>,{},<span class="string">'dim'</span>,{},<span class="string">'name'</span>,{});
+0085 <span class="keyword">for</span> i = 1:n_rows
+0086     tline = fgetl(fid);
+0087     <span class="keyword">if</span> exist(<span class="string">'OCTAVE_VERSION'</span>)
+0088         parts = strsplit(tline,<span class="string">' '</span>);
+0089     <span class="keyword">else</span>
+0090         parts = regexp(tline,<span class="string">' '</span>,<span class="string">'split'</span>);
+0091     <span class="keyword">end</span>
+0092     nsz = size(names,2)+1;
+0093     names(nsz).dim = str2double( parts(1) );
+0094     names(nsz).tag = str2double( parts(2) );
+0095     tname = parts(3);
+0096     names(nsz).name = strrep(tname{1},<span class="string">'&quot;'</span>,<span class="string">''</span>);
+0097 <span class="keyword">end</span>
+0098 <span class="keyword">end</span>
+0099 
+0100 <a name="_sub3" href="#_subfunctions" class="code">function elements = parse_elements( fid )</a>
+0101 <span class="comment">% Line Format:</span>
+0102 <span class="comment">% elm-number elm-type number-of-tags &lt; tag &gt; ... node-number-list</span>
+0103 tline = fgetl(fid);
+0104 n_rows = sscanf(tline,<span class="string">'%d'</span>);
+0105 <span class="comment">% elements = struct('simp',{},'phys_tag',{},'geom_tag',{});</span>
+0106 elements(n_rows).simp = [];
+0107 elements(n_rows).phys_tag = [];
+0108 elements(n_rows).geom_tag = [];
+0109 elements(n_rows).type = [];
+0110 
+0111 <span class="keyword">for</span> i = 1:n_rows
+0112     tline = fgetl(fid);
+0113     n = sscanf(tline, <span class="string">'%d'</span>)';
+0114 <span class="comment">%     nsz = size(elements,2)+1;</span>
+0115     elements(i).simp = n(n(3) + 4:end);
+0116     <span class="comment">%</span>
+0117     elements(i).type = n(2);
+0118     <span class="keyword">if</span> n(3) &gt; 0 <span class="comment">% get tags if they exist</span>
+0119         <span class="comment">% By default, first tag is number of parent physical entity</span>
+0120         <span class="comment">% second is parent elementary geometrical entity</span>
+0121         <span class="comment">% third is number of parent mesh partitions followed by</span>
+0122         <span class="comment">% partition ids</span>
+0123         tags = n(4:3+n(3));
+0124         <span class="keyword">if</span> length(tags) &gt;= 1
+0125             elements(i).phys_tag = tags(1);
+0126             <span class="keyword">if</span> length(tags) &gt;= 2
+0127                 elements(i).geom_tag = tags(2);
+0128             <span class="keyword">end</span>
+0129         <span class="keyword">end</span>
+0130     <span class="keyword">end</span>
+0131 <span class="keyword">end</span>
+0132 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

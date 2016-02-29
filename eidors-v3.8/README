@@ -1,0 +1,34 @@
+This is EIDORS v3.8, released on 11 May 2015.
+The eidors-v3.8.zip file contains all code and
+ documentation to run EIDORS on all platforms.
+EIDORS requires Matlab (>7.6, R2008a) or GNU Octave.
+
+Unless otherwise specified inside the respective files,
+EIDORS functions are licensed under the GNU GPL, either
+version 2 or version 3 (at your choice). You can find a
+copy of the license at: www.gnu.org/licenses/gpl.html.
+
+Additionally, you can download the model_library.zip
+file, which contains precalculated additional finite
+element models for use with EIDORS.  The model_library.zip
+file is not necessary, EIDORS will recalculate these
+models if they are not available.
+
+To use the EIDORS software, follow these steps:
+
+- Download the software eidors-v3.8.zip
+- Unzip the software in a directory such as
+      /path/to/eidors or C:/path/to/eidors
+- Start Matlab / GNU Octave
+- type: >>run /path/to/eidors/startup.m
+    (windows >>run C:/path/to/eidors/startup.m)
+- Try the Tutorials, or execute one of the sample programs in the
+   /path/to/eidors/examples directory (such as compare_2d_algs(1)) 
+
+For new features and other changes with this release,
+see the CHANGES file in the eidors directory.
+
+For other information on EIDORS, see www.eidors.org
+
+For questions and comments on EIDORS, you can join the
+eidors3d-help mailing list.

@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of get_elem_volume</title>
+  <meta name="keywords" content="get_elem_volume">
+  <meta name="description" content="GET_ELEM_VOLUME: VOL = get_elem_volume(fwd_model, map_node )">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">eidors</a> &gt; <a href="index.html">models</a> &gt; get_elem_volume.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/models&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>get_elem_volume
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>GET_ELEM_VOLUME: VOL = get_elem_volume(fwd_model, map_node )</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function VOL = get_elem_volume( fwd_model, map_node ) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> GET_ELEM_VOLUME: VOL = get_elem_volume(fwd_model, map_node )
+ Calculate volume (or area) of each element in model
+
+ If the model has a 'coarse2fine' element, then the
+ returned VOL applies to the coarse matrix
+
+ if map_node == 1, then calculated volumes are the volume fraction for each node</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>	EIDORS_OBJ: 'constructor' to create a eidors structure</li><li><a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>	SPARSE Create sparse matrix (EIDORS overload).</li><li><a href="../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>	EIDORS_CACHE Control eidors caching</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/deprecated/calc_noise_params.html" class="code" title="function params = calc_noise_params(imdl, vh, vi )">calc_noise_params</a>	params = GREIT_noise_params(imdl, homg_voltage, sig_voltage)</li><li><a href="../../eidors/meshing/distmesh/dm_mk_fwd_model.html" class="code" title="function [fwd_mdl]= dm_mk_fwd_model( fd, fh, nnodes, bbox, elec_nodes,refine_nodes, z_contact, name)">dm_mk_fwd_model</a>	DM_MK_FWD_MODEL: create a fwd_model object using distmesh</li><li><a href="analytic_2d_circle.html" class="code" title="function V = analytic_2d_circle(I, params)">analytic_2d_circle</a>	V = analytic_2d_circle(J, [s_h, s_i, b, a, angl])</li><li><a href="fix_model.html" class="code" title="function [mdl] = fix_model(mdl,opt)">fix_model</a>	FIX_MODEL: Add useful fields to a model</li><li><a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>	MK_GRID_C2F - calculate a coarse2fine mapping for grid coarse models.</li><li><a href="mk_tet_c2f.html" class="code" title="function [c2f] = mk_tet_c2f(fmdl, rmdl, opt)">mk_tet_c2f</a>	MK_TET_C2F - calculate a coarse2fine mapping for two tet-based models.</li><li><a href="mk_tri_c2f.html" class="code" title="function c2f = mk_tri_c2f(fmdl,rmdl,opt)">mk_tri_c2f</a>	MK_TRI_C2F</li><li><a href="../../eidors/solvers/inverse/calc_noise_figure.html" class="code" title="function [NF,SE] = calc_noise_figure( inv_model, hp, iterations)">calc_noise_figure</a>	CALC_NOISE_FIGURE: calculate the noise amplification (NF) of an algorithm</li><li><a href="../../eidors/tools/test_performance.html" class="code" title="function [r, params] =  test_performance( imdls, fmdl );">test_performance</a>	TEST_PERFORMANCE: test of difference reconstruction algorithms</li><li><a href="../../eidors/tools/test_performance_img.html" class="code" title="function [params_img] =  test_performance_img( imdls, fmdl );">test_performance_img</a>	TEST_PERFORMANCE: test of difference reconstruction algorithms</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function VOL = get_elem_volume( fwd_model, map_node )</a>
+0002 <span class="comment">% GET_ELEM_VOLUME: VOL = get_elem_volume(fwd_model, map_node )</span>
+0003 <span class="comment">% Calculate volume (or area) of each element in model</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% If the model has a 'coarse2fine' element, then the</span>
+0006 <span class="comment">% returned VOL applies to the coarse matrix</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% if map_node == 1, then calculated volumes are the volume fraction for each node</span>
+0009 
+0010 <span class="comment">% (C) 2009 Andy Adler. License: GPL version 2 or version 3</span>
+0011 <span class="comment">% $Id: get_elem_volume.m 4871 2015-04-10 03:11:54Z alistair_boyle $</span>
+0012 
+0013 <span class="keyword">if</span> nargin==1; map_node= 0; <span class="keyword">end</span>
+0014 
+0015 <span class="comment">% calculate element volume and surface area</span>
+0016 NODE = fwd_model.nodes';
+0017 ELEM = fwd_model.elems';
+0018 [d,e]= size(ELEM);
+0019 
+0020 
+0021 <span class="comment">% cashing</span>
+0022 c_obj = {NODE, ELEM};
+0023 VOL = <a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'get-cache'</span>, c_obj, <span class="string">'elem_volume'</span>);
+0024 <span class="keyword">if</span> isempty(VOL)
+0025     VOL=zeros(e,1);
+0026     ones_d = ones(1,d);
+0027     d1fac = prod( 1:d-1 );
+0028     <span class="keyword">if</span> d &gt; size(NODE,1)
+0029         <span class="keyword">for</span> i=1:e
+0030             this_elem = NODE(:,ELEM(:,i));
+0031             VOL(i)= abs(det([ones_d;this_elem])) / d1fac;
+0032         <span class="keyword">end</span>
+0033     <span class="keyword">elseif</span> d == 3 <span class="comment">% 3D nodes in 2D mesh</span>
+0034         <span class="keyword">for</span> i=1:e
+0035             this_elem = NODE(:,ELEM(:,i));
+0036             d12= det([ones_d;this_elem([1,2],:)])^2;
+0037             d13= det([ones_d;this_elem([1,3],:)])^2;
+0038             d23= det([ones_d;this_elem([2,3],:)])^2;
+0039             VOL(i)= sqrt(d12 + d13 + d23 ) / d1fac;
+0040         <span class="keyword">end</span>
+0041     <span class="keyword">elseif</span> d == 2 <span class="comment">% 3D nodes in 1D mesh (ie resistor mesh)</span>
+0042         <span class="keyword">for</span> i=1:e
+0043             this_elem = NODE(:,ELEM(:,i));
+0044             d12= det([ones_d;this_elem([1],:)])^2;
+0045             d13= det([ones_d;this_elem([2],:)])^2;
+0046             d23= det([ones_d;this_elem([3],:)])^2;
+0047             VOL(i)= sqrt(d12 + d13 + d23 ) / d1fac;
+0048         <span class="keyword">end</span>
+0049     <span class="keyword">else</span>
+0050         error(<span class="string">'mesh size not understood when calculating volumes'</span>)
+0051     <span class="keyword">end</span>
+0052     <span class="comment">% caching</span>
+0053     <a href="../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'boost_priority'</span>, -4); <span class="comment">% low priority</span>
+0054     <a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'set-cache'</span>, c_obj, <span class="string">'elem_volume'</span>, VOL);
+0055     <a href="../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'boost_priority'</span>, +4); <span class="comment">% restore priority</span>
+0056 <span class="keyword">end</span>
+0057 
+0058 <span class="keyword">if</span> isfield(fwd_model,<span class="string">'coarse2fine'</span>)
+0059    VOL= fwd_model.coarse2fine' * VOL;
+0060 <span class="keyword">end</span>
+0061 
+0062 <span class="comment">% Calculate the mapping of each element onto the associated node</span>
+0063 <span class="comment">% Map(i,j) = 1/Ne if elem j has node i</span>
+0064 <span class="keyword">if</span> map_node
+0065    map = <a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>( ELEM, ones(d,1)*(1:e), 1/d, size(NODE,2),e);
+0066    VOL = map * VOL;
+0067 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

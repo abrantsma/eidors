@@ -1,0 +1,1330 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of ng_mk_extruded_model</title>
+  <meta name="keywords" content="ng_mk_extruded_model">
+  <meta name="description" content="NG_MAKE_EXTRUDED_MODEL: create extruded models using netgen">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">eidors</a> &gt; <a href="../index.html">meshing</a> &gt; <a href="index.html">netgen</a> &gt; ng_mk_extruded_model.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/meshing/netgen&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>ng_mk_extruded_model
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>NG_MAKE_EXTRUDED_MODEL: create extruded models using netgen</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [fmdl,mat_idx] = ng_mk_extruded_model(shape, elec_pos, elec_shape,extra_ng_code) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> NG_MAKE_EXTRUDED_MODEL: create extruded models using netgen
+ [fmdl,mat_idx] = ng_mk_extruded_models(trunk_shape, elec_pos, ...
+                 elec_shape, extra_ng_code);
+ INPUT:
+ trunk_shape = { height,[x,y],curve_type,maxsz}
+   height      -&gt; if height = 0 calculate a 2D model
+   [x,y]       -&gt; N-by-2 CLOCKWISE list of points defining the 2D shape
+                  NOTE: Use a cell array to specify additional curves for
+                  internal objects
+   curve_type  -&gt; 1 - interpret as vertices (default)
+                  2 - interpret as splines with de Boor points at even 
+                  indices (legacy)
+                  3 - interpolate points (piecewise polynomial
+                  interpolation). Syntax [3, N] also specifies the number
+                  of samples to create.
+                  4 - interpolate points with Fourier descriptor. Syntax 
+                  [4, N] also specifies the number of samples to create.
+                  NOTE: If additional curves are specified, curve_type can
+                  also be a cell array. Otherwise, curve_type defaults to
+                  1 for internal shapes.
+   maxsz       -&gt; max size of mesh elems (default = course mesh)
+
+ ELECTRODE POSITIONS:
+  elec_pos = [n_elecs_per_plane,spacing,z_planes] where spacing is either
+             0 for even spacing w.r.t angular positions (0,15,30... deg)
+             or
+             1 for equal distances between electrodes
+             Any fractional part (e.g. 0.15) is interpreted as a starting
+             position -- fraction of 2*pi for values spacing &lt; 1 and
+             fraction of total perimeter for spacing &gt; 1.
+     OR
+  elec_pos = [degrees,z] centres of each electrode (N_elecs x 2)
+
+ ELECTRODE SHAPES::
+  elec_shape = [width,height, [maxsz, pem, discr]]  % Rectangular elecs
+     OR
+  elec_shape = [radius, [0, maxsz, pem, discr] ]  % Circular elecs
+     radius      -&gt; specify -1 for point electrodes
+     maxsz (OPT) -&gt; max size of mesh elems (default = course mesh),
+                    ignored if &lt;= 0 
+     pem  (OPT)  -&gt; 1: Point Electrode Model, 0: Complete Electrode Model (default)
+     discr (OPT) -&gt; discretize electrode normals (0 = ignore = default)
+                    Adjusting this value helps Netgen problems with
+                    electrodes facing each other.
+
+ Specify either a common electrode shape or for each electrode
+
+ CITATION_REQUEST:
+ AUTHOR: B Grychtol et al.
+ TITLE: Impact of model shape mismatch on reconstruction quality in
+ Electrical Impedance Tomography
+ JOURNAL: IEEE Trans Med Imag
+ YEAR: 2012
+ VOL: 31
+ NUM: 9
+ DOI: 10.1109/TMI.2012.2200904
+ PDF: http://www.sce.carleton.ca/faculty/adler/publications/2012/
+      grychtol-2012-model-shape-EIT.pdf</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="../../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>	EIDORS_OBJ: 'constructor' to create a eidors structure</li><li><a href="../../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>	SHOW_FEM: show the EIDORS3D finite element model</li><li><a href="call_netgen.html" class="code" title="function status= call_netgen(geo_file, vol_file, msz_file, finelevel)">call_netgen</a>	CALL_NETGEN: call netgen to create a vol_file from a geo_file</li><li><a href="fourier_fit.html" class="code" title="function C = fourier_fit(points,N,start);">fourier_fit</a>	FOURIER_FIT: use fourier series to interpolate onto a boundary</li><li><a href="mdl2d_from3d.html" class="code" title="function mdl2 = mdl2d_from3d(mdl3);">mdl2d_from3d</a>	mdl2d_from3d: Create 2D mdl from z=0 plane of 3d model</li><li><a href="ng_mk_extruded_model.html" class="code" title="function [fmdl,mat_idx] = ng_mk_extruded_model(shape, elec_pos, elec_shape,extra_ng_code)">ng_mk_extruded_model</a>	NG_MAKE_EXTRUDED_MODEL: create extruded models using netgen</li><li><a href="ng_mk_fwd_model.html" class="code" title="function [fwd_mdl, mat_idx_reordered]=ng_mk_fwd_model( ng_vol_filename, centres,name, stim_pattern, z_contact, postprocmesh)">ng_mk_fwd_model</a>	NG_MK_FWD_MODEL: create a fwd_model object from a netgen vol file</li><li><a href="piece_poly_fit.html" class="code" title="function [pp, m] = piece_poly_fit(points, fstr, linear_frac)">piece_poly_fit</a>	PIECE_POLY_FIT: piecewise polynomial fitting toolset</li><li><a href="../../../eidors/solvers/forward/find_boundary.html" class="code" title="function [srf, idx] = find_boundary(simp);">find_boundary</a>	[srf, idx] = find_boundary(simp);</li><li><a href="../../../eidors/tools/citeme.html" class="code" title="function citeme(fname)">citeme</a>	CITEME Display citation requests</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="ng_mk_extruded_model.html" class="code" title="function [fmdl,mat_idx] = ng_mk_extruded_model(shape, elec_pos, elec_shape,extra_ng_code)">ng_mk_extruded_model</a>	NG_MAKE_EXTRUDED_MODEL: create extruded models using netgen</li><li><a href="../../../eidors/meshing/stl/stl_read.html" class="code" title="function mdl = stl_read(fname)">stl_read</a>	STL_READ  Read in an stl file and output an EIDORS model struct</li><li><a href="../../../eidors/models/mk_library_model.html" class="code" title="function out = mk_library_model(shape,elec_pos,elec_shape,maxsz,nfft,scale)">mk_library_model</a>	MK_LIBRARY_MODEL - FEM models based on library shapes</li><li><a href="../../../eidors/models/place_elec_on_surf.html" class="code" title="function mdl2 = place_elec_on_surf(mdl,elec_pos, elec_spec,ng_opt_file, maxh)">place_elec_on_surf</a>	PLACE_ELEC_ON_SURF Place electrodes on the surface of a model</li><li><a href="../../../eidors/models/test_GREIT_model.html" class="code" title="">test_GREIT_model</a>	</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function fmdl = mk_extruded_model(shape, elec_pos, elec_shape,</a></li><li><a href="#_sub2" class="code">function [tank_height, tank_shape, tank_maxh, is2D] = parse_shape(shape)</a></li><li><a href="#_sub3" class="code">function new_points = interpolate(points, N, curve_type)</a></li><li><a href="#_sub4" class="code">function [points, spln_sgmnts] = remove_linear_control_points(points)</a></li><li><a href="#_sub5" class="code">function out = interpolate_shape(points, n_points)</a></li><li><a href="#_sub6" class="code">function out = fourier_interpolate_shape(points, n_points)</a></li><li><a href="#_sub7" class="code">function out = calc_vertex_dir(points, edges, edgnrm)</a></li><li><a href="#_sub8" class="code">function out = calc_centroid(points)</a></li><li><a href="#_sub9" class="code">function out = calc_convex(verts)</a></li><li><a href="#_sub10" class="code">function [elecs, centres] = parse_elecs(elec_pos, elec_shape, tank_shape, hig, is2D )</a></li><li><a href="#_sub11" class="code">function [pos, normal] = calc_elec_centre(tank_shape, th)</a></li><li><a href="#_sub12" class="code">function [pos, normal] = calc_elec_centre_spline(tank_shape, th)</a></li><li><a href="#_sub13" class="code">function elec = elec_spec( row, is2D, hig, rad )</a></li><li><a href="#_sub14" class="code">function write_geo_file(geofn, tank_height, tank_shape,</a></li><li><a href="#_sub15" class="code">function write_header(fid,tank_height,tank_shape,maxsz,extra)</a></li><li><a href="#_sub16" class="code">function write_curve(fid, tank_shape, name, scale)</a></li><li><a href="#_sub17" class="code">function write_circ_elec(fid,name,c, dirn, rd, centroid, maxh)</a></li><li><a href="#_sub18" class="code">function write_rect_elec(fid,name,c, dirn,wh,d,maxh)</a></li><li><a href="#_sub19" class="code">function [srf,vtx,fc,bc,simp,edg,mat_ind] = ng_remove_electrodes</a></li><li><a href="#_sub20" class="code">function [srf,vtx,fc,bc,simp,edg,mat_ind] = ng_remove_electrodes_old</a></li><li><a href="#_sub21" class="code">function [fmdl, mat_idx] = do_unit_test</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [fmdl,mat_idx] = ng_mk_extruded_model(shape, elec_pos, elec_shape, </a><span class="keyword">...</span>
+0002     extra_ng_code)
+0003 <span class="comment">% NG_MAKE_EXTRUDED_MODEL: create extruded models using netgen</span>
+0004 <span class="comment">% [fmdl,mat_idx] = ng_mk_extruded_models(trunk_shape, elec_pos, ...</span>
+0005 <span class="comment">%                 elec_shape, extra_ng_code);</span>
+0006 <span class="comment">% INPUT:</span>
+0007 <span class="comment">% trunk_shape = { height,[x,y],curve_type,maxsz}</span>
+0008 <span class="comment">%   height      -&gt; if height = 0 calculate a 2D model</span>
+0009 <span class="comment">%   [x,y]       -&gt; N-by-2 CLOCKWISE list of points defining the 2D shape</span>
+0010 <span class="comment">%                  NOTE: Use a cell array to specify additional curves for</span>
+0011 <span class="comment">%                  internal objects</span>
+0012 <span class="comment">%   curve_type  -&gt; 1 - interpret as vertices (default)</span>
+0013 <span class="comment">%                  2 - interpret as splines with de Boor points at even</span>
+0014 <span class="comment">%                  indices (legacy)</span>
+0015 <span class="comment">%                  3 - interpolate points (piecewise polynomial</span>
+0016 <span class="comment">%                  interpolation). Syntax [3, N] also specifies the number</span>
+0017 <span class="comment">%                  of samples to create.</span>
+0018 <span class="comment">%                  4 - interpolate points with Fourier descriptor. Syntax</span>
+0019 <span class="comment">%                  [4, N] also specifies the number of samples to create.</span>
+0020 <span class="comment">%                  NOTE: If additional curves are specified, curve_type can</span>
+0021 <span class="comment">%                  also be a cell array. Otherwise, curve_type defaults to</span>
+0022 <span class="comment">%                  1 for internal shapes.</span>
+0023 <span class="comment">%   maxsz       -&gt; max size of mesh elems (default = course mesh)</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">% ELECTRODE POSITIONS:</span>
+0026 <span class="comment">%  elec_pos = [n_elecs_per_plane,spacing,z_planes] where spacing is either</span>
+0027 <span class="comment">%             0 for even spacing w.r.t angular positions (0,15,30... deg)</span>
+0028 <span class="comment">%             or</span>
+0029 <span class="comment">%             1 for equal distances between electrodes</span>
+0030 <span class="comment">%             Any fractional part (e.g. 0.15) is interpreted as a starting</span>
+0031 <span class="comment">%             position -- fraction of 2*pi for values spacing &lt; 1 and</span>
+0032 <span class="comment">%             fraction of total perimeter for spacing &gt; 1.</span>
+0033 <span class="comment">%     OR</span>
+0034 <span class="comment">%  elec_pos = [degrees,z] centres of each electrode (N_elecs x 2)</span>
+0035 <span class="comment">%</span>
+0036 <span class="comment">% ELECTRODE SHAPES::</span>
+0037 <span class="comment">%  elec_shape = [width,height, [maxsz, pem, discr]]  % Rectangular elecs</span>
+0038 <span class="comment">%     OR</span>
+0039 <span class="comment">%  elec_shape = [radius, [0, maxsz, pem, discr] ]  % Circular elecs</span>
+0040 <span class="comment">%     radius      -&gt; specify -1 for point electrodes</span>
+0041 <span class="comment">%     maxsz (OPT) -&gt; max size of mesh elems (default = course mesh),</span>
+0042 <span class="comment">%                    ignored if &lt;= 0</span>
+0043 <span class="comment">%     pem  (OPT)  -&gt; 1: Point Electrode Model, 0: Complete Electrode Model (default)</span>
+0044 <span class="comment">%     discr (OPT) -&gt; discretize electrode normals (0 = ignore = default)</span>
+0045 <span class="comment">%                    Adjusting this value helps Netgen problems with</span>
+0046 <span class="comment">%                    electrodes facing each other.</span>
+0047 <span class="comment">%</span>
+0048 <span class="comment">% Specify either a common electrode shape or for each electrode</span>
+0049 <span class="comment">%</span>
+0050 <span class="comment">% CITATION_REQUEST:</span>
+0051 <span class="comment">% AUTHOR: B Grychtol et al.</span>
+0052 <span class="comment">% TITLE: Impact of model shape mismatch on reconstruction quality in</span>
+0053 <span class="comment">% Electrical Impedance Tomography</span>
+0054 <span class="comment">% JOURNAL: IEEE Trans Med Imag</span>
+0055 <span class="comment">% YEAR: 2012</span>
+0056 <span class="comment">% VOL: 31</span>
+0057 <span class="comment">% NUM: 9</span>
+0058 <span class="comment">% DOI: 10.1109/TMI.2012.2200904</span>
+0059 <span class="comment">% PDF: http://www.sce.carleton.ca/faculty/adler/publications/2012/</span>
+0060 <span class="comment">%      grychtol-2012-model-shape-EIT.pdf</span>
+0061 
+0062 <span class="comment">% (C) Bartlomiej Grychtol, 2010. (C) Alistair Boyle, 2013. Licenced under GPL v2 or v3</span>
+0063 <span class="comment">% $Id: ng_mk_extruded_model.m 4732 2015-03-23 13:18:59Z aadler $</span>
+0064 
+0065 <span class="comment">% TODO: Implement control segments in the bit that writes the file.</span>
+0066 
+0067 <span class="keyword">if</span> isstr(shape) &amp;&amp; strcmp(shape,<span class="string">'UNIT_TEST'</span>); fmdl = <a href="#_sub21" class="code" title="subfunction [fmdl, mat_idx] = do_unit_test">do_unit_test</a>; <span class="keyword">return</span>; <span class="keyword">end</span>
+0068 
+0069 <a href="../../../eidors/tools/citeme.html" class="code" title="function citeme(fname)">citeme</a>(mfilename);
+0070 
+0071 <span class="keyword">if</span> nargin &lt; 4; extra_ng_code = {<span class="string">''</span>,<span class="string">''</span>}; <span class="keyword">end</span>
+0072 cache_obj = { shape, elec_pos, elec_shape, extra_ng_code};
+0073 
+0074 fmdl = <a href="../../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'get-cache'</span>, cache_obj, <span class="string">'ng_mk_extruded_models'</span> );
+0075 <span class="keyword">if</span> isempty(fmdl);
+0076    fmdl = <a href="#_sub1" class="code" title="subfunction fmdl = mk_extruded_model(shape, elec_pos, elec_shape, ">mk_extruded_model</a>( shape, elec_pos, elec_shape, extra_ng_code );
+0077 <span class="comment">%  eidors_cache('boost_priority', -2); % netgen objs are low priority</span>
+0078    <a href="../../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'set-cache'</span>, cache_obj, <span class="string">'ng_mk_extruded_models'</span>, fmdl);
+0079 <span class="comment">%  eidors_cache('boost_priority', +2); % return values</span>
+0080 <span class="keyword">end</span>
+0081 
+0082 mat_idx = fmdl.mat_idx_reordered;
+0083 
+0084 <a name="_sub1" href="#_subfunctions" class="code">function fmdl = mk_extruded_model(shape, elec_pos, elec_shape, </a><span class="keyword">...</span>
+0085     extra_ng_code)
+0086 
+0087 fnstem = tempname;
+0088 geofn= [fnstem,<span class="string">'.geo'</span>];
+0089 meshfn= [fnstem,<span class="string">'.vol'</span>];
+0090 
+0091 [tank_height, tank_shape, tank_maxh, is2D] = <a href="#_sub2" class="code" title="subfunction [tank_height, tank_shape, tank_maxh, is2D] = parse_shape(shape)">parse_shape</a>(shape);
+0092 [elecs, centres] = <a href="#_sub10" class="code" title="subfunction [elecs, centres] = parse_elecs(elec_pos, elec_shape, tank_shape, hig, is2D )">parse_elecs</a>(elec_pos, elec_shape, tank_shape, tank_height, is2D );
+0093 <a href="#_sub14" class="code" title="subfunction write_geo_file(geofn, tank_height, tank_shape, ">write_geo_file</a>(geofn, tank_height, tank_shape, <span class="keyword">...</span>
+0094                tank_maxh, elecs, extra_ng_code);
+0095            
+0096 <span class="keyword">if</span> 0<span class="comment">% DEBUG SHAPE</span>
+0097    plot(tank_shape.vertices(:,1),tank_shape.vertices(:,2));
+0098    hold on
+0099    plot(centres(:,1),centres(:,2),<span class="string">'sk'</span>)
+0100    <span class="keyword">for</span> i = 1:size(elecs,2)
+0101        dirn = elecs(i).normal;
+0102        quiver(centres(i,1),centres(i,2),dirn(1),dirn(2),<span class="string">'k'</span>);
+0103    <span class="keyword">end</span>
+0104    hold off
+0105    axis equal
+0106 <span class="keyword">end</span>
+0107            
+0108 <a href="call_netgen.html" class="code" title="function status= call_netgen(geo_file, vol_file, msz_file, finelevel)">call_netgen</a>( geofn, meshfn );
+0109 
+0110 fmdl = <a href="ng_mk_fwd_model.html" class="code" title="function [fwd_mdl, mat_idx_reordered]=ng_mk_fwd_model( ng_vol_filename, centres,name, stim_pattern, z_contact, postprocmesh)">ng_mk_fwd_model</a>( meshfn, centres, <span class="string">'ng'</span>, [],0.01,<span class="keyword">...</span>
+0111     @<a href="#_sub19" class="code" title="subfunction [srf,vtx,fc,bc,simp,edg,mat_ind] = ng_remove_electrodes">ng_remove_electrodes</a>);
+0112 
+0113 delete(geofn); delete(meshfn); <span class="comment">% remove temp files</span>
+0114 
+0115 <span class="keyword">if</span> is2D
+0116     fmdl = <a href="mdl2d_from3d.html" class="code" title="function mdl2 = mdl2d_from3d(mdl3);">mdl2d_from3d</a>(fmdl);
+0117 <span class="keyword">end</span>
+0118 
+0119 
+0120 
+0121 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0122 <span class="comment">% TANK SHAPE (struct):</span>
+0123 <span class="comment">%         vertices: [Nx2]</span>
+0124 <span class="comment">%             size: 0.5* length of the diagonal of the containing rectangle</span>
+0125 <span class="comment">%     edge_normals: [Nx2]</span>
+0126 <span class="comment">%       vertex_dir: [Nx2] direction of vertex movement when scaling</span>
+0127 <span class="comment">%         centroid: [x y]</span>
+0128 <span class="comment">%   vertices_polar: [Nx2] Phi, r</span>
+0129 <span class="comment">%           convex: [N] boolean array indicating external angle &gt;= 180 deg</span>
+0130 <span class="comment">%       curve_type: One of three values</span>
+0131 <span class="comment">%                   1 - Normal, each point is a vertex</span>
+0132 <span class="comment">%                   2 - Spline, all even points are de Boor points</span>
+0133 <span class="comment">%                   3 - Same as 1 but will be converted to smooth</span>
+0134 <span class="comment">%</span>
+0135 <a name="_sub2" href="#_subfunctions" class="code">function [tank_height, tank_shape, tank_maxh, is2D] = parse_shape(shape)</a>
+0136     <span class="comment">% parses the shape input</span>
+0137 
+0138     <span class="comment">%defaults</span>
+0139     is2D = false;
+0140     tank_maxh = 0;
+0141     tank_shape = [];
+0142     tank_shape.curve_type = 1;
+0143     curve_info = [];
+0144 
+0145     <span class="keyword">if</span> iscell(shape) &amp;&amp; length(shape)&gt;2
+0146         tank_height = shape{1};
+0147         <span class="keyword">if</span> ~iscell(shape{2})
+0148             points = shape{2};
+0149         <span class="keyword">else</span>
+0150             c = shape{2};
+0151             points = c{1};
+0152             <span class="keyword">if</span> numel(shape{2}) &gt; 1
+0153                 tank_shape.additional_shapes = c(2:end);
+0154             <span class="keyword">end</span>
+0155         <span class="keyword">end</span>
+0156         
+0157         <span class="keyword">if</span> ~iscell(shape{3})
+0158             tank_shape.curve_type = shape{3};
+0159             <span class="keyword">if</span> iscell(tank_shape.curve_type)
+0160                 tank_shape.curve_type = tank_shape.curve_type{1};
+0161             <span class="keyword">end</span>
+0162         <span class="keyword">else</span>
+0163             c = shape{3};
+0164             tank_shape.curve_type = c{1};
+0165             <span class="keyword">if</span> numel(shape{3}) &gt; 1
+0166                 tank_shape.additional_curve_type = c(2:end);
+0167             <span class="keyword">end</span>
+0168         <span class="keyword">end</span>
+0169         
+0170         <span class="keyword">if</span> max(size(tank_shape.curve_type)) &gt; 1
+0171             curve_info = tank_shape.curve_type;
+0172             tank_shape.curve_type = curve_info(1);
+0173         <span class="keyword">end</span>
+0174 <span class="comment">%         if length(shape) &gt; 2</span>
+0175 <span class="comment">%             tank_height = shape{1};</span>
+0176 <span class="comment">%         end</span>
+0177         <span class="keyword">if</span> length(shape) &gt; 3
+0178             tank_maxh = shape{4};
+0179         <span class="keyword">end</span>
+0180     <span class="keyword">else</span>
+0181         points = shape;
+0182     <span class="keyword">end</span>
+0183     
+0184     spln_sgmnts = zeros(size(points)); <span class="comment">%default</span>
+0185     <span class="keyword">if</span> tank_shape.curve_type == 2
+0186         [points, spln_sgmnts] = <a href="#_sub4" class="code" title="subfunction [points, spln_sgmnts] = remove_linear_control_points(points)">remove_linear_control_points</a>(points);
+0187     <span class="keyword">end</span>
+0188     
+0189     <span class="keyword">if</span> ~isempty(curve_info)
+0190         N = curve_info(2);
+0191     <span class="keyword">else</span>
+0192         N = 50;
+0193     <span class="keyword">end</span>
+0194     points = <a href="#_sub3" class="code" title="subfunction new_points = interpolate(points, N, curve_type)">interpolate</a>(points,N, tank_shape.curve_type);
+0195     spln_sgmnts = zeros(size(points));
+0196     
+0197     <span class="keyword">if</span> isfield(tank_shape, <span class="string">'additional_curve_type'</span>)
+0198         <span class="keyword">for</span> i = 1:numel(tank_shape.additional_curve_type)
+0199             <span class="keyword">if</span> numel(tank_shape.additional_curve_type{i}) == 1
+0200                 N = 50;
+0201             <span class="keyword">else</span>
+0202                 N = tank_shape.additional_curve_type{i}(2);
+0203             <span class="keyword">end</span>
+0204             tank_shape.additional_shapes{i} = <a href="#_sub3" class="code" title="subfunction new_points = interpolate(points, N, curve_type)">interpolate</a>(<span class="keyword">...</span>
+0205                 tank_shape.additional_shapes{i},N, tank_shape.additional_curve_type{i}(1));
+0206         <span class="keyword">end</span>
+0207     <span class="keyword">end</span>
+0208     
+0209     <span class="comment">% piecewise polynomial interpolation</span>
+0210     <span class="keyword">if</span> tank_shape.curve_type == 3 
+0211         <span class="keyword">if</span> ~isempty(curve_info)
+0212             n_samples = curve_info(2);
+0213         <span class="keyword">else</span>
+0214             n_samples = 50;
+0215         <span class="keyword">end</span>
+0216         points = <a href="#_sub5" class="code" title="subfunction out = interpolate_shape(points, n_points)">interpolate_shape</a>(points, n_samples);
+0217         spln_sgmnts = zeros(size(points)); <span class="comment">% now needs to be bigger</span>
+0218     <span class="keyword">end</span>
+0219 
+0220     <span class="comment">% Fourier descriptor interpolation</span>
+0221     <span class="keyword">if</span> tank_shape.curve_type == 4
+0222         <span class="keyword">if</span> ~isempty(curve_info)
+0223             n_samples = curve_info(2);
+0224         <span class="keyword">else</span>
+0225             n_samples = 50;
+0226         <span class="keyword">end</span>
+0227         points = <a href="#_sub6" class="code" title="subfunction out = fourier_interpolate_shape(points, n_points)">fourier_interpolate_shape</a>(points, n_samples);
+0228         spln_sgmnts = zeros(size(points)); <span class="comment">% now needs to be bigger</span>
+0229     <span class="keyword">end</span>
+0230     
+0231     tank_shape.centroid = <a href="#_sub8" class="code" title="subfunction out = calc_centroid(points)">calc_centroid</a>(points);
+0232     tank_shape.spln_sgmnts = spln_sgmnts;
+0233 
+0234     tank_shape.vertices = points;
+0235     <span class="comment">% diagonal of the containing rectangle:</span>
+0236     range_points = max(points) - min(points);
+0237     tank_shape.size = 0.5 * sqrt(sum(range_points.^2));
+0238     
+0239     <span class="keyword">if</span> tank_height==0
+0240         is2D = 1;
+0241         <span class="comment">% Need some width to let netgen work, but not too much so</span>
+0242         <span class="comment">% that it meshes the entire region</span>
+0243         tank_height = tank_shape.size/5; <span class="comment">% initial estimate</span>
+0244         <span class="keyword">if</span> tank_maxh&gt;0
+0245             tank_height = min(tank_height,2*tank_maxh);
+0246         <span class="keyword">end</span>
+0247     <span class="keyword">end</span>
+0248 
+0249 
+0250     tank_shape.edge_normals = [];
+0251     tank_shape.vertex_dir = [];
+0252 
+0253     tmp = points;
+0254     tmp(end+1,:) = tmp(1,:); <span class="comment">%duplicate first vertex at the end;</span>
+0255 
+0256     edges = diff(tmp,1);
+0257     tmp = [];
+0258     <span class="comment">% Normal to vector (x y) is (-y x).</span>
+0259     <span class="comment">% It points outward for clockwise definition</span>
+0260     tmp = circshift(edges, [0 1]); <span class="comment">%swap coords</span>
+0261     <span class="comment">%normalize</span>
+0262     lngth = sqrt(sum(tmp.^2, 2));
+0263     tmp(:,1) = -tmp(:,1) ./ lngth;
+0264     tmp(:,2) = tmp(:,2)  ./ lngth;
+0265     tank_shape.edge_normals = tmp;
+0266 
+0267     tank_shape.vertex_dir = <a href="#_sub7" class="code" title="subfunction out = calc_vertex_dir(points, edges, edgnrm)">calc_vertex_dir</a>(points, edges, <span class="keyword">...</span>
+0268         tank_shape.edge_normals);
+0269     
+0270     
+0271     tmp = [];
+0272     polar = zeros(size(points));
+0273     <span class="keyword">for</span> i = 1:length(points)
+0274         tmp = points(i,:) - tank_shape.centroid;
+0275         [polar(i,1) polar(i,2)]  = cart2pol(tmp(1),tmp(2));
+0276     <span class="keyword">end</span>
+0277     tank_shape.vertices_polar = polar;
+0278     
+0279     tank_shape.convex = <a href="#_sub9" class="code" title="subfunction out = calc_convex(verts)">calc_convex</a>(tank_shape.vertices);
+0280     
+0281     <span class="comment">% debug plot</span>
+0282 <span class="keyword">if</span> 0
+0283     pts = edges./2 + points;
+0284     plot(tank_shape.vertices(:,1),tank_shape.vertices(:,2),<span class="string">'-o'</span>); hold on;
+0285     plot(tank_shape.centroid(:,1),tank_shape.centroid(:,2),<span class="string">'+'</span>);
+0286     plot(tank_shape.vertices(:,1)+0.05*tank_shape.vertex_dir(:,1),<span class="keyword">...</span>
+0287         tank_shape.vertices(:,2)+0.05*tank_shape.vertex_dir(:,2),<span class="string">'ro-'</span>)
+0288     quiver(pts(:,1),pts(:,2),tank_shape.edge_normals(:,1),tank_shape.edge_normals(:,2));
+0289     hold off
+0290 <span class="keyword">end</span>
+0291     
+0292     
+0293 <a name="_sub3" href="#_subfunctions" class="code">function new_points = interpolate(points, N, curve_type)</a>
+0294 <span class="keyword">switch</span> curve_type
+0295     <span class="keyword">case</span> 3 
+0296         <span class="comment">% piecewise polynomial interpolation</span>
+0297         new_points = <a href="#_sub5" class="code" title="subfunction out = interpolate_shape(points, n_points)">interpolate_shape</a>(points, N);
+0298     <span class="keyword">case</span> 4
+0299         <span class="comment">% Fourier descriptor interpolation</span>
+0300         new_points = <a href="#_sub6" class="code" title="subfunction out = fourier_interpolate_shape(points, n_points)">fourier_interpolate_shape</a>(points, N);
+0301     <span class="keyword">otherwise</span> 
+0302         <span class="comment">% do nothing</span>
+0303         new_points = points;
+0304 <span class="keyword">end</span>  
+0305     
+0306     
+0307 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0308 <span class="comment">% INPUT:</span>
+0309 <span class="comment">% points - [2N x 2] defined vertices (odd) and control points (even)</span>
+0310 <span class="comment">% OUTPUT:</span>
+0311 <span class="comment">% points   - same as points but with linear control points removed</span>
+0312 <span class="comment">% spln_sgmnts - boolean array indicating which segments are splines</span>
+0313 <a name="_sub4" href="#_subfunctions" class="code">function [points, spln_sgmnts] = remove_linear_control_points(points)</a>
+0314 n_points = length(points);
+0315 points(end+1,:) = points(1,:);
+0316 spln_sgmnts(1:(n_points/2)) = 1;
+0317 <span class="keyword">for</span> i = 1:2:n_points
+0318     a = (points(i+1,:) - points(i,:));
+0319     a = a/norm(a);
+0320     b = (points(i+2,:) - points(i,:));
+0321     b = b/norm(b); 
+0322     <span class="keyword">if</span> a(1) == b(1) &amp;&amp; a(2) == b(2)
+0323         spln_sgmnts(i/2 + 0.5) = 0;
+0324     <span class="keyword">end</span>    
+0325 <span class="keyword">end</span>
+0326 idx = find(spln_sgmnts==0) * 2;
+0327 points(idx,:) = [];
+0328 points(<span class="keyword">end</span>,:) = [];
+0329 
+0330     
+0331 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0332 <span class="comment">% INPUT:</span>
+0333 <span class="comment">% points - [N x 2] defined vertices</span>
+0334 <span class="comment">% OUTPUT:</span>
+0335 <span class="comment">% out    - interpolated vertices</span>
+0336 <a name="_sub5" href="#_subfunctions" class="code">function out = interpolate_shape(points, n_points)</a>
+0337 <span class="comment">% Quadratic spline interpolation of the points provided.</span>
+0338 
+0339 
+0340 [pp m] = <a href="piece_poly_fit.html" class="code" title="function [pp, m] = piece_poly_fit(points, fstr, linear_frac)">piece_poly_fit</a>(points);
+0341 p = linspace(0,1,n_points+1)'; p(end) = [];
+0342 [th xy] = <a href="piece_poly_fit.html" class="code" title="function [pp, m] = piece_poly_fit(points, fstr, linear_frac)">piece_poly_fit</a>(pp,0,p);
+0343 tmp = [th xy];
+0344 tmp = sortrows(tmp,-1);<span class="comment">% ensure clockwise direction</span>
+0345 xy = tmp(:,2:3);
+0346 
+0347 out = xy + repmat(m, [n_points,1]);
+0348 
+0349 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0350 <span class="comment">% INPUT:</span>
+0351 <span class="comment">% points - [N x 2] defined vertices</span>
+0352 <span class="comment">% OUTPUT:</span>
+0353 <span class="comment">% out    - interpolated vertices</span>
+0354 <a name="_sub6" href="#_subfunctions" class="code">function out = fourier_interpolate_shape(points, n_points)</a>
+0355 <span class="comment">% Quadratic spline interpolation of the points provided.</span>
+0356 
+0357 
+0358 pp = <a href="fourier_fit.html" class="code" title="function C = fourier_fit(points,N,start);">fourier_fit</a>(points, size(points,1)-1); <span class="comment">% don't want to overfit</span>
+0359 p = linspace(0,1,n_points+1)'; p(end) = [];
+0360 xy = <a href="fourier_fit.html" class="code" title="function C = fourier_fit(points,N,start);">fourier_fit</a>(pp,p);
+0361 <span class="comment">% [th r] = cart2pol(xy);</span>
+0362 <span class="comment">% tmp = [th xy];</span>
+0363 <span class="comment">% tmp = sortrows(tmp,-1);% ensure clockwise direction</span>
+0364 <span class="comment">% xy = tmp(:,2:3);</span>
+0365 
+0366 out = xy;<span class="comment">% + repmat(m, [n_points,1]);</span>
+0367 
+0368 
+0369 <a name="_sub7" href="#_subfunctions" class="code">function out = calc_vertex_dir(points, edges, edgnrm)</a>
+0370 <span class="comment">%     calculate the direction of vertex movement if all edges are shifted</span>
+0371 <span class="comment">%     outwards by 1 unit along their normals:</span>
+0372 
+0373 <span class="comment">%     duplicate last edge at the beginning</span>
+0374     edg = [edges(<span class="keyword">end</span>,:) ; edges];
+0375     edgnrm = [edgnrm(<span class="keyword">end</span>,:) ; edgnrm];
+0376 
+0377     out = zeros(size(points));
+0378     <span class="keyword">for</span> i = 1:length(points)
+0379         p1 = points(i,:) + edgnrm(i,:);
+0380         p2 = points(i,:) + edgnrm(i+1,:);
+0381 
+0382         dir1(1) = edgnrm(i,2); dir1(2) = -edgnrm(i,1);
+0383         dir2(1) = edgnrm(i+1,2); dir2(2) = -edgnrm(i+1,1);
+0384         <span class="comment">% if the edge directions are the same (accounting for round-off</span>
+0385         <span class="comment">% error), return the edge normal.</span>
+0386         <span class="keyword">if</span> isempty(find(abs(dir1 - dir2) &gt; 1e-14))
+0387             out(i,:) = edgnrm(i,:);
+0388         <span class="keyword">else</span>
+0389             A = [dir1' , -dir2'];
+0390             u = (p2 - p1)';
+0391             x = A\u;
+0392             out(i,:) = x(1) * dir1 + p1 - points(i,:);
+0393         <span class="keyword">end</span>
+0394     <span class="keyword">end</span>
+0395 
+0396 <a name="_sub8" href="#_subfunctions" class="code">function out = calc_centroid(points)</a>
+0397 <span class="comment">% Calculates the centroid of the shape</span>
+0398 <span class="comment">% The algorithm identifies a middle point M within the shape and then uses it</span>
+0399 <span class="comment">% to divide the shape into N triangles (N=number of vertices), calculates</span>
+0400 <span class="comment">% the area and centroid of each traingle, and finally computes the centroid</span>
+0401 <span class="comment">% of the shape as a mean of the centroids of the individual traingles</span>
+0402 <span class="comment">% weighted by their area.</span>
+0403 
+0404     <span class="comment">% it never makes sense to have less than 3 points</span>
+0405     n_points = size(points,1);
+0406     <span class="keyword">if</span>  n_points == 3
+0407         out = mean(points); <span class="comment">% centroid of a triangle</span>
+0408         <span class="keyword">return</span>
+0409     <span class="keyword">end</span>
+0410 
+0411     out = 0;
+0412     pts = [points ; points(1,:)];
+0413 
+0414     <span class="comment">% guess a point in the middle</span>
+0415     m = mean(points);
+0416 
+0417     <span class="keyword">if</span> ~inpolygon(m(1),m(2),points(:,1),points(:,2))
+0418         f1 = figure;
+0419         set(f1,<span class="string">'Name'</span>, <span class="string">'Select a point within the shape'</span>);
+0420         plot(pts(:,1),pts(:,2));
+0421         m = ginput(1);
+0422         close(f1)
+0423     <span class="keyword">end</span>
+0424 
+0425     tmp = 0;
+0426     tot_area = 0;
+0427     <span class="keyword">for</span> i = 1:n_points
+0428         a = pts(i,:);
+0429         b = pts(i+1,:);
+0430         cntrd = (m + a + b)/3;
+0431         area = 0.5 * abs(det([m 1; a 1; b 1]));
+0432         tmp = tmp + cntrd*area;
+0433         tot_area = tot_area + area;
+0434     <span class="keyword">end</span>
+0435 
+0436     out = tmp./tot_area;
+0437 
+0438 <a name="_sub9" href="#_subfunctions" class="code">function out = calc_convex(verts)</a>
+0439 <span class="comment">% Returns an array of boolean values for every vertex, true if the external</span>
+0440 <span class="comment">% angle at this vertex is greater or equal to 180 degrees, false otherwise.</span>
+0441 <span class="comment">% This marks the vertices which upset the convexity of the polygon and</span>
+0442 <span class="comment">% require special treatment.</span>
+0443 
+0444 n_verts = size(verts,1);
+0445 tmp = [verts(<span class="keyword">end</span>,:); verts; verts(1,:)];
+0446 verts = tmp;
+0447 
+0448 <span class="keyword">for</span> i = 2:n_verts+1
+0449     v1 = [verts(i-1,:) - verts(i,:), 0];
+0450     v2 = [verts(i+1,:) - verts(i,:), 0];
+0451     cp = cross(v1,v2);
+0452     out(i-1) = cp(3) &gt;= 0;
+0453 <span class="keyword">end</span>
+0454 
+0455 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0456 <span class="comment">% ELECTRODE POSITIONS:</span>
+0457 <span class="comment">%  elec_pos = [n_elecs_per_plane,(0=equal angles,1=equal dist),z_planes]</span>
+0458 <span class="comment">%     OR</span>
+0459 <span class="comment">%  elec_pos = [degrees,z] centres of each electrode (N_elecs x 2)</span>
+0460 <span class="comment">%</span>
+0461 <span class="comment">% ELECTRODE SHAPES::</span>
+0462 <span class="comment">%  elec_shape = [width,height, {maxsz}]  % Rectangular elecs</span>
+0463 <span class="comment">%     OR</span>
+0464 <span class="comment">%  elec_shape = [radius, {0, maxsz} ]  % Circular elecs</span>
+0465 <span class="comment">%     maxsz  (OPT)  -&gt; max size of mesh elems (default = courase mesh)</span>
+0466 <span class="comment">%</span>
+0467 <span class="comment">% OUTPUT:</span>
+0468 <span class="comment">%  elecs(i).pos   = [x,y,z]</span>
+0469 <span class="comment">%  elecs(i).shape = 'C' or 'R'</span>
+0470 <span class="comment">%  elecs(i).dims  = [radius] or [width,height]</span>
+0471 <span class="comment">%  elecs(i).maxh  = '-maxh=#' or '';</span>
+0472 <a name="_sub10" href="#_subfunctions" class="code">function [elecs, centres] = parse_elecs(elec_pos, elec_shape, tank_shape, hig, is2D )</a>
+0473 
+0474     <span class="keyword">if</span> isempty(elec_pos)
+0475         elecs = [];
+0476         centres = [];
+0477         <span class="keyword">return</span>; <span class="comment">% no electrodes, nothing to do</span>
+0478     <span class="keyword">end</span>
+0479     
+0480    <span class="keyword">if</span> is2D
+0481       elec_pos(:,3) = hig/2;
+0482    <span class="keyword">end</span>
+0483    
+0484    <span class="comment">% temp fix</span>
+0485    rad = tank_shape.size;
+0486 
+0487    <span class="comment">% It never makes sense to specify only one elec</span>
+0488    <span class="comment">% So elec_pos means the number of electrodes in this case</span>
+0489    <span class="keyword">if</span> size(elec_pos,1) == 1
+0490        <span class="comment">% Parse elec_pos = [n_elecs_per_plane,(0=equal angles,1=equal dist),z_planes]</span>
+0491       n_elecs= elec_pos(1); <span class="comment">% per plane</span>
+0492       offset = elec_pos(2) - floor(elec_pos(2));
+0493       <span class="keyword">switch</span> floor(elec_pos(2))
+0494           <span class="keyword">case</span> 0
+0495               th = linspace(0,2*pi, n_elecs+1)'; th(end)=[];
+0496               th = th + offset*2*pi;
+0497               ind = th &gt;= 2*pi;
+0498               th(ind) = th(ind) - 2*pi;
+0499           <span class="keyword">case</span> 1
+0500               <span class="comment">% piece_poly_fit doesn't seem to work very well</span>
+0501               <span class="keyword">if</span> 1<span class="comment">%tank_shape.curve_type == 4</span>
+0502                   pp = <a href="fourier_fit.html" class="code" title="function C = fourier_fit(points,N,start);">fourier_fit</a>(tank_shape.vertices,<span class="keyword">...</span>
+0503                       size(tank_shape.vertices,1) - 1,tank_shape.vertices(1,:));
+0504                   p = linspace(0,1,n_elecs+1)'; p(end) = [];
+0505                   p = p + offset;
+0506                   xy = <a href="fourier_fit.html" class="code" title="function C = fourier_fit(points,N,start);">fourier_fit</a>(pp,p);
+0507                  <span class="comment">% NOTE, THIS IS A HACK. Some complicated shapes can't be</span>
+0508                  <span class="comment">% described by angle alone</span>
+0509                   th = atan2(xy(:,2) - tank_shape.centroid(2), <span class="keyword">...</span>
+0510                              xy(:,1) - tank_shape.centroid(1));
+0511 
+0512               <span class="keyword">elseif</span> any( tank_shape.curve_type == [1,2,3] )
+0513                   <span class="comment">% I can't seem able to get the first electrode exactly on</span>
+0514                   <span class="comment">% the first vertex</span>
+0515                   pp= <a href="piece_poly_fit.html" class="code" title="function [pp, m] = piece_poly_fit(points, fstr, linear_frac)">piece_poly_fit</a>(tank_shape.vertices);
+0516                   p = linspace(1,0,n_elecs+1)'; p(end) = [];
+0517                   off = offset*2*pi + tank_shape.vertices_polar(1,1);
+0518                   th = <a href="piece_poly_fit.html" class="code" title="function [pp, m] = piece_poly_fit(points, fstr, linear_frac)">piece_poly_fit</a>(pp,off,p);
+0519               <span class="keyword">else</span>
+0520                   error(<span class="string">'curve_type unrecognized'</span>);
+0521               <span class="keyword">end</span>
+0522       <span class="keyword">end</span>
+0523 
+0524       on_elecs = ones(n_elecs, 1);
+0525       el_th = []; 
+0526       el_z  = []; 
+0527       <span class="keyword">for</span> i=3:length(elec_pos)
+0528         el_th = [el_th; th];
+0529         el_z  = [el_z ; on_elecs*elec_pos(i)];
+0530       <span class="keyword">end</span>
+0531    <span class="keyword">else</span>
+0532       el_th = elec_pos(:,1)*2*pi/360;
+0533       el_z  = elec_pos(:,2);
+0534    <span class="keyword">end</span>
+0535       
+0536    n_elecs= size(el_z,1); 
+0537 
+0538    <span class="keyword">if</span> size(elec_shape,1) == 1
+0539       elec_shape = ones(n_elecs,1) * elec_shape;
+0540    <span class="keyword">end</span>
+0541 
+0542    <span class="keyword">for</span> i= 1:n_elecs
+0543      row = elec_shape(i,:); 
+0544      elecs(i) = <a href="#_sub13" class="code" title="subfunction elec = elec_spec( row, is2D, hig, rad )">elec_spec</a>( row, is2D, hig, rad );
+0545    <span class="keyword">end</span>
+0546    
+0547    
+0548    <span class="comment">%centres = [rad*sin(el_th),rad*cos(el_th),el_z];</span>
+0549    <span class="keyword">for</span> i= 1:n_elecs; 
+0550 <span class="comment">%        switch tank_shape.curve_type</span>
+0551 <span class="comment">%            case 1</span>
+0552                [centres(i,1:2), normal] = <a href="#_sub11" class="code" title="subfunction [pos, normal] = calc_elec_centre(tank_shape, th)">calc_elec_centre</a>(tank_shape, el_th(i));
+0553 <span class="comment">%            case{2, 3}</span>
+0554 <span class="comment">%                [centres(i,1:2), normal] = calc_elec_centre_spline(tank_shape, el_th(i));</span>
+0555 <span class="comment">%            otherwise</span>
+0556 <span class="comment">%                error('Unknown curve type');</span>
+0557 <span class="comment">%        end</span>
+0558        centres(i,3) = el_z(i);
+0559        elecs(i).pos  = centres(i,:);
+0560        <span class="keyword">if</span> elecs(i).discretize &gt; 0
+0561         <span class="comment">% this bit is to prevent netgen choking on slightly misalligned</span>
+0562         <span class="comment">% electrods</span>
+0563         th = cart2pol(normal(1),normal(2));
+0564         frac = 2*pi /elecs(i).discretize ;
+0565         th = frac * round( th / frac);
+0566         [normal(1) normal(2)] = pol2cart(th,1);
+0567        <span class="keyword">end</span>
+0568        elecs(i).normal = normal;
+0569        
+0570    <span class="keyword">end</span>
+0571 
+0572    <span class="keyword">if</span> n_elecs == 0
+0573       elecs= struct([]); <span class="comment">% empty</span>
+0574       centres= []; 
+0575    <span class="keyword">end</span>
+0576 
+0577    
+0578    
+0579     <a name="_sub11" href="#_subfunctions" class="code">function [pos, normal] = calc_elec_centre(tank_shape, th)</a>
+0580         <span class="comment">% The calculation relies on the theorem that if point D lies on a</span>
+0581         <span class="comment">% line between B and C, but point A is not on that line, then:</span>
+0582         <span class="comment">%   |BD|    |AB| sin(&lt;DAB)</span>
+0583         <span class="comment">%   ---- = ---------------</span>
+0584         <span class="comment">%   |DC|    |AC| sin(&lt;DAC)</span>
+0585         <span class="comment">% Thus, B and C are vertices of our shape, A is its centroid and D</span>
+0586         <span class="comment">% is the sought center of the electrode. All quantities on RHS are</span>
+0587         <span class="comment">% known.</span>
+0588         
+0589         <span class="comment">% make sure th is between -pi and pi</span>
+0590         <span class="keyword">if</span> th &gt; pi; th = th - 2*pi; <span class="keyword">end</span>
+0591         
+0592         
+0593         vert_pol = tank_shape.vertices_polar; <span class="comment">%[th, r]</span>
+0594         
+0595      
+0596         n_vert = size(vert_pol,1);
+0597         vert_pol = [vert_pol , (1:n_vert)'];
+0598         <span class="comment">% Re-order the vertices -pi to pi. Now counter-clockwise</span>
+0599         vert_pol = sortrows(vert_pol,1); 
+0600         <span class="comment">% find the edge on which the elctrode lies. (Edge 1 is between</span>
+0601         <span class="comment">% verticies 1 and 2)</span>
+0602         idx = find(vert_pol(:,1) &gt; th, 1, <span class="string">'first'</span>);
+0603         <span class="keyword">if</span> isempty(idx); idx = 1; <span class="keyword">end</span>
+0604         edg_no = vert_pol(idx,3);
+0605         
+0606         
+0607         normal = tank_shape.edge_normals(edg_no,:);
+0608               
+0609         v1 = edg_no;
+0610         <span class="keyword">if</span> edg_no == n_vert <span class="comment">% between the last and first vertex</span>
+0611             v2 = 1;
+0612         <span class="keyword">else</span>
+0613             v2 = v1+1;
+0614         <span class="keyword">end</span>
+0615         vert_pol = [];
+0616         
+0617         
+0618         vert_pol = tank_shape.vertices_polar;
+0619         vert = tank_shape.vertices;
+0620         cntr = tank_shape.centroid;
+0621         <span class="comment">% position between vertices - see first comment</span>
+0622         AB = sqrt(sum( (vert(v1,:) - cntr).^2 ));
+0623         AC = sqrt(sum( (vert(v2,:) - cntr).^2 ));
+0624         DAB = abs(vert_pol(v1,1)-th); 
+0625         <span class="keyword">if</span> DAB &gt; pi, DAB = abs( DAB - 2*pi); <span class="keyword">end</span>; 
+0626         DAC  = abs(vert_pol(v2,1)-th);
+0627         <span class="keyword">if</span> DAC &gt; pi, DAC = abs( DAC - 2*pi); <span class="keyword">end</span>;
+0628         <span class="keyword">if</span> DAC ~= 0
+0629             ratio = AB * sin(DAB) / (AC * sin(DAC));
+0630             pos = vert(v1,:) + ( ratio / (1 + ratio) ) * (vert(v2,:) - vert(v1,:));
+0631         <span class="keyword">else</span>
+0632             pos = vert(v2,:);
+0633         <span class="keyword">end</span>
+0634 
+0635         
+0636         
+0637    <a name="_sub12" href="#_subfunctions" class="code">function [pos, normal] = calc_elec_centre_spline(tank_shape, th)</a>
+0638         <span class="comment">% The calculation proceeds by finding a common point between a line</span>
+0639         <span class="comment">% from the centroid outwards and the equation of the relevant</span>
+0640         <span class="comment">% quadratic spline segment defined using 3 control points</span>
+0641         
+0642         <span class="comment">% make sure th is between -pi and pi</span>
+0643         <span class="keyword">if</span> th &gt; pi; th = th - 2*pi; <span class="keyword">end</span> 
+0644         
+0645         vert_pol = tank_shape.vertices_polar; <span class="comment">%[th, r]</span>
+0646         
+0647         <span class="comment">% The number of vertices must be even, but just in case...</span>
+0648         <span class="keyword">if</span> mod(size(vert_pol,1),2)
+0649             error([<span class="string">'The number of points must be even. '</span><span class="keyword">...</span>
+0650                 <span class="string">'One de Boor control point for every vertex'</span>]);
+0651         <span class="keyword">end</span>
+0652         
+0653         <span class="comment">% if the curve is defined as splines, every second point is not</span>
+0654         <span class="comment">% actually a vertex. We remove them.</span>
+0655         <span class="keyword">if</span> tank_shape.curve_type == 2 || tank_shape.curve_type == 3
+0656             vert_pol(2:2:<span class="keyword">end</span>,:) = [];
+0657         <span class="keyword">end</span>
+0658       
+0659         n_vert = size(vert_pol,1);
+0660    
+0661         vert_pol = [vert_pol , (1:n_vert)']; <span class="comment">%excludes control points</span>
+0662         <span class="comment">% Re-order the vertices -pi to pi. Now counter-clockwise</span>
+0663         vert_pol = sortrows(vert_pol,1); 
+0664         <span class="comment">% find the edge on which the electrode lies. Edge 1 is between</span>
+0665         <span class="comment">% vertices 1 and 2.</span>
+0666         idx = find(vert_pol(:,1) &gt; th, 1, <span class="string">'first'</span>);
+0667         <span class="keyword">if</span> isempty(idx); idx = 1; <span class="keyword">end</span>
+0668         edg_no = vert_pol(idx,3);
+0669         
+0670         v1 = edg_no;
+0671         <span class="keyword">if</span> edg_no == n_vert <span class="comment">% between the last and first vertex</span>
+0672             v2 = 1;
+0673         <span class="keyword">else</span>
+0674             v2 = v1+1;
+0675         <span class="keyword">end</span>
+0676         vert_pol = [];
+0677         
+0678         <span class="comment">% correcting for the control points</span>
+0679         v1 = 2 * v1 - 1;
+0680         v2 = 2 * v2 - 1;
+0681         
+0682         <span class="comment">% the spline goes from point P0 to P2 such that P1-P0 is a tangent</span>
+0683         <span class="comment">% at P0 and P2-P1 is a tangent at P2</span>
+0684         C = tank_shape.centroid;
+0685         P0 = tank_shape.vertices(v1,:) - C;
+0686         P1 = tank_shape.vertices(v1+1,:) - C; <span class="comment">% control point</span>
+0687         P2 = tank_shape.vertices(v2,:) - C;
+0688         
+0689         
+0690         <span class="comment">% find the gradient of the line from centroid to electrode center:</span>
+0691         [x, y] = pol2cart(th, 1);
+0692         <span class="comment">% FIXME: This doesn't crash only because of round-off errors.</span>
+0693         g = y/x;
+0694         <span class="comment">% (because we subtracted the centroid from the vertices, the line</span>
+0695         <span class="comment">% passes through the origin now)</span>
+0696         
+0697         <span class="comment">% the spline is f(t) = (1-t)^2 * P0 + 2t(1-t)P1 + t^2 * P2</span>
+0698         <span class="comment">% which can also be expressed as</span>
+0699         f = @(t) (P2 - 2*P1 + P0)*t^2 + 2*(P1 - P0)*t + P0;
+0700         <span class="comment">% and it's derivative:</span>
+0701         df = @(t) 2*(P2 - 2*P1 + P0)*t + 2*(P1 - P0);
+0702         <span class="comment">% to find the value of t for which the line cross, we substitute</span>
+0703         <span class="comment">% p0 = y0-ax0 for P0 and so on.</span>
+0704         p0 = P0(2) - g * P0(1);
+0705         p1 = P1(2) - g * P1(1);
+0706         p2 = P2(2) - g * P2(1);
+0707         
+0708         <span class="comment">% thus we have a quadratic equation a*t^2 + b*t + c = 0 where</span>
+0709         a = (p2 - 2*p1 + p0);
+0710         b = 2* (p1 - p0);
+0711         c = p0;
+0712         
+0713         <span class="keyword">if</span> abs(a) &lt; 1e-10
+0714             t = -c/b;
+0715             pos = f(t) + C;
+0716             tmp = df(t);
+0717             normal = [-tmp(2), tmp(1)] / sqrt(sum(tmp.^2));
+0718             <span class="keyword">return</span>;
+0719         <span class="keyword">end</span>
+0720         
+0721         <span class="comment">% the determinant is</span>
+0722         D = b^2 - 4*a*c;
+0723         
+0724         <span class="comment">% find the roots</span>
+0725         <span class="keyword">if</span> D == 0
+0726             t = -b / (2 * a);
+0727 
+0728         <span class="keyword">elseif</span> D &gt; 0
+0729             t1 = (-b - sqrt(D) ) / (2 * a);
+0730             t2 = (-b + sqrt(D) ) / (2 * a);
+0731             <span class="keyword">if</span> t1 &gt;= 0 &amp;&amp; t1 &lt;= 1
+0732                 t = t1;
+0733             <span class="keyword">else</span>
+0734                 t = t2;
+0735             <span class="keyword">end</span>
+0736         <span class="keyword">else</span>
+0737             error(<span class="string">'Something went wrong, cannot place electrode on spline'</span>);
+0738         <span class="keyword">end</span>
+0739         
+0740         pos = f(t) + C;
+0741         tmp = df(t);
+0742         normal = [-tmp(2), tmp(1)]/ sqrt(sum(tmp.^2));
+0743 
+0744    
+0745    
+0746 
+0747 <a name="_sub13" href="#_subfunctions" class="code">function elec = elec_spec( row, is2D, hig, rad )</a>
+0748   <span class="keyword">if</span>     is2D
+0749      <span class="keyword">if</span> length(row)&gt;=2 &amp;&amp; row(2) == -1 <span class="comment">% Point electrodes</span>
+0750         <span class="comment">% Create rectangular electrodes with bottom, cw point where we want</span>
+0751         elec.shape = <span class="string">'P'</span> ;
+0752         <span class="keyword">if</span> length(row)&gt;=3 &amp;&amp; row(3) &gt; 0
+0753            elec.dims  =  row(3);
+0754         <span class="keyword">else</span>
+0755            elec.dims  =  rad; <span class="comment">% Make big if unspecified</span>
+0756         <span class="keyword">end</span>
+0757      <span class="keyword">else</span>
+0758         <span class="comment">% create circular electrodes for now, rectangular not yet supported</span>
+0759 <span class="comment">%         elec.shape = 'C';</span>
+0760 <span class="comment">%         elec.dims = row(1);</span>
+0761         elec.shape = <span class="string">'R'</span>;
+0762         elec.dims  = [row(1),hig];
+0763      <span class="keyword">end</span>
+0764   <span class="keyword">else</span>
+0765      <span class="keyword">if</span> length(row)&lt;2 || row(2) == 0 <span class="comment">% Circular electrodes</span>
+0766         elec.shape = <span class="string">'C'</span>;
+0767         elec.dims  = row(1);
+0768      <span class="keyword">elseif</span> row(2) == -1 <span class="comment">% Point electrodes</span>
+0769         <span class="comment">% Create rectangular electrodes with bottom, cw point where we want</span>
+0770         elec.shape = <span class="string">'P'</span>; 
+0771         <span class="keyword">if</span> length(row)&gt;=3 &amp;&amp; row(3) &gt; 0
+0772            elec.dims  =  row(3);
+0773         <span class="keyword">else</span>
+0774            elec.dims  =  rad; <span class="comment">% Make big if unspecified</span>
+0775         <span class="keyword">end</span>
+0776      <span class="keyword">elseif</span> row(2)&gt;0      <span class="comment">% Rectangular electrodes</span>
+0777         elec.shape = <span class="string">'R'</span>;
+0778         elec.dims  = row(1:2);
+0779      <span class="keyword">else</span>
+0780         error(<span class="string">'negative electrode width'</span>);
+0781      <span class="keyword">end</span>
+0782   <span class="keyword">end</span>
+0783 
+0784   <span class="keyword">if</span> length(row)&gt;=3 &amp;&amp; row(3) &gt; 0
+0785      elec.maxh = sprintf(<span class="string">'-maxh=%f'</span>, row(3));
+0786   <span class="keyword">else</span>
+0787      elec.maxh = <span class="string">''</span>;
+0788   <span class="keyword">end</span>
+0789 
+0790   <span class="keyword">if</span> length(row)&lt;4 || row(4) == 0
+0791      elec.model = <span class="string">'cem'</span>; <span class="comment">% Complete Electrode Model (CEM)</span>
+0792   <span class="keyword">else</span>
+0793      elec.model = <span class="string">'pem'</span>; <span class="comment">% Point Electrode Model (PEM)</span>
+0794   <span class="keyword">end</span>
+0795   <span class="comment">%TODO support Shunt Electrode Model (SEM)</span>
+0796 
+0797   <span class="keyword">if</span> length(row) &lt; 5 || row(5) == 0
+0798       elec.discretize = 0;
+0799   <span class="keyword">else</span>
+0800       elec.discretize = row(5);
+0801   <span class="keyword">end</span>
+0802   
+0803   
+0804   
+0805   
+0806   
+0807   
+0808   
+0809   
+0810   
+0811   
+0812   
+0813   
+0814   
+0815 <a name="_sub14" href="#_subfunctions" class="code">function write_geo_file(geofn, tank_height, tank_shape, </a><span class="keyword">...</span>
+0816                         tank_maxh, elecs, extra_ng_code)
+0817     fid=fopen(geofn,<span class="string">'w'</span>);
+0818     <a href="#_sub15" class="code" title="subfunction write_header(fid,tank_height,tank_shape,maxsz,extra)">write_header</a>(fid,tank_height,tank_shape,tank_maxh,extra_ng_code);
+0819 
+0820     n_verts = size(tank_shape.vertices,1);
+0821     n_elecs = length(elecs);
+0822     <span class="comment">%  elecs(i).pos   = [x,y,z]</span>
+0823     <span class="comment">%  elecs(i).shape = 'C' or 'R'</span>
+0824     <span class="comment">%  elecs(i).dims  = [radius] or [width,height]</span>
+0825     <span class="comment">%  elecs(i).maxh  = '-maxh=#' or '';</span>
+0826     <span class="comment">%  elecs(i).edg_no = i (index of the edge on which the electrode lies)</span>
+0827     pts_elecs_idx = [];
+0828     <span class="comment">%^keyboard</span>
+0829     <span class="keyword">for</span> i=1:n_elecs
+0830         name = sprintf(<span class="string">'elec%04d'</span>,i);
+0831         pos = elecs(i).pos;
+0832         dirn = elecs(i).normal;
+0833         <span class="keyword">switch</span> elecs(i).shape
+0834             <span class="keyword">case</span> <span class="string">'C'</span>
+0835                 <a href="#_sub17" class="code" title="subfunction write_circ_elec(fid,name,c, dirn, rd, centroid, maxh)">write_circ_elec</a>(fid,name, pos, dirn,  <span class="keyword">...</span>
+0836                     elecs(i).dims, tank_shape.centroid, elecs(i).maxh);
+0837             <span class="keyword">case</span> <span class="string">'R'</span>
+0838                 <a href="#_sub18" class="code" title="subfunction write_rect_elec(fid,name,c, dirn,wh,d,maxh)">write_rect_elec</a>(fid,name, pos, dirn,  <span class="keyword">...</span>
+0839                     elecs(i).dims, tank_shape.size/10, elecs(i).maxh);
+0840                 <span class="comment">%        case 'P'</span>
+0841                 <span class="comment">%          pts_elecs_idx = [ pts_elecs_idx, i];</span>
+0842                 <span class="comment">%          continue; % DON'T print solid cyl</span>
+0843 
+0844             <span class="keyword">otherwise</span>; error(<span class="string">'unknown electrode shape'</span>);
+0845         <span class="keyword">end</span>
+0846         <span class="comment">%       fprintf(fid,'solid cyl%04d = trunk   and %s; \n',i,name);</span>
+0847     <span class="keyword">end</span>
+0848     fprintf(fid,<span class="string">'solid trunk = bound'</span>);
+0849     <span class="keyword">if</span> isfield(tank_shape,<span class="string">'additional_shapes'</span>)
+0850          <span class="keyword">for</span> i = 1:length(tank_shape.additional_shapes)
+0851              fprintf(fid,<span class="string">' and not add_obj%04d'</span>,i);
+0852          <span class="keyword">end</span>
+0853     <span class="keyword">end</span>
+0854     fprintf(fid,<span class="string">';\n'</span>);
+0855     
+0856     <span class="keyword">if</span> isfield(tank_shape,<span class="string">'additional_shapes'</span>)
+0857         <span class="keyword">for</span> i = 1:length(tank_shape.additional_shapes)
+0858             fprintf(fid,<span class="string">'solid add_obj%04dc = add_obj%04d'</span>,i,i);
+0859             <span class="keyword">for</span> j = (i+1):length(tank_shape.additional_shapes)
+0860                 fprintf(fid,<span class="string">' and not add_obj%04d'</span>,j);
+0861             <span class="keyword">end</span>
+0862 
+0863 <span class="comment">% This code was added while trying to debug mixed shapes</span>
+0864 <span class="comment">%   with solid geometry and extruded shapes. It didn't help</span>
+0865 <span class="comment">%           if ~isempty(extra_ng_code{1})</span>
+0866 <span class="comment">%                fprintf(fid,' and not %s',extra_ng_code{1});</span>
+0867 <span class="comment">%           end</span>
+0868 
+0869             fprintf(fid,[<span class="string">' and plane(0,0,0;0,0,-1)\n'</span> <span class="keyword">...</span>
+0870                 <span class="string">'      and  plane(0,0,%6.2f;0,0,1)'</span>],tank_height);
+0871             fprintf(fid,<span class="string">';\n'</span>);
+0872         <span class="keyword">end</span>
+0873     <span class="keyword">end</span>
+0874     
+0875     <span class="keyword">if</span> tank_maxh ~= 0
+0876         fprintf(fid,<span class="string">'tlo trunk -transparent -maxh=%f;\n'</span>,tank_maxh);
+0877     <span class="keyword">else</span>
+0878         fprintf(fid,<span class="string">'tlo trunk -transparent;\n'</span>);
+0879     <span class="keyword">end</span>
+0880     <span class="keyword">if</span> ~isempty(extra_ng_code{1})
+0881         fprintf(fid,<span class="string">'tlo %s -col=[0,1,0];\n'</span>,extra_ng_code{1});
+0882     <span class="keyword">end</span>
+0883 
+0884     <span class="keyword">if</span> isfield(tank_shape,<span class="string">'additional_shapes'</span>)
+0885          <span class="keyword">for</span> i = 1:length(tank_shape.additional_shapes)
+0886              fprintf(fid,<span class="string">'tlo add_obj%04dc -col=[0,1,0];\n'</span>,i);
+0887          <span class="keyword">end</span>
+0888     <span class="keyword">end</span>
+0889 
+0890     <span class="keyword">for</span> i=1:n_elecs
+0891         <span class="keyword">if</span> any(i == pts_elecs_idx); <span class="keyword">continue</span>; <span class="keyword">end</span>
+0892         fprintf(fid,<span class="string">'tlo elec%04d -col=[1,0,0] %s;\n'</span>,i,elecs(i).maxh);
+0893     <span class="keyword">end</span>
+0894 
+0895 
+0896     fclose(fid); <span class="comment">% geofn</span>
+0897 
+0898    
+0899    
+0900    <a name="_sub15" href="#_subfunctions" class="code">function write_header(fid,tank_height,tank_shape,maxsz,extra)</a>
+0901    <span class="keyword">if</span> maxsz==0; 
+0902       maxsz = <span class="string">''</span>;
+0903    <span class="keyword">else</span>
+0904       maxsz = sprintf(<span class="string">'-maxh=%f'</span>,maxsz);
+0905    <span class="keyword">end</span>
+0906 
+0907    <span class="keyword">if</span> ~isempty( extra{1} )
+0908       extra{1} = [<span class="string">' and not '</span>,extra{1}];
+0909    <span class="keyword">end</span>
+0910 
+0911    
+0912    fprintf(fid,<span class="string">'#Automatically generated by ng_mk_extruded_model\n'</span>);
+0913    fprintf(fid,<span class="string">'algebraic3d\n'</span>);
+0914    fprintf(fid,<span class="string">'%s\n'</span>,extra{2}); <span class="comment">% Define extra stuff here</span>
+0915    
+0916    fprintf(fid,<span class="string">'curve3d extrsncurve=(2; 0,0,0; 0,0,%6.2f; 1; 2,1,2);\n'</span>, <span class="keyword">...</span>
+0917        tank_height+1);
+0918 
+0919 
+0920    <a href="#_sub16" class="code" title="subfunction write_curve(fid, tank_shape, name, scale)">write_curve</a>(fid,tank_shape,<span class="string">'outer'</span>, 1.15);
+0921    <a href="#_sub16" class="code" title="subfunction write_curve(fid, tank_shape, name, scale)">write_curve</a>(fid,tank_shape,<span class="string">'inner'</span>, 0.99);
+0922    <a href="#_sub16" class="code" title="subfunction write_curve(fid, tank_shape, name, scale)">write_curve</a>(fid,tank_shape,<span class="string">'surf'</span>, 1);
+0923    
+0924     fprintf(fid,[<span class="string">'solid bound= plane(0,0,0;0,0,-1)\n'</span> <span class="keyword">...</span>
+0925                 <span class="string">'      and  plane(0,0,%6.2f;0,0,1)\n'</span> <span class="keyword">...</span>
+0926                 <span class="string">'      and  extrusion(extrsncurve;surf;0,1,0)'</span><span class="keyword">...</span>
+0927                 <span class="string">'%s %s;\n'</span>],tank_height,extra{1},maxsz);
+0928             
+0929    fprintf(fid,[<span class="string">'solid inner_bound= plane(0,0,0;0,0,-1)\n'</span> <span class="keyword">...</span>
+0930                 <span class="string">'      and  plane(0,0,%6.2f;0,0,1)\n'</span> <span class="keyword">...</span>
+0931                 <span class="string">'      and  extrusion(extrsncurve;inner;0,1,0)'</span><span class="keyword">...</span>
+0932                 <span class="string">'%s %s;\n'</span>],tank_height,extra{1},maxsz);
+0933 
+0934    fprintf(fid,[<span class="string">'solid outer_bound= plane(0,0,0;0,0,-1)\n'</span> <span class="keyword">...</span>
+0935                 <span class="string">'      and  plane(0,0,%6.2f;0,0,1)\n'</span> <span class="keyword">...</span>
+0936                 <span class="string">'      and  extrusion(extrsncurve;outer;0,1,0)'</span><span class="keyword">...</span>
+0937                 <span class="string">'%s %s;\n'</span>],tank_height,extra{1},maxsz);
+0938            
+0939    <span class="comment">% EVERYTHING below this line assumes additional shapes are defined</span>
+0940    <span class="keyword">if</span> ~isfield(tank_shape, <span class="string">'additional_shapes'</span>), <span class="keyword">return</span>, <span class="keyword">end</span>
+0941    
+0942    <span class="keyword">for</span> i = 1:length(tank_shape.additional_shapes)
+0943        name_curve = sprintf(<span class="string">'add_curve%04d'</span>,i); 
+0944        <a href="#_sub16" class="code" title="subfunction write_curve(fid, tank_shape, name, scale)">write_curve</a>(fid,tank_shape.additional_shapes{i},name_curve);
+0945        name_obj = sprintf(<span class="string">'add_obj%04d'</span>,i); 
+0946        fprintf(fid,[<span class="string">'solid %s= plane(0,0,%6.2f;0,0,-1)\n'</span> <span class="keyword">...</span>
+0947            <span class="string">'      and  plane(0,0,%6.2f;0,0,1)\n'</span> <span class="keyword">...</span>
+0948            <span class="string">'      and  extrusion(extrsncurve;%s;0,1,0)'</span><span class="keyword">...</span>
+0949            <span class="string">'%s %s;\n'</span>],name_obj,-i,tank_height+i,name_curve,extra{1},maxsz);
+0950    <span class="keyword">end</span>
+0951                    
+0952         
+0953    <a name="_sub16" href="#_subfunctions" class="code">function write_curve(fid, tank_shape, name, scale)</a>
+0954         <span class="keyword">if</span> nargin &lt;4
+0955             scale = 1;
+0956         <span class="keyword">end</span>
+0957        
+0958         is_struct = isstruct(tank_shape);
+0959         <span class="keyword">if</span> ~is_struct
+0960             vertices = tank_shape;
+0961             STRUCT = false;
+0962             <span class="keyword">if</span> scale ~= 1
+0963                 warning(<span class="string">'Scale is ignored when second input is an array'</span>);
+0964                 scale = 1;
+0965             <span class="keyword">end</span>
+0966         <span class="keyword">elseif</span> scale ~= 1
+0967             vertices = tank_shape.vertices + <span class="keyword">...</span>
+0968                 (scale-1)*tank_shape.vertex_dir*tank_shape.size;
+0969         <span class="keyword">else</span>
+0970             vertices = tank_shape.vertices;
+0971         <span class="keyword">end</span>
+0972        n_vert = size(vertices,1);
+0973        
+0974        fprintf(fid,<span class="string">'curve2d %s=(%d; \n'</span>, name, n_vert);
+0975        
+0976        <span class="keyword">for</span> i = 1:n_vert
+0977            <span class="comment">% because of the definitions of the local axis in extrusion, the</span>
+0978            <span class="comment">% x coordinate has to be multiplied by -1. This assures the</span>
+0979            <span class="comment">% object appears at the expected coordinates. To maintain</span>
+0980            <span class="comment">% clockwise order (required by netget) the vertices are printed</span>
+0981            <span class="comment">% in the opposite order.</span>
+0982            fprintf(fid,<span class="string">'       %6.4f, %6.4f;\n'</span>,[-1 1].*vertices(n_vert-i+1,:));
+0983            <span class="comment">%             fprintf(fid,'       %6.2f, %6.2f;\n',vertices(i,:));</span>
+0984        <span class="keyword">end</span>
+0985        <span class="keyword">if</span> is_struct
+0986            spln_sgmnts = tank_shape.spln_sgmnts;
+0987        <span class="keyword">else</span>
+0988            spln_sgmnts = zeros(max(size(vertices)));
+0989        <span class="keyword">end</span>
+0990        n_sgmnts = length(spln_sgmnts);
+0991        fprintf(fid,<span class="string">'       %d;\n'</span>,n_sgmnts);
+0992        cv = 1; <span class="comment">%current vertex</span>
+0993        <span class="keyword">for</span> i = 1:n_sgmnts
+0994            <span class="keyword">if</span> spln_sgmnts(i)
+0995                <span class="keyword">if</span> i == n_sgmnts
+0996                   fprintf(fid,<span class="string">'       %d, %d, %d, %d );\n\n\n'</span>, 3, cv,cv+1, 1);
+0997                <span class="keyword">else</span>
+0998                    fprintf(fid,<span class="string">'       %d, %d, %d, %d; \n'</span>, 3, cv, cv+1, cv+2);
+0999                <span class="keyword">end</span>
+1000                cv = cv + 2;
+1001            <span class="keyword">else</span>
+1002                <span class="keyword">if</span> i == n_sgmnts
+1003                    fprintf(fid,<span class="string">'       %d, %d, %d );\n\n\n'</span>, 2, cv, 1);
+1004                <span class="keyword">else</span>
+1005                    fprintf(fid,<span class="string">'       %d, %d, %d; \n'</span>, 2, cv, cv+1);
+1006                <span class="keyword">end</span>
+1007                cv = cv + 1;
+1008            <span class="keyword">end</span>
+1009        <span class="keyword">end</span>
+1010        
+1011        
+1012 <a name="_sub17" href="#_subfunctions" class="code">function write_circ_elec(fid,name,c, dirn, rd, centroid, maxh)</a>
+1013 <span class="comment">% writes the specification for a netgen cylindrical rod on fid,</span>
+1014 <span class="comment">%  named name, centerd on c,</span>
+1015 <span class="comment">% in the direction given by vector dirn, radius rd</span>
+1016 <span class="comment">% direction is in the xy plane</span>
+1017 
+1018     <span class="comment">% the direction vector</span>
+1019     dirn(3) = 0; dirn = dirn/norm(dirn);
+1020 
+1021     fprintf(fid,<span class="string">'solid %s  = '</span>, name);
+1022     fprintf(fid,[<span class="string">'  outer_bound and not inner_bound and '</span><span class="keyword">...</span>
+1023         <span class="string">'cylinder(%6.3f,%6.3f,%6.3f;%6.3f,%6.3f,%6.3f;%6.3f) '</span><span class="keyword">...</span>
+1024         <span class="string">'and plane(%6.3f,%6.3f,%6.3f;%6.3f,%6.3f,%6.3f) '</span><span class="keyword">...</span>
+1025         <span class="string">'and not bound;\n'</span>], <span class="keyword">...</span>
+1026         c(1)-dirn(1),c(2)-dirn(2),c(3)-dirn(3),<span class="keyword">...</span>
+1027         c(1)+dirn(1),c(2)+dirn(2),c(3)+dirn(3), rd, <span class="keyword">...</span>
+1028         centroid(1), centroid(2), 0, -dirn(1), -dirn(2), dirn(3));
+1029 
+1030 <a name="_sub18" href="#_subfunctions" class="code">function write_rect_elec(fid,name,c, dirn,wh,d,maxh)</a>
+1031 <span class="comment">% writes the specification for a netgen cuboid on fid, named name, centerd on c,</span>
+1032 <span class="comment">% in the direction given by vector dirn,</span>
+1033 <span class="comment">% hw = [height, width]  and depth d</span>
+1034 <span class="comment">% direction is in the xy plane</span>
+1035    w = wh(1); h= wh(2);
+1036    dirn(3) = 0; dirn = dirn/norm(dirn);
+1037    dirnp = [-dirn(2),dirn(1),0];
+1038    dirnp = dirnp/norm(dirnp);
+1039 
+1040    bl = c - (d/2)* dirn + (w/2)*dirnp - [0,0,h/2];
+1041    tr = c + (d/2)* dirn - (w/2)*dirnp + [0,0,h/2];
+1042    fprintf(fid,<span class="string">'solid %s  = outer_bound and not inner_bound and'</span>, name);
+1043    fprintf(fid,<span class="string">' plane (%6.3f,%6.3f,%6.3f;0, 0, -1) and\n'</span>, <span class="keyword">...</span>
+1044            bl(1),bl(2),bl(3));
+1045    fprintf(fid,<span class="string">' plane(%6.3f,%6.3f,%6.3f;%6.3f,%6.3f,%6.3f) and\n'</span>, <span class="keyword">...</span>
+1046            bl(1),bl(2),bl(3),-dirn(1),-dirn(2),0);
+1047    fprintf(fid,<span class="string">' plane(%6.3f,%6.3f,%6.3f;%6.3f,%6.3f,%6.3f) and\n'</span>, <span class="keyword">...</span>
+1048            bl(1),bl(2),bl(3),dirnp(1),dirnp(2),0);
+1049    fprintf(fid,<span class="string">' plane(%6.3f,%6.3f,%6.3f;0, 0, 1) and\n'</span>, <span class="keyword">...</span>
+1050            tr(1),tr(2),tr(3));
+1051    fprintf(fid,<span class="string">' plane(%6.3f,%6.3f,%6.3f;%6.3f,%6.3f,%6.3f) and\n'</span>, <span class="keyword">...</span>
+1052            tr(1),tr(2),tr(3),dirn(1),dirn(2),0);
+1053    fprintf(fid,<span class="string">' plane(%6.3f,%6.3f,%6.3f;%6.3f,%6.3f,%6.3f  )\n'</span>, <span class="keyword">...</span>
+1054            tr(1),tr(2),tr(3),-dirnp(1),-dirnp(2),0);
+1055    fprintf(fid,<span class="string">' and not bound;\n'</span>);
+1056     
+1057 <span class="comment">% NG_REMOVE_ELECTRODES: cleans up matrices read from a *.vol file</span>
+1058 <span class="comment">% [srf,vtx,fc,bc,simp,edg,mat_ind]= ng_remove_electrodes...</span>
+1059 <span class="comment">%     (srf,vtx,fc,bc,simp,edg,mat_ind, N_elec)</span>
+1060 <span class="comment">%</span>
+1061 <span class="comment">% Used to clean up external objects used to force electrode meshing in</span>
+1062 <span class="comment">% ng_mk_extruded_model.</span>
+1063 <span class="comment">%</span>
+1064 <a name="_sub19" href="#_subfunctions" class="code">function [srf,vtx,fc,bc,simp,edg,mat_ind] = ng_remove_electrodes</a><span class="keyword">...</span>
+1065     (srf,vtx,fc,bc,simp,edg,mat_ind, N_elec)
+1066 
+1067 fc = []; <span class="comment">% Unused, and we're not sure what it is;</span>
+1068 
+1069 <span class="comment">% total objects:</span>
+1070 N_obj = max(mat_ind);
+1071 
+1072 <span class="comment">% The electodes are the last N_elec simps</span>
+1073 elec_ind = mat_ind &gt; (N_obj - N_elec);
+1074 
+1075 in = unique(simp(~elec_ind,:)); <span class="comment">% nodes in real object</span>
+1076 out = unique(simp(elec_ind,:)); <span class="comment">% nodes in electrodes</span>
+1077 boundary = intersect(in,out);   <span class="comment">% nodes shared obj/electrodes</span>
+1078 out = setdiff(out,boundary);    <span class="comment">% nodes only in electrodes</span>
+1079 
+1080 <span class="comment">% remove simps which contain nodes in the &quot;out&quot; list</span>
+1081 remove_simp = any( ismember(simp,out), 2);
+1082 simp0 = simp;
+1083 simp( remove_simp,:) = [];
+1084 
+1085 <span class="comment">% Choose which vertices to keep</span>
+1086 vtx_renum = logical( zeros(size(vtx,1),1) );
+1087 vtx_renum( in ) = logical(1);
+1088 vtx_renum = cumsum(vtx_renum);
+1089 
+1090 vtx(out,:) = [];
+1091 simp =  reshape( vtx_renum(simp), size(simp));
+1092 
+1093 <span class="comment">% recalculate surface</span>
+1094 <span class="comment">% STUPID MATLAB BUGS MEAN WE CANT allow int32 here</span>
+1095 srf= double( <a href="../../../eidors/solvers/forward/find_boundary.html" class="code" title="function [srf, idx] = find_boundary(simp);">find_boundary</a>(simp) );
+1096 bc = ones(size(srf,1),1); <span class="comment">% Add srf for the electrodes</span>
+1097 
+1098 <span class="comment">% Iterate over electrodes</span>
+1099 <span class="keyword">for</span> i=1:N_elec;
+1100   eleci_obj = mat_ind == (N_obj - N_elec + i);
+1101   this_elec = unique( simp0( eleci_obj, : ));
+1102   eleci_nodes = vtx_renum( intersect( this_elec, in )); 
+1103 
+1104 <span class="comment">% This is the direct way to get electrodes. Instead we need to call the</span>
+1105 <span class="comment">%   electrode finder function</span>
+1106 <span class="comment">% elec(i).nodes = eleci_nodes;</span>
+1107   
+1108   eleci_srf = all( ismember(srf, eleci_nodes), 2);
+1109   bc( eleci_srf ) = i+1; <span class="comment">% give this elec a surface</span>
+1110 <span class="keyword">end</span>
+1111 
+1112 mat_ind( remove_simp) = [];
+1113 
+1114 <span class="comment">% Test code:</span>
+1115 <span class="comment">% fmdl.type='fwd_model'; fmdl.nodes = vtx; fmdl.elems =  simp_obj; fmdl.electrode= elec;</span>
+1116 
+1117 
+1118 
+1119 <a name="_sub20" href="#_subfunctions" class="code">function [srf,vtx,fc,bc,simp,edg,mat_ind] = ng_remove_electrodes_old</a><span class="keyword">...</span>
+1120     (srf,vtx,fc,bc,simp,edg,mat_ind, N_elec)
+1121 
+1122 <span class="comment">% total objects:</span>
+1123 N_obj = max(mat_ind);
+1124 
+1125 <span class="comment">% The electodes are the last N_elec simps</span>
+1126 e_simp_ind = mat_ind &gt; (N_obj - N_elec);
+1127 
+1128 in = unique(simp(~e_simp_ind,:));
+1129 out = unique(simp(e_simp_ind,:));
+1130 boundary = intersect(in,out);
+1131 out = setdiff(out,boundary);
+1132 
+1133 ext_srf_ind = ismember(srf,out);
+1134 ext_srf_ind = ext_srf_ind(:,1) | ext_srf_ind(:,2) | ext_srf_ind(:,3);
+1135 
+1136 srf(ext_srf_ind,:) = [];
+1137 bc(ext_srf_ind,:) = [];
+1138 fc(ext_srf_ind,:) = [];
+1139 simp = simp(~e_simp_ind,:);
+1140 mat_ind = mat_ind(~e_simp_ind);
+1141 
+1142 <span class="comment">% fix bc:</span>
+1143 n_unique = numel(unique(bc));
+1144 missing = setdiff(1:n_unique, unique(bc));
+1145 spare = setdiff(unique(bc), 1:n_unique); 
+1146 
+1147 <span class="keyword">for</span> i = 1:length(missing)
+1148     bc( bc==spare(i) ) = missing(i);
+1149 <span class="keyword">end</span>
+1150 
+1151 <span class="comment">% fix vtx:</span>
+1152 v = 1:size(vtx,1);
+1153 unused_v = setdiff(v, union(unique(simp),unique(srf))); 
+1154 v(unused_v) = [];
+1155 <span class="keyword">for</span> i = 1:size(vtx,1);
+1156 <span class="comment">%     simp_ind = find(simp == i);</span>
+1157 <span class="comment">%     srf_ind = find( srf == i);</span>
+1158     new_v_ind = find(v == i);
+1159     simp( simp == i ) = new_v_ind; 
+1160     srf( srf  == i ) = new_v_ind;
+1161 <span class="keyword">end</span>
+1162 vtx(unused_v,:) = [];
+1163 
+1164 
+1165 <span class="comment">%%</span>
+1166 <a name="_sub21" href="#_subfunctions" class="code">function [fmdl, mat_idx] = do_unit_test</a>
+1167 fmdl = [];
+1168 mat_idx = [];
+1169     a = [
+1170    -0.8981   -0.7492   -0.2146    0.3162    0.7935    0.9615    0.6751    0.0565   -0.3635   -0.9745
+1171     0.1404    0.5146    0.3504    0.5069    0.2702   -0.2339   -0.8677   -0.6997   -0.8563   -0.4668 ]';
+1172 <span class="comment">% [fmdl, mat_idx] = ng_mk_extruded_model({2,{a,0.5*a,0.2*a},1},[16,0,1],[0.01]);</span>
+1173 <span class="comment">% load CT2</span>
+1174 
+1175 <span class="comment">% [fmdl, mat_idx] = ng_mk_extruded_model({150,flipud(trunk),1},[16,0,75],[0.01]);</span>
+1176 
+1177 <span class="comment">% [fmdl, mat_idx] = ng_mk_extruded_model({2,{trunk/100, lung_heart_dep/100, heart/100},1},[16,1,1],[0.1]);</span>
+1178 <span class="comment">% img = mk_image( fmdl, 1);</span>
+1179 <span class="comment">%  img.elem_data(mat_idx{2}) = 1.1;</span>
+1180 
+1181 <span class="comment">% trunk = [    -4    -2     2     4     4     2    -2    -4</span>
+1182 <span class="comment">%               2     4     4     2    -2    -4    -4    -2]';</span>
+1183 <span class="comment">% heart_lung = [    -2    -1    -0.8  0.8  1     2     2    -2</span>
+1184 <span class="comment">%                    1     2     1.8  1.8  2     1    -2    -2]';</span>
+1185 <span class="comment">% lung = [    -2    -1    -1  -1  1     2     2    -2</span>
+1186 <span class="comment">%             1     2     0   0  2     1    -2    -2]';</span>
+1187 <span class="comment">% heart = [    -1    -1     1     1</span>
+1188 <span class="comment">%               0     2     2     0]';</span>
+1189 
+1190 <span class="comment">% [fmdl, mat_idx] = ng_mk_extruded_model({2,{trunk, heart_lung, heart},1},[16,1,1],[0.1]);</span>
+1191 
+1192 <span class="comment">%  figure, show_fem( fmdl );</span>
+1193  
+1194 <span class="comment">%%</span>
+1195 xx=[
+1196   -88.5777  -11.4887    4.6893   49.8963  122.7033  150.3033  195.5103 249.7573 <span class="keyword">...</span>
+1197   258.8013  279.7393  304.9623  309.2443  322.0923  337.7963  340.6503 348.2633 <span class="keyword">...</span>
+1198   357.3043  358.7333  361.5873  364.9183  365.3943  366.3453  366.3453 365.3943 <span class="keyword">...</span>
+1199   362.5393  351.5943  343.5053  326.8513  299.2503  288.3073  264.9923 224.0703 <span class="keyword">...</span>
+1200   206.4633  162.6833  106.5313   92.2543   57.5153    7.0733   -8.6297 -42.4167 <span class="keyword">...</span>
+1201   -90.9547 -105.7057 -134.2577 -178.0367 -193.2647 -222.7687 -265.5957 -278.9197 <span class="keyword">...</span>
+1202  -313.1817 -355.5337 -363.6237 -379.3267 -397.8857 -400.7407 -401.6927 -398.8377 <span class="keyword">...</span>
+1203  -395.0307 -384.0867 -368.3837 -363.6247 -351.7277 -334.1217 -328.4117 -314.1357 <span class="keyword">...</span>
+1204  -291.2947 -282.7297 -267.0257 -236.5707 -221.8187 -196.5977 -159.4807 -147.5837];
+1205 
+1206 yy=[
+1207  -385.8513 -386.8033 -386.3273 -384.8993 -368.7193 -353.9673 -323.0363 -283.5403 <span class="keyword">...</span>
+1208  -274.9743 -254.0363 -225.4843 -217.8703 -187.4153 -140.7813 -124.6013  -86.0573 <span class="keyword">...</span>
+1209   -38.4703  -29.4273   -9.9173   21.0137   32.4347   53.3727   83.8257   93.3437 <span class="keyword">...</span>
+1210   114.7587  149.0237  161.8717  187.5677  222.3037  231.3447  247.5237  267.5087 <span class="keyword">...</span>
+1211   271.3177  277.0297  281.3127  279.4097  274.6507  273.2227  276.5547  284.6447 <span class="keyword">...</span>
+1212   295.1127  297.4927  301.7757  304.1557  302.2537  297.4947  287.5017  282.2667 <span class="keyword">...</span>
+1213   259.9017  225.6387  213.7427  185.6677  141.4127  125.2337   88.5917   34.8187 <span class="keyword">...</span>
+1214    17.6897  -22.2803  -73.6723  -85.0923 -117.9263 -163.6083 -176.4573 -205.9613 <span class="keyword">...</span>
+1215  -245.9343 -256.4023 -275.4373 -304.9403 -315.4083 -332.0623 -352.0473 -355.3783];
+1216 
+1217 a = [xx; yy]';
+1218 a = flipud(a);
+1219 <span class="comment">% th=linspace(0,2*pi,33)'; th(end)=[];</span>
+1220 <span class="comment">% a=[sin(th)*0.3,cos(th)];</span>
+1221 
+1222 
+1223      fmdl = <a href="ng_mk_extruded_model.html" class="code" title="function [fmdl,mat_idx] = ng_mk_extruded_model(shape, elec_pos, elec_shape,extra_ng_code)">ng_mk_extruded_model</a>({300,a,[4,25]},[16,1.11,150],[1]);
+1224      <a href="../../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(fmdl);</pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

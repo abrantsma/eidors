@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of jacobian_adjoint_higher_order</title>
+  <meta name="keywords" content="jacobian_adjoint_higher_order">
+  <meta name="description" content="Find the Jacobian associated with an image (and forward model)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">eidors</a> &gt; <a href="../index.html">solvers</a> &gt; <a href="index.html">forward</a> &gt; jacobian_adjoint_higher_order.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/solvers/forward&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>jacobian_adjoint_higher_order
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Find the Jacobian associated with an image (and forward model)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function J = jacobian_adjoint_higher_order(fwd_model,img) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">Find the Jacobian associated with an image (and forward model)
+Derivative of discretization method</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="../../../eidors/algorithms/left_divide.html" class="code" title="function [V] = left_divide(E,I,tol,pp,V)">left_divide</a>	[V] = left_divide(E,I,tol,pp,V);</li><li><a href="../../../eidors/models/mdl_normalize.html" class="code" title="function out = mdl_normalize(mdl, val)">mdl_normalize</a>	MDL_NORMALIZE Check or set the normalize_measurements flag on a model.</li><li><a href="../../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>	SPARSE Create sparse matrix (EIDORS overload).</li><li><a href="../../../eidors/solvers/calc_system_mat.html" class="code" title="function system_mat = calc_system_mat( fwd_model, img)">calc_system_mat</a>	CALC_SYSTEM_MAT: calculate FEM system matrix from fwd_model and image</li><li><a href="fem_1st_to_higher_order.html" class="code" title="function [boundary,elems,nodes]=fem_1st_to_higher_order(fwd_model)">fem_1st_to_higher_order</a>	FEM_1ST_TO_HIGH_ORDER:  Modify the FEM for high order FEM called as</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function J = jacobian_adjoint_higher_order(fwd_model,img)</a>
+0002 <span class="comment">%Find the Jacobian associated with an image (and forward model)</span>
+0003 <span class="comment">%Derivative of discretization method</span>
+0004 
+0005 <span class="keyword">if</span> nargin == 1
+0006    img= fwd_model;
+0007 <span class="keyword">elseif</span>  strcmp(getfield(warning(<span class="string">'query'</span>,<span class="string">'EIDORS:DeprecatedInterface'</span>),<span class="string">'state'</span>),<span class="string">'on'</span>)
+0008    warning(<span class="string">'EIDORS:DeprecatedInterface'</span>, <span class="keyword">...</span>
+0009       [<span class="string">'Calling JACOBIAN_ADJOINT_HIGHER_ORDER with two arguments is deprecated and will cause'</span> <span class="keyword">...</span>
+0010        <span class="string">' an error in a future version. First argument ignored.'</span>]);
+0011 <span class="keyword">end</span>
+0012 fwd_model= img.fwd_model;
+0013 
+0014 <span class="comment">%Modify the forward model to be of my type</span>
+0015 <span class="keyword">if</span> ~isfield(fwd_model,<span class="string">'approx_type'</span>)    || <span class="keyword">...</span>
+0016    strcmp(fwd_model.approx_type,<span class="string">'tri3'</span>) || <span class="keyword">...</span>
+0017    strcmp(fwd_model.approx_type,<span class="string">'tet4'</span>)
+0018     <span class="comment">%Do nothing</span>
+0019 <span class="keyword">else</span>
+0020     [bound,elem,nodes] = <a href="fem_1st_to_higher_order.html" class="code" title="function [boundary,elems,nodes]=fem_1st_to_higher_order(fwd_model)">fem_1st_to_higher_order</a>(fwd_model);
+0021     fwd_model.boundary=bound; fwd_model.elems=elem; fwd_model.nodes=nodes;
+0022     img.fwd_model=fwd_model; <span class="comment">%CHANGE THIS</span>
+0023 <span class="keyword">end</span>
+0024 
+0025 <span class="comment">%Calculate the total stiffness matrix and elemental stiffness matrices</span>
+0026 s_mat = <a href="../../../eidors/solvers/calc_system_mat.html" class="code" title="function system_mat = calc_system_mat( fwd_model, img)">calc_system_mat</a>(img); At=s_mat.E; elemstiff=s_mat.elemstiff;
+0027  
+0028 <span class="comment">%Find electrode stucture and no.of electrodes</span>
+0029 <span class="comment">%Find stim strucutre and no. stimulations</span>
+0030 <span class="comment">%Find node structure and find no.nodes</span>
+0031 <span class="comment">%Find element structure and create vector of length no. elements</span>
+0032 elecstruc=fwd_model.electrode; nelecs=size(elecstruc,2);
+0033 stimstruc=fwd_model.stimulation; nstims=size(stimstruc,2); 
+0034 nodestruc=fwd_model.nodes; nnodes=size(nodestruc,1); 
+0035 elemstruc=fwd_model.elems; nelems=size(elemstruc,1); 
+0036 
+0037 <span class="comment">%Find total number of measurements</span>
+0038 nmeass=0;
+0039 <span class="keyword">for</span> k=1:nstims
+0040     stimkmeasmatrix = stimstruc(k).meas_pattern;
+0041     nmeass=nmeass+size(stimkmeasmatrix,1);
+0042 <span class="keyword">end</span>
+0043 
+0044 <span class="comment">%Complete or Point? - Check first electrode and change index vector of</span>
+0045 <span class="comment">%'node' number corresponding to electrode</span>
+0046 elecnode=zeros(1,nelecs);
+0047 <span class="keyword">if</span>(size(elecstruc(1).nodes,2)==1 &amp;&amp; size(elecstruc(1).nodes,1)==1) <span class="comment">%POINT</span>
+0048     <span class="comment">%Initialise node to electrode matrix</span>
+0049     Node2Elec=<a href="../../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(nelecs,nnodes);
+0050     <span class="keyword">for</span> i=1:nelecs
+0051         <span class="comment">%Assign electrode index at correct node</span>
+0052         elecnode(i)=elecstruc(i).nodes;
+0053         Node2Elec(i,elecnode(i))=1;
+0054     <span class="keyword">end</span>
+0055     <span class="comment">%Assign a matrix for derivative of FEM w.r.t conduc</span>
+0056     dA_zero=<a href="../../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(nnodes,nnodes);
+0057     
+0058     <span class="comment">%Assign correct size unknowns and right hand side matrix (forward)</span>
+0059     datafwd=zeros(nnodes,nstims); 
+0060     nodeunknownsfwd=zeros(nnodes,nstims); 
+0061 <span class="keyword">else</span>
+0062     <span class="comment">%Initialise node to electrode matrix</span>
+0063     Node2Elec=<a href="../../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(nelecs,nnodes+nelecs);
+0064     <span class="keyword">for</span> i=1:nelecs
+0065         <span class="comment">%Assign electrode at bottom of list</span>
+0066         elecnode(i)=nnodes+i;
+0067         Node2Elec(i,elecnode(i))=1;
+0068     <span class="keyword">end</span>
+0069     
+0070     <span class="comment">%Assign a matrix for derivative of FEM w.r.t conduc</span>
+0071     dA_zero=<a href="../../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(nnodes+nelecs,nnodes+nelecs);
+0072         
+0073     <span class="comment">%Assign correct size unknowns and right hand side matrix (forward)</span>
+0074     datafwd=zeros(nnodes+nelecs,nstims); 
+0075     nodeunknownsfwd=zeros(nnodes+nelecs,nstims); 
+0076 <span class="keyword">end</span>
+0077 
+0078 <span class="comment">%Loop over stimulations and assign current matrix</span>
+0079 <span class="comment">%CHANGE THIS BY USING NODE2ELEC MATRIX!!!!</span>
+0080 <span class="keyword">for</span> ii=1:nstims
+0081     <span class="comment">%The vector of current values for stimulation</span>
+0082     curnode=stimstruc(ii).stim_pattern;
+0083     <span class="keyword">for</span> i=1:nelecs
+0084         datafwd(elecnode(i),ii)=curnode(i);
+0085     <span class="keyword">end</span>
+0086 <span class="keyword">end</span>
+0087 
+0088 <span class="comment">%Create index vector and eliminate ground node equation from index</span>
+0089 groundnode=fwd_model.gnd_node; idx=1:size(At,1); idx(groundnode)=[];
+0090 
+0091 <span class="comment">%Solve the simulated linear system with index</span>
+0092 nodeunknownsfwd(idx,:)=<a href="../../../eidors/algorithms/left_divide.html" class="code" title="function [V] = left_divide(E,I,tol,pp,V)">left_divide</a>(At(idx,idx),datafwd(idx,:));
+0093 
+0094 <span class="comment">%Calculate Jacobian tensor - DE_{i,j,k} == dV_i,j / dS_k</span>
+0095 <span class="comment">%V_i,j - voltage change on electrode i for stim j</span>
+0096 <span class="comment">%S_k - conductivity change on element k</span>
+0097 DE= zeros(nelecs,nstims,nelems);
+0098 
+0099 <span class="comment">%First step, we only want to pick off the ith electrode</span>
+0100 zi2E(:,idx) = Node2Elec(:,idx)/At(idx,idx);
+0101 
+0102 <span class="comment">%SPEED UP HERE</span>
+0103 <span class="comment">%Factorise A = C'*S*C  - S diagonal conduc (C=system_mat_fields)</span>
+0104 <span class="comment">%We don't need extra multiplication in loop below</span>
+0105 <span class="comment">%only for piecewise linear FEM??</span>
+0106 <span class="comment">%</span>
+0107 <span class="comment">%zi2E= zeros(nelecs, nnodes+nelecs);</span>
+0108 <span class="comment">%zi2E(:,idx) = Node2Elec(:,idx)/At(idx,idx);</span>
+0109 <span class="comment">%zi2E=zi2E*FC'; sv=Fc*sv;</span>
+0110 
+0111 <span class="comment">%Calculate the partial derivative matrix for kth change</span>
+0112 <span class="keyword">for</span> k=1:nelems    
+0113     <span class="comment">%kth element stiffness matrix, global nodes and index vector</span>
+0114     stiffk=elemstiff(k).elemstiff; nodesk=elemstruc(k,:); idx2=1:size(nodesk,2);
+0115         
+0116     <span class="comment">%Create the FEM derivative matrix</span>
+0117     dA_dSk=dA_zero; dA_dSk(nodesk(idx2),nodesk(idx2))=stiffk(idx2,idx2);
+0118 
+0119     <span class="comment">%Now form product with solution</span>
+0120     DE(:,:,k) = zi2E(:,idx)*dA_dSk(idx,idx)*nodeunknownsfwd(idx,:);
+0121 <span class="keyword">end</span>
+0122 
+0123 <span class="comment">%Calculate Jacobian matrix (measurement patterns specified here)</span>
+0124 cntjac=0; J=zeros(nmeass,nelems);
+0125 <span class="keyword">for</span> j=1:nstims   
+0126    meas_pat= fwd_model.stimulation(j).meas_pattern;
+0127    n_meas  = size(meas_pat,1);
+0128    DEj = reshape( DE(:,j,:), nelecs, nelems);
+0129    J( cntjac+(1:n_meas),: ) = meas_pat*DEj;
+0130    cntjac = cntjac + n_meas;
+0131 <span class="keyword">end</span>; 
+0132 
+0133 <span class="comment">%Get the Jacobian and normalize measurements (if field exists)</span>
+0134 <span class="keyword">if</span> <a href="../../../eidors/models/mdl_normalize.html" class="code" title="function out = mdl_normalize(mdl, val)">mdl_normalize</a>(fwd_model)
+0135 <span class="comment">%    data=mc_fwd_solve( img );</span>
+0136 <span class="comment">%    J= J ./ (data.meas(:)*ones(1,nelems));</span>
+0137 <span class="keyword">end</span>
+0138 
+0139 <span class="comment">%Negative Jacobian for injected currents??</span>
+0140 J= -J;  
+0141 
+0142 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

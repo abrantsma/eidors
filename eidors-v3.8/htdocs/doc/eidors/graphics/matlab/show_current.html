@@ -1,0 +1,260 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of show_current</title>
+  <meta name="keywords" content="show_current">
+  <meta name="description" content="SHOW_CURRENT: show current or other quantity defined">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">eidors</a> &gt; <a href="#">graphics</a> &gt; <a href="index.html">matlab</a> &gt; show_current.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/graphics/matlab&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>show_current
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>SHOW_CURRENT: show current or other quantity defined</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function quiv = show_current( img, vv ) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> SHOW_CURRENT: show current or other quantity defined
+  on nodes onto the image
+
+ show_current( img, volt )
+   img -&gt; img object 
+   volt-&gt; voltage on nodes (if not specified, img is solved
+      via fwd_solve, or the value on node_data is used)
+
+ Without specified values, show_current will
+   create one current vector for each element
+ The points are specified as either
+   img.fwd_model.mdl_slice_mapper.npx   - number of points in horizontal direction
+   img.fwd_model.mdl_slice_mapper.npy   - number of points in vertical 
+    or
+   img.fwd_model.mdl_slice_mapper.x_pts - vector of points in horizontal direction
+   img.fwd_model.mdl_slice_mapper.y_pts - vector of points in vertical
+
+ For 3D models, the slice may be specified as (see mdl_slice_mapper for information)
+   img.fwd_model.mdl_slice_mapper.level 
+ 
+ If an output is specified, then no image is draws
+ 
+ Examples:
+   img = mk_image( mk_common_model('b2c2',8));
+   show_current(img); 
+ OR
+   img = mk_image( mk_common_model('b2c2',8));
+   img.fwd_model.mdl_slice_mapper.npx  = 64;
+   img.fwd_model.mdl_slice_mapper.npy  = 32;
+   show_current(img); 
+ OR
+   img = mk_image( mk_common_model('b2c2',8));
+   q = show_current(img); 
+   quiver(q.xp,q.yp, q.xc,q.yc, 2,'b','LineWidth',2);</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="mdl_slice_mapper.html" class="code" title="function map = mdl_slice_mapper( fmdl, maptype );">mdl_slice_mapper</a>	MDL_SLICE_MAPPER: map pixels to FEM elements or nodes</li><li><a href="show_current.html" class="code" title="function quiv = show_current( img, vv )">show_current</a>	SHOW_CURRENT: show current or other quantity defined</li><li><a href="../../../eidors/models/interp_mesh.html" class="code" title="function mdl_pts = interp_mesh( mdl, n_interp)">interp_mesh</a>	INTERP_MESH: calculate interpolation points onto mdl elements</li><li><a href="../../../eidors/models/mk_common_model.html" class="code" title="function inv_mdl= mk_common_model( str, n_elec, varargin )">mk_common_model</a>	MK_COMMON_MODEL: make common EIT models</li><li><a href="../../../eidors/models/mk_image.html" class="code" title="function img= mk_image(mdl, elem_data, params, name)">mk_image</a>	MK_IMAGE: create eidors image object</li><li><a href="../../../eidors/solvers/calc_jacobian_bkgnd.html" class="code" title="function img_bkgnd = calc_jacobian_bkgnd( inv_model )">calc_jacobian_bkgnd</a>	CALC_JACOBIAN_BKGND: calculate background image around</li><li><a href="../../../eidors/solvers/forward/fwd_solve_1st_order.html" class="code" title="function data =fwd_solve_1st_order(fwd_model, img)">fwd_solve_1st_order</a>	FWD_SOLVE_1ST_ORDER: data= fwd_solve_1st_order( img)</li><li><a href="../../../eidors/solvers/forward/system_mat_1st_order.html" class="code" title="function s_mat= system_mat_1st_order( fwd_model, img)">system_mat_1st_order</a>	SYSTEM_MAT_1ST_ORDER: SS= system_mat_1st_order( fwd_model, img)</li><li><a href="../../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>	FWD_SOLVE: calculate data from a fwd_model object and an image</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="show_current.html" class="code" title="function quiv = show_current( img, vv )">show_current</a>	SHOW_CURRENT: show current or other quantity defined</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function vv = fix_dim(vv)</a></li><li><a href="#_sub2" class="code">function  [x,y] = grid_the_space( fmdl);</a></li><li><a href="#_sub3" class="code">function do_unit_test</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function quiv = show_current( img, vv )</a>
+0002 <span class="comment">% SHOW_CURRENT: show current or other quantity defined</span>
+0003 <span class="comment">%  on nodes onto the image</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% show_current( img, volt )</span>
+0006 <span class="comment">%   img -&gt; img object</span>
+0007 <span class="comment">%   volt-&gt; voltage on nodes (if not specified, img is solved</span>
+0008 <span class="comment">%      via fwd_solve, or the value on node_data is used)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% Without specified values, show_current will</span>
+0011 <span class="comment">%   create one current vector for each element</span>
+0012 <span class="comment">% The points are specified as either</span>
+0013 <span class="comment">%   img.fwd_model.mdl_slice_mapper.npx   - number of points in horizontal direction</span>
+0014 <span class="comment">%   img.fwd_model.mdl_slice_mapper.npy   - number of points in vertical</span>
+0015 <span class="comment">%    or</span>
+0016 <span class="comment">%   img.fwd_model.mdl_slice_mapper.x_pts - vector of points in horizontal direction</span>
+0017 <span class="comment">%   img.fwd_model.mdl_slice_mapper.y_pts - vector of points in vertical</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">% For 3D models, the slice may be specified as (see mdl_slice_mapper for information)</span>
+0020 <span class="comment">%   img.fwd_model.mdl_slice_mapper.level</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">% If an output is specified, then no image is draws</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% Examples:</span>
+0025 <span class="comment">%   img = mk_image( mk_common_model('b2c2',8));</span>
+0026 <span class="comment">%   show_current(img);</span>
+0027 <span class="comment">% OR</span>
+0028 <span class="comment">%   img = mk_image( mk_common_model('b2c2',8));</span>
+0029 <span class="comment">%   img.fwd_model.mdl_slice_mapper.npx  = 64;</span>
+0030 <span class="comment">%   img.fwd_model.mdl_slice_mapper.npy  = 32;</span>
+0031 <span class="comment">%   show_current(img);</span>
+0032 <span class="comment">% OR</span>
+0033 <span class="comment">%   img = mk_image( mk_common_model('b2c2',8));</span>
+0034 <span class="comment">%   q = show_current(img);</span>
+0035 <span class="comment">%   quiver(q.xp,q.yp, q.xc,q.yc, 2,'b','LineWidth',2);</span>
+0036 
+0037 
+0038 <span class="comment">% (C) 2010 Andy Adler. License: GPL version 2 or version 3</span>
+0039 <span class="comment">% $Id: show_current.m 4653 2015-01-11 08:54:47Z nolwenn85 $</span>
+0040 
+0041 <span class="keyword">if</span> isstr(img) &amp;&amp; strcmp(img,<span class="string">'UNIT_TEST'</span>); <a href="#_sub3" class="code" title="subfunction do_unit_test">do_unit_test</a>; <span class="keyword">return</span>; <span class="keyword">end</span>
+0042 
+0043 dims = size(img.fwd_model.nodes,2);
+0044 
+0045 <span class="keyword">if</span> nargin==1; <span class="comment">% We need to calculate</span>
+0046    <span class="keyword">if</span> isfield(img,<span class="string">'elem_data'</span>)
+0047       img.fwd_solve.get_all_meas = 1;
+0048       vh = <a href="../../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>(img);
+0049       vv = vh.volt(:,1);
+0050    <span class="keyword">elseif</span> isfield(img,<span class="string">'node_data'</span>);
+0051       vv = img.node_data(:,1);
+0052       error(<span class="string">'show_current: cannot interpolate conductivity onto elements (yet)'</span>);
+0053    <span class="keyword">else</span>
+0054       error(<span class="string">'show_current: one parameter provided, and cannot solve for node voltages'</span>);
+0055    <span class="keyword">end</span>
+0056 <span class="keyword">end</span> 
+0057 
+0058 Nel = size(img.fwd_model.elems,1);
+0059 elemcur = zeros(Nel+1,dims);
+0060 <span class="comment">% Calc field as I = sigma E</span>
+0061 <span class="comment">%V1 = V0 + Ex*x1 + Ey*y1   [ 1 x1 y1 ] [ V0 ]</span>
+0062 <span class="comment">%V2 = V0 + Ex*x2 + Ey*y2 = [ 1 x2 y2 ]*[ Ex ]</span>
+0063 <span class="comment">%V3 = V0 + Ex*x3 + Ey*y    [ 1 x3 y3 ] [ Ey ]</span>
+0064 oo = ones(dims+1,1);
+0065 <span class="keyword">for</span> i=1:Nel
+0066   idx = img.fwd_model.elems(i,:);
+0067   nod = img.fwd_model.nodes(idx,:);
+0068   <span class="keyword">if</span> dims ==2
+0069      VE  = ([oo, nod])\<a href="#_sub1" class="code" title="subfunction vv = fix_dim(vv)">fix_dim</a>(vv(idx));
+0070   <span class="keyword">else</span>
+0071      VE  = ([oo, nod])\vv(idx);
+0072   <span class="keyword">end</span>
+0073   elemcur(i+1,:) = img.elem_data(i,1)*VE(2:end)';
+0074 <span class="comment">%  elemcur(i+1,:) = (reshape(img.elem_data(i,1,:,:),dims,dims)*VE(2:end))';</span>
+0075 
+0076 <span class="keyword">end</span>
+0077 
+0078 <span class="keyword">if</span> isfield(img.fwd_model, <span class="string">'mdl_slice_mapper'</span>);
+0079    <span class="keyword">if</span> dims == 2;
+0080       img.fwd_model.mdl_slice_mapper.level = [inf,inf,0];
+0081    <span class="keyword">end</span>
+0082    elem_ptr = <a href="mdl_slice_mapper.html" class="code" title="function map = mdl_slice_mapper( fmdl, maptype );">mdl_slice_mapper</a>( img.fwd_model, <span class="string">'elem'</span> );
+0083    szep = size(elem_ptr);
+0084 
+0085    [xp,yp] = <a href="#_sub2" class="code" title="subfunction  [x,y] = grid_the_space( fmdl);">grid_the_space</a>( img.fwd_model);
+0086 
+0087    xc = reshape( elemcur(elem_ptr+1,1), szep);
+0088    yc = reshape( elemcur(elem_ptr+1,2), szep);
+0089    <span class="keyword">if</span> dims==3
+0090       zc = reshape( elemcur(elem_ptr+1,3), szep);
+0091    <span class="keyword">end</span>
+0092 <span class="keyword">else</span> 
+0093    pp = <a href="../../../eidors/models/interp_mesh.html" class="code" title="function mdl_pts = interp_mesh( mdl, n_interp)">interp_mesh</a>( img.fwd_model);
+0094    xp = pp(:,1);
+0095    yp= pp(:,2);
+0096    xc = elemcur(2:<span class="keyword">end</span>,1);
+0097    yc = elemcur(2:<span class="keyword">end</span>,2);
+0098    <span class="keyword">if</span> dims==3
+0099       zc = elemcur(2:<span class="keyword">end</span>,3);
+0100    <span class="keyword">end</span>
+0101 <span class="keyword">end</span>
+0102 
+0103 quiv.xp = xp; 
+0104 quiv.yp = yp; 
+0105 quiv.xc = xc; 
+0106 quiv.yc = yc; 
+0107 <span class="keyword">if</span> dims==3
+0108    quiv.zc = zc; 
+0109 <span class="keyword">end</span>
+0110 <span class="keyword">if</span> nargout == 0
+0111    quiver(xp,yp,xc,yc,2,<span class="string">'k'</span>);
+0112 <span class="keyword">end</span>
+0113 
+0114 <a name="_sub1" href="#_subfunctions" class="code">function vv = fix_dim(vv)</a>
+0115     <span class="keyword">if</span> size(vv,1) == 1
+0116         vv = vv';
+0117     <span class="keyword">end</span>
+0118 
+0119 <a name="_sub2" href="#_subfunctions" class="code">function  [x,y] = grid_the_space( fmdl);</a>
+0120 
+0121   xspace = []; yspace = [];
+0122   <span class="keyword">try</span> 
+0123      xspace = fmdl.mdl_slice_mapper.x_pts;
+0124      yspace = fmdl.mdl_slice_mapper.y_pts;
+0125   <span class="keyword">end</span>
+0126 
+0127   <span class="keyword">if</span> isempty(xspace)
+0128      npx  = fmdl.mdl_slice_mapper.npx;
+0129      npy  = fmdl.mdl_slice_mapper.npy;
+0130 
+0131      xmin = min(fmdl.nodes(:,1));    xmax = max(fmdl.nodes(:,1));
+0132      xmean= mean([xmin,xmax]); xrange= xmax-xmin;
+0133 
+0134      ymin = min(fmdl.nodes(:,2));    ymax = max(fmdl.nodes(:,2));
+0135      ymean= mean([ymin,ymax]); yrange= ymax-ymin;
+0136 
+0137      range= max([xrange, yrange]);
+0138      xspace = linspace( xmean - range*0.5, xmean + range*0.5, npx );
+0139      yspace = linspace( ymean + range*0.5, ymean - range*0.5, npy );
+0140   <span class="keyword">end</span>
+0141   <span class="keyword">if</span> size(xspace,2) == 1
+0142       [x,y]=meshgrid( xspace, yspace );
+0143   <span class="keyword">else</span>
+0144       x= xspace;
+0145       y= yspace;
+0146   <span class="keyword">end</span>
+0147 
+0148 <a name="_sub3" href="#_subfunctions" class="code">function do_unit_test</a>
+0149    fmdl.nodes = [0,0;0,1;1,0;1,1];
+0150    fmdl.elems = [1,2,3;2,3,4];
+0151    fmdl.electrode(1).nodes = [1,2]; fmdl.electrode(1).z_contact = 0.01;
+0152    fmdl.electrode(2).nodes = [3,4]; fmdl.electrode(2).z_contact = 0.01;
+0153    fmdl.gnd_node = 1;
+0154    fmdl.stimulation(1).stim_pattern = [1;-1];
+0155    fmdl.stimulation(1).meas_pattern = [1,-1];
+0156    fmdl.solve = @<a href="../../../eidors/solvers/forward/fwd_solve_1st_order.html" class="code" title="function data =fwd_solve_1st_order(fwd_model, img)">fwd_solve_1st_order</a>;
+0157    fmdl.system_mat = @<a href="../../../eidors/solvers/forward/system_mat_1st_order.html" class="code" title="function s_mat= system_mat_1st_order( fwd_model, img)">system_mat_1st_order</a>;
+0158    fmdl.type = <span class="string">'fwd_model'</span>
+0159    img = <a href="../../../eidors/models/mk_image.html" class="code" title="function img= mk_image(mdl, elem_data, params, name)">mk_image</a>(fmdl,[1,1]); 
+0160    img.fwd_solve.get_all_meas = 1;
+0161 
+0162    img.fwd_model.mdl_slice_mapper.npx = 6;
+0163    img.fwd_model.mdl_slice_mapper.npy = 6;
+0164    <a href="show_current.html" class="code" title="function quiv = show_current( img, vv )">show_current</a>(img);
+0165 
+0166    imdl= <a href="../../../eidors/models/mk_common_model.html" class="code" title="function inv_mdl= mk_common_model( str, n_elec, varargin )">mk_common_model</a>(<span class="string">'d2d2c'</span>,8);
+0167    img = <a href="../../../eidors/solvers/calc_jacobian_bkgnd.html" class="code" title="function img_bkgnd = calc_jacobian_bkgnd( inv_model )">calc_jacobian_bkgnd</a>( imdl );
+0168    img.fwd_model.mdl_slice_mapper.npx = 64;
+0169    img.fwd_model.mdl_slice_mapper.npy = 64;
+0170    <a href="show_current.html" class="code" title="function quiv = show_current( img, vv )">show_current</a>(img);
+0171 
+0172    img.fwd_model.mdl_slice_mapper.x_pts = linspace(0,1,62);
+0173    img.fwd_model.mdl_slice_mapper.y_pts = linspace(0,1,56);
+0174    img.fwd_model.mdl_slice_mapper.level = [inf,inf,0];
+0175 
+0176    img.fwd_solve.get_all_meas = 1;
+0177    vh = <a href="../../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>(img);
+0178    <a href="show_current.html" class="code" title="function quiv = show_current( img, vv )">show_current</a>(img, vh.volt(:,1));</pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

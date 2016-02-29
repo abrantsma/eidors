@@ -1,0 +1,1472 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of mk_grid_c2f</title>
+  <meta name="keywords" content="mk_grid_c2f">
+  <meta name="description" content="MK_GRID_C2F - calculate a coarse2fine mapping for grid coarse models.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">eidors</a> &gt; <a href="index.html">models</a> &gt; mk_grid_c2f.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/models&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>mk_grid_c2f
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>MK_GRID_C2F - calculate a coarse2fine mapping for grid coarse models.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">MK_GRID_C2F - calculate a coarse2fine mapping for grid coarse models.
+ C2F = MK_GRID_C2F(FMDL,RMDL) returns in C2F the fraction of volume of
+ each element of the fine (tet-based) model contained in each element of
+ the coarse (vox-based) model.
+ Uses CONVHULLN to calculate the volume defined by a set of intersection
+ points between individual tet and vox elements.
+
+ C2F = MK_GRID_C2F(FMDL,RMDL,OPT) allows specifying options.
+ 
+ Inputs:
+   FMDL - an EIDORS (tet-based) forward model
+   RMDL - a grid model, as returned by MK_GRID_MODEL
+   OPT  - an option structure with the following fields and defaults:
+      .do_not_scale  - set to true to prevent scaling the models to unit
+                       cube before any calculations, including thresholds.
+                       Default: false
+      .tol_node2tet  - tolerance for determinant &lt;= 0 in testing for
+                       points inside tets. Default: eps
+      .tol_edge2edge - maximum distance between &quot;intersecting&quot; edges
+                       Default: 6*sqrt(3)*eps(a), where a is
+                       min(max(abs(fmdl.nodes(:))),max(abs(rmdl.nodes(:)))
+      .tol_edge2tri  - minimum value of a barycentric coordinate to 
+                       decide a point is lying inside a triangle and not
+                       on its edge. Default: eps
+      .save_memory   - modifies function behavior to decrease memory 
+                       footprint by increasing the number of iterations;
+                       useful for large problems. Must be an integer 
+                       between 0 and 3
+                          0  -  calculate all at once (default)
+                          1  -  calculate one xy voxel plane at a time
+                          2  -  calculate one y voxel row at a time
+                          3  -  calculate each voxel separately
+
+ [C2F M] = MK_GRID_C2F(...) also returns a struct with useful fields
+ characterising the vox model
+
+ Set eidors_msg 'log level' &lt; 2 to supress output to command line.
+
+ Examples:
+     fmdl = ng_mk_cyl_models([2,2,.2],[],[]);
+     rmdl = mk_grid_model([],-2:2,-2:2,0:2);
+     c2f  = mk_grid_c2f(fmdl,rmdl);
+     h = show_fem(fmdl); set(h,'LineWidth',0.1)
+     hold on
+     h = show_fem(rmdl); set(h,'EdgeColor','b','LineWidth',2);
+     hold off
+
+ See also <a href="mk_grid_model.html" class="code" title="function [cmdl, c2f]= mk_grid_model(fmdl, xvec, yvec, zvec);">MK_GRID_MODEL</a>, <a href="find_edge2edge_intersections.html" class="code" title="function [pts,FE2CE,FE2pts,CE2pts] = find_edge2edge_intersections(FE,FN,CE,CN, epsilon)">FIND_EDGE2EDGE_INTERSECTIONS</a>, CONVHULLN
+     <a href="mk_tet_c2f.html" class="code" title="function [c2f] = mk_tet_c2f(fmdl, rmdl, opt)">MK_TET_C2F</a>, <a href="mk_coarse_fine_mapping.html" class="code" title="function [mapping, outside] = mk_coarse_fine_mapping( f_mdl, c_mdl );">MK_COARSE_FINE_MAPPING</a>, <a href="point_in_triangle.html" class="code" title="function out = point_in_triangle(P,E,V,epsilon, str)">POINT_IN_TRIANGLE</a>, EIDORS_MSG</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>	EIDORS_MSG eidors progress and status messages</li><li><a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>	SHOW_FEM: show the EIDORS3D finite element model</li><li><a href="../../eidors/meshing/netgen/ng_mk_cyl_models.html" class="code" title="function [fmdl,mat_idx] = ng_mk_cyl_models(cyl_shape, elec_pos,elec_shape, extra_ng_code);">ng_mk_cyl_models</a>	NG_MAKE_CYL_MODELS: create cylindrical models using netgen</li><li><a href="find_edge2edge_intersections.html" class="code" title="function [pts,FE2CE,FE2pts,CE2pts] = find_edge2edge_intersections(FE,FN,CE,CN, epsilon)">find_edge2edge_intersections</a>	FIND_EDGE2EDGE_INTERSECTIONS intersections between edges of two models</li><li><a href="fix_model.html" class="code" title="function [mdl] = fix_model(mdl,opt)">fix_model</a>	FIX_MODEL: Add useful fields to a model</li><li><a href="get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>	GET_ELEM_VOLUME: VOL = get_elem_volume(fwd_model, map_node )</li><li><a href="mk_coarse_fine_mapping.html" class="code" title="function [mapping, outside] = mk_coarse_fine_mapping( f_mdl, c_mdl );">mk_coarse_fine_mapping</a>	MK_COARSE_FINE_MAPPING: create a mapping matrix from coarse to fine FEM</li><li><a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>	MK_GRID_C2F - calculate a coarse2fine mapping for grid coarse models.</li><li><a href="mk_grid_model.html" class="code" title="function [cmdl, c2f]= mk_grid_model(fmdl, xvec, yvec, zvec);">mk_grid_model</a>	MK_GRID_MODEL: Create reconstruction model on pixelated grid</li><li><a href="mk_image.html" class="code" title="function img= mk_image(mdl, elem_data, params, name)">mk_image</a>	MK_IMAGE: create eidors image object</li><li><a href="point_in_triangle.html" class="code" title="function out = point_in_triangle(P,E,V,epsilon, str)">point_in_triangle</a>	POINT_IN_TRIANGLE tests points for membership in triangles</li><li><a href="tet_to_inequal.html" class="code" title="function [A,b]=tet_to_inequal(v,e)">tet_to_inequal</a>	[A,b]=tet_to_inequal(v)</li><li><a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>	SPARSE Create sparse matrix (EIDORS overload).</li><li><a href="../../eidors/overloads/uniquetol.html" class="code" title="function out = uniquetol(in, tol, varargin)">uniquetol</a>	C = uniquetol(A,TOL):  unique values in A using tolerance TOL.</li><li><a href="../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>	EIDORS_CACHE Control eidors caching</li><li><a href="../../eidors/tools/eidors_debug.html" class="code" title="function out = eidors_debug(command, fstr)">eidors_debug</a>	EIDORS_DEBUG Global managment of debug flags</li><li><a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>	PROGRESS_MSG Progress messages and timing.</li><li><a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>	UNIT_TEST_CMP: compare matrices in eidors output</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>	MK_GRID_C2F - calculate a coarse2fine mapping for grid coarse models.</li><li><a href="mk_grid_model.html" class="code" title="function [cmdl, c2f]= mk_grid_model(fmdl, xvec, yvec, zvec);">mk_grid_model</a>	MK_GRID_MODEL: Create reconstruction model on pixelated grid</li><li><a href="mk_tet_c2f.html" class="code" title="function [c2f] = mk_tet_c2f(fmdl, rmdl, opt)">mk_tet_c2f</a>	MK_TET_C2F - calculate a coarse2fine mapping for two tet-based models.</li><li><a href="mk_voxel_volume.html" class="code" title="function [imdl, fmdl] = mk_voxel_volume(varargin)">mk_voxel_volume</a>	MK_VOXEL_VOLUME create a voxel model to reconstruct on</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [c2f, m]= do_mk_grid_c2f(fmdl0,rmdl0,opt0)</a></li><li><a href="#_sub2" class="code">function c2f = combine_c2f(c2f, tmp,felem_idx,relem_idx)</a></li><li><a href="#_sub3" class="code">function [c2f, m] = separable_calculations(fmdl,rmdl,opt)</a></li><li><a href="#_sub4" class="code">function [fmdl, rmdl, opt, felem_idx] = crop_models(fmdl0,rmdl0,opt, relem_idx)</a></li><li><a href="#_sub5" class="code">function fmdl = prepare_fmdl(fmdl)</a></li><li><a href="#_sub6" class="code">function m = prepare_vox_mdl(rmdl,opt)</a></li><li><a href="#_sub7" class="code">function rnode2tet = get_nodes_in_tets(fmdl,rmdl, opt)</a></li><li><a href="#_sub8" class="code">function [insnode] = get_nodes_in_voxels(fmdl,rmdl)</a></li><li><a href="#_sub9" class="code">function [intpts, face2edge, face2intpt, edge2intpt] = get_voxel_intersection_points(fmdl,faces,opt)</a></li><li><a href="#_sub10" class="code">function [intpts, tri2edge, tri2intpt, edge2intpt] = get_tet_intersection_points(fmdl,m,opt)</a></li><li><a href="#_sub11" class="code">function [voxels, node2vox] = mk_voxels(opt)</a></li><li><a href="#_sub12" class="code">function faces = mk_faces(voxels,opt)</a></li><li><a href="#_sub13" class="code">function edges = mk_edges(voxels, opt)</a></li><li><a href="#_sub14" class="code">function vox2face = mk_vox2face(opt)</a></li><li><a href="#_sub15" class="code">function [vox2edge, vol] = mk_vox2edge(m,opt)</a></li><li><a href="#_sub16" class="code">function show_voxels(rmdl,voxels)</a></li><li><a href="#_sub17" class="code">function test_faces(rmdl, faces, opt)</a></li><li><a href="#_sub18" class="code">function[fmdl,rmdl] = center_scale_models(fmdl,rmdl, opt)</a></li><li><a href="#_sub19" class="code">function opt = parse_opts(fmdl,rmdl, opt)</a></li><li><a href="#_sub20" class="code">function logmsg(varargin)</a></li><li><a href="#_sub21" class="code">function do_unit_test</a></li><li><a href="#_sub22" class="code">function do_case_tests</a></li><li><a href="#_sub23" class="code">function do_small_test</a></li><li><a href="#_sub24" class="code">function do_realistic_test</a></li><li><a href="#_sub25" class="code">function do_edge2edge_timing_test</a></li><li><a href="#_sub26" class="code">function rnode2tet = test_vnode_in_tet(rmdl,fmdl)</a></li><li><a href="#_sub27" class="code">function [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)</a></li><li><a href="#_sub28" class="code">function [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)</a></li><li><a href="#_sub29" class="code">function [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)</a></li><li><a href="#_sub30" class="code">function [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)</a></li><li><a href="#_sub31" class="code">function show_test(vox,tet)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)</a>
+0002 <span class="comment">%MK_GRID_C2F - calculate a coarse2fine mapping for grid coarse models.</span>
+0003 <span class="comment">% C2F = MK_GRID_C2F(FMDL,RMDL) returns in C2F the fraction of volume of</span>
+0004 <span class="comment">% each element of the fine (tet-based) model contained in each element of</span>
+0005 <span class="comment">% the coarse (vox-based) model.</span>
+0006 <span class="comment">% Uses CONVHULLN to calculate the volume defined by a set of intersection</span>
+0007 <span class="comment">% points between individual tet and vox elements.</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% C2F = MK_GRID_C2F(FMDL,RMDL,OPT) allows specifying options.</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% Inputs:</span>
+0012 <span class="comment">%   FMDL - an EIDORS (tet-based) forward model</span>
+0013 <span class="comment">%   RMDL - a grid model, as returned by MK_GRID_MODEL</span>
+0014 <span class="comment">%   OPT  - an option structure with the following fields and defaults:</span>
+0015 <span class="comment">%      .do_not_scale  - set to true to prevent scaling the models to unit</span>
+0016 <span class="comment">%                       cube before any calculations, including thresholds.</span>
+0017 <span class="comment">%                       Default: false</span>
+0018 <span class="comment">%      .tol_node2tet  - tolerance for determinant &lt;= 0 in testing for</span>
+0019 <span class="comment">%                       points inside tets. Default: eps</span>
+0020 <span class="comment">%      .tol_edge2edge - maximum distance between &quot;intersecting&quot; edges</span>
+0021 <span class="comment">%                       Default: 6*sqrt(3)*eps(a), where a is</span>
+0022 <span class="comment">%                       min(max(abs(fmdl.nodes(:))),max(abs(rmdl.nodes(:)))</span>
+0023 <span class="comment">%      .tol_edge2tri  - minimum value of a barycentric coordinate to</span>
+0024 <span class="comment">%                       decide a point is lying inside a triangle and not</span>
+0025 <span class="comment">%                       on its edge. Default: eps</span>
+0026 <span class="comment">%      .save_memory   - modifies function behavior to decrease memory</span>
+0027 <span class="comment">%                       footprint by increasing the number of iterations;</span>
+0028 <span class="comment">%                       useful for large problems. Must be an integer</span>
+0029 <span class="comment">%                       between 0 and 3</span>
+0030 <span class="comment">%                          0  -  calculate all at once (default)</span>
+0031 <span class="comment">%                          1  -  calculate one xy voxel plane at a time</span>
+0032 <span class="comment">%                          2  -  calculate one y voxel row at a time</span>
+0033 <span class="comment">%                          3  -  calculate each voxel separately</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">% [C2F M] = MK_GRID_C2F(...) also returns a struct with useful fields</span>
+0036 <span class="comment">% characterising the vox model</span>
+0037 <span class="comment">%</span>
+0038 <span class="comment">% Set eidors_msg 'log level' &lt; 2 to supress output to command line.</span>
+0039 <span class="comment">%</span>
+0040 <span class="comment">% Examples:</span>
+0041 <span class="comment">%     fmdl = ng_mk_cyl_models([2,2,.2],[],[]);</span>
+0042 <span class="comment">%     rmdl = mk_grid_model([],-2:2,-2:2,0:2);</span>
+0043 <span class="comment">%     c2f  = mk_grid_c2f(fmdl,rmdl);</span>
+0044 <span class="comment">%     h = show_fem(fmdl); set(h,'LineWidth',0.1)</span>
+0045 <span class="comment">%     hold on</span>
+0046 <span class="comment">%     h = show_fem(rmdl); set(h,'EdgeColor','b','LineWidth',2);</span>
+0047 <span class="comment">%     hold off</span>
+0048 <span class="comment">%</span>
+0049 <span class="comment">% See also MK_GRID_MODEL, FIND_EDGE2EDGE_INTERSECTIONS, CONVHULLN</span>
+0050 <span class="comment">%     MK_TET_C2F, MK_COARSE_FINE_MAPPING, POINT_IN_TRIANGLE, EIDORS_MSG</span>
+0051 
+0052 <span class="comment">% (C) 2015 Bartlomiej Grychtol - all rights reserved by Swisstom AG</span>
+0053 <span class="comment">% License: GPL version 2 or 3</span>
+0054 <span class="comment">% $Id: mk_grid_c2f.m 4893 2015-04-24 07:28:21Z bgrychtol-ipa $</span>
+0055 
+0056 <span class="comment">% &gt;&gt; SWISSTOM CONTRIBUTION &lt;&lt;</span>
+0057 
+0058 
+0059 <span class="keyword">if</span> ischar(fmdl) &amp;&amp; strcmp(fmdl,<span class="string">'UNIT_TEST'</span>), <a href="#_sub21" class="code" title="subfunction do_unit_test">do_unit_test</a>; <span class="keyword">return</span>; <span class="keyword">end</span>
+0060 <span class="keyword">if</span> ischar(fmdl) &amp;&amp; strcmp(fmdl,<span class="string">'PROFILE'</span>), <a href="#_sub23" class="code" title="subfunction do_small_test">do_small_test</a>; <span class="keyword">return</span>; <span class="keyword">end</span>
+0061 <span class="keyword">if</span> nargin &lt; 3
+0062     opt = struct();
+0063 <span class="keyword">end</span>
+0064 
+0065 [fmdl,rmdl] = <a href="#_sub18" class="code" title="subfunction[fmdl,rmdl] = center_scale_models(fmdl,rmdl, opt)">center_scale_models</a>(fmdl,rmdl, opt);
+0066 
+0067 opt = <a href="#_sub19" class="code" title="subfunction opt = parse_opts(fmdl,rmdl, opt)">parse_opts</a>(fmdl,rmdl, opt);
+0068 
+0069 copt.cache_obj = {fmdl.nodes,
+0070                   fmdl.elems,
+0071                   rmdl.nodes,
+0072                   rmfield(opt,<span class="string">'save_memory'</span>)};
+0073                
+0074 copt.fstr = <span class="string">'mk_grid_c2f'</span>;
+0075 
+0076 [c2f, m] = <a href="../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(@<a href="#_sub1" class="code" title="subfunction [c2f, m]= do_mk_grid_c2f(fmdl0,rmdl0,opt0)">do_mk_grid_c2f</a>,{fmdl,rmdl,opt},copt);
+0077 
+0078 
+0079 
+0080 <span class="comment">%-------------------------------------------------------------------------%</span>
+0081 <span class="comment">% Wrapper providing the save_memory functionality</span>
+0082 <a name="_sub1" href="#_subfunctions" class="code">function [c2f, m]= do_mk_grid_c2f(fmdl0,rmdl0,opt0)</a>
+0083     <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'@@@'</span>,2);
+0084     
+0085     m = [];
+0086     c2f = <a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(opt0.nTet,opt0.nVox);
+0087    
+0088     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Prepare tet model...'</span>);
+0089     fmdl0 = <a href="#_sub5" class="code" title="subfunction fmdl = prepare_fmdl(fmdl)">prepare_fmdl</a>(fmdl0);
+0090     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(Inf);
+0091     
+0092     <span class="keyword">if</span> opt0.save_memory == 0
+0093        relem_idx = ones(opt0.nVox,1);
+0094        [fmdl, rmdl, opt, felem_idx] = <a href="#_sub4" class="code" title="subfunction [fmdl, rmdl, opt, felem_idx] = crop_models(fmdl0,rmdl0,opt, relem_idx)">crop_models</a>(fmdl0,rmdl0,opt0,relem_idx);
+0095        <span class="keyword">if</span> any(felem_idx)
+0096           [tmp, m] = <a href="#_sub3" class="code" title="subfunction [c2f, m] = separable_calculations(fmdl,rmdl,opt)">separable_calculations</a>(fmdl,rmdl0,opt);
+0097           c2f = <a href="#_sub2" class="code" title="subfunction c2f = combine_c2f(c2f, tmp,felem_idx,relem_idx)">combine_c2f</a>(c2f, tmp,felem_idx,relem_idx);
+0098        <span class="keyword">end</span>
+0099     <span class="keyword">else</span> <span class="comment">% save_memory &gt; 0</span>
+0100        <a href="#_sub20" class="code" title="subfunction logmsg(varargin)">logmsg</a>(<span class="string">' Saving memory mode level %d\n'</span>,opt0.save_memory);
+0101        max_iter = opt0.Zsz;
+0102        <span class="keyword">if</span> opt0.save_memory &gt;= 2, max_iter = max_iter * opt0.Ysz; <span class="keyword">end</span>
+0103        <span class="keyword">if</span> opt0.save_memory == 3, max_iter = max_iter * opt0.Xsz; <span class="keyword">end</span>
+0104        pmopt.final_msg = <span class="string">''</span>;
+0105        <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Progress:'</span>,0,max_iter,pmopt);
+0106        progress = 0;
+0107        opt = opt0;
+0108        m = <a href="#_sub6" class="code" title="subfunction m = prepare_vox_mdl(rmdl,opt)">prepare_vox_mdl</a>(rmdl0,opt0);
+0109        <span class="keyword">for</span> z = 1:opt0.Zsz
+0110           opt.Zsz = 1;
+0111           opt.zvec = opt0.zvec(z:z+1);
+0112           opt.xplane = opt0.xplane(z,:);
+0113           opt.yplane = opt0.yplane(z,:);
+0114           relem_idx = false(opt0.Xsz*opt0.Ysz*opt0.Zsz,1);
+0115           relem_idx((z-1)*opt0.Xsz*opt0.Ysz + (1:opt0.Xsz*opt0.Ysz)) = true;
+0116           <span class="keyword">if</span> opt0.save_memory &gt; 1
+0117              <span class="keyword">for</span> y = 1:opt0.Ysz
+0118                 opt.Ysz = 1;
+0119                 opt.yvec = opt0.yvec(y:y+1);
+0120                 opt.zplane = opt0.zplane(y,:);
+0121                 opt.xplane = opt0.xplane(z,y);
+0122                 opt.zstep = opt.ystep*(opt.Ysz+1);
+0123                 relem_idx_y = false(opt0.Xsz*opt0.Ysz,1);
+0124                 relem_idx_y((y-1)*opt0.Xsz + (1:opt0.Xsz)) = true;
+0125                 relem_idx_y = relem_idx &amp; repmat(relem_idx_y,opt0.Zsz,1);
+0126                 <span class="keyword">if</span> opt0.save_memory &gt; 2
+0127                    <span class="keyword">for</span> x = 1:opt0.Xsz
+0128                       opt.Xsz = 1;
+0129                       opt.xvec = opt0.xvec(x:x+1);
+0130                       opt.yplane = opt0.yplane(z,x);
+0131                       opt.zplane = opt0.zplane(y,x);
+0132                       opt.ystep = opt.xstep*opt.Xsz+1;
+0133                       opt.zstep = opt.ystep*(opt.Ysz+1);
+0134                       relem_idx_x = false(opt0.Xsz,1);
+0135                       relem_idx_x(x) = true;
+0136                       relem_idx_x = relem_idx_y &amp; repmat(relem_idx_x,opt0.Ysz*opt0.Zsz,1);
+0137                       [fmdl, rmdl, opt, felem_idx] = <a href="#_sub4" class="code" title="subfunction [fmdl, rmdl, opt, felem_idx] = crop_models(fmdl0,rmdl0,opt, relem_idx)">crop_models</a>(fmdl0,rmdl0,opt,relem_idx_x);
+0138                       <span class="keyword">if</span> any(felem_idx)
+0139                          <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,<a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>)-1);
+0140                          tmp = <a href="#_sub3" class="code" title="subfunction [c2f, m] = separable_calculations(fmdl,rmdl,opt)">separable_calculations</a>(fmdl,rmdl,opt);
+0141                          <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,<a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>)+1);
+0142                          c2f = <a href="#_sub2" class="code" title="subfunction c2f = combine_c2f(c2f, tmp,felem_idx,relem_idx)">combine_c2f</a>(c2f, tmp,felem_idx,relem_idx_x);
+0143                       <span class="keyword">end</span>
+0144                       progress = progress + 1;
+0145                       <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(progress,max_iter);
+0146                    <span class="keyword">end</span>
+0147                 <span class="keyword">else</span>
+0148                    [fmdl, rmdl, opt, felem_idx] = <a href="#_sub4" class="code" title="subfunction [fmdl, rmdl, opt, felem_idx] = crop_models(fmdl0,rmdl0,opt, relem_idx)">crop_models</a>(fmdl0,rmdl0,opt,relem_idx_y);
+0149                    <span class="keyword">if</span> any(felem_idx)
+0150                       <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,<a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>)-1);
+0151                       tmp = <a href="#_sub3" class="code" title="subfunction [c2f, m] = separable_calculations(fmdl,rmdl,opt)">separable_calculations</a>(fmdl,rmdl,opt);
+0152                       <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,<a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>)+1);
+0153                       c2f = <a href="#_sub2" class="code" title="subfunction c2f = combine_c2f(c2f, tmp,felem_idx,relem_idx)">combine_c2f</a>(c2f, tmp,felem_idx,relem_idx_y);
+0154                    <span class="keyword">end</span>
+0155                    progress = progress + 1;
+0156                    <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(progress, max_iter);
+0157                 <span class="keyword">end</span>
+0158              <span class="keyword">end</span>
+0159 
+0160           <span class="keyword">else</span>
+0161              [fmdl, rmdl, opt, felem_idx] = <a href="#_sub4" class="code" title="subfunction [fmdl, rmdl, opt, felem_idx] = crop_models(fmdl0,rmdl0,opt, relem_idx)">crop_models</a>(fmdl0,rmdl0,opt,relem_idx);
+0162              <span class="keyword">if</span> any(felem_idx)
+0163                 <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,<a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>)-1);
+0164                 tmp = <a href="#_sub3" class="code" title="subfunction [c2f, m] = separable_calculations(fmdl,rmdl,opt)">separable_calculations</a>(fmdl,rmdl,opt);
+0165                 <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,<a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>)+1);
+0166                 c2f = <a href="#_sub2" class="code" title="subfunction c2f = combine_c2f(c2f, tmp,felem_idx,relem_idx)">combine_c2f</a>(c2f, tmp,felem_idx,relem_idx);
+0167              <span class="keyword">end</span>
+0168              progress = progress + 1;
+0169              <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(progress, max_iter);
+0170           <span class="keyword">end</span>
+0171           
+0172           
+0173        <span class="keyword">end</span>
+0174        <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(Inf);
+0175     <span class="keyword">end</span>
+0176 
+0177 <span class="comment">%-------------------------------------------------------------------------%</span>
+0178 <span class="comment">% Wrapper helper, combines partial c2f matrices</span>
+0179 <a name="_sub2" href="#_subfunctions" class="code">function c2f = combine_c2f(c2f, tmp,felem_idx,relem_idx)</a>
+0180     fidx = find(felem_idx); 
+0181     ridx = find(relem_idx);
+0182     c2f(fidx,ridx) = c2f(fidx,ridx) + tmp;
+0183     
+0184 <span class="comment">%-------------------------------------------------------------------------%</span>
+0185 <span class="comment">% The main function</span>
+0186 <a name="_sub3" href="#_subfunctions" class="code">function [c2f, m] = separable_calculations(fmdl,rmdl,opt)</a>
+0187     DEBUG = <a href="../../eidors/tools/eidors_debug.html" class="code" title="function out = eidors_debug(command, fstr)">eidors_debug</a>(<span class="string">'query'</span>,<span class="string">'mk_grid_c2f'</span>);
+0188    
+0189     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Prepare vox model...'</span>);
+0190     m = <a href="#_sub6" class="code" title="subfunction m = prepare_vox_mdl(rmdl,opt)">prepare_vox_mdl</a>(rmdl,opt);
+0191     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(Inf);
+0192     
+0193     <span class="keyword">try</span>
+0194     
+0195     <span class="comment">% tet edge v. vox face</span>
+0196     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Find tet_edge2vox_face intersections...'</span>)
+0197     [intpts1, rec2tedge, rec2intpt1, tedge2intpt1] = <a href="#_sub9" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = get_voxel_intersection_points(fmdl,faces,opt)">get_voxel_intersection_points</a>(fmdl,m.faces,opt);
+0198     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(sprintf(<span class="string">'Found %d'</span>, size(intpts1,1)), Inf);
+0199     
+0200     <span class="comment">% vox edge v. tet face</span>
+0201     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Find vox_edge2tet_face intersections...'</span>,0,3)
+0202     [intpts2, tri2vedge, tri2intpt2, vedge2intpt2] = <a href="#_sub10" class="code" title="subfunction [intpts, tri2edge, tri2intpt, edge2intpt] = get_tet_intersection_points(fmdl,m,opt)">get_tet_intersection_points</a>(fmdl,m,opt);
+0203     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(sprintf(<span class="string">'Found %d'</span>, size(intpts2,1)), Inf);
+0204     
+0205     <span class="comment">% Note: Rather than calculating edge2edge intersections, one could</span>
+0206     <span class="comment">% include them in one or both of the previous tests. However, it is</span>
+0207     <span class="comment">% then difficult to guarantee that the numerically border-line cases</span>
+0208     <span class="comment">% get assigned to all the vox and tets concerned</span>
+0209     
+0210     <span class="comment">% vox edge v. tet edge</span>
+0211     pmopt.final_msg = <span class="string">'none'</span>;   
+0212     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Find tet_edge2vox_edge intersections...'</span>,-1,pmopt)
+0213     [intpts3, tedge2vedge, tedge2intpt3, vedge2intpt3] =<a href="find_edge2edge_intersections.html" class="code" title="function [pts,FE2CE,FE2pts,CE2pts] = find_edge2edge_intersections(FE,FN,CE,CN, epsilon)">find_edge2edge_intersections</a>(fmdl.edges,fmdl.nodes,m.edges,rmdl.nodes, opt.tol_edge2edge); 
+0214     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(sprintf(<span class="string">'Found %d'</span>,size(intpts3,1)),Inf);
+0215     
+0216     <span class="comment">% tet node in vox</span>
+0217     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Find tet_nodes in voxels...'</span>)
+0218     [fnode2vox] = <a href="#_sub8" class="code" title="subfunction [insnode] = get_nodes_in_voxels(fmdl,rmdl)">get_nodes_in_voxels</a>(fmdl,rmdl);
+0219     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(sprintf(<span class="string">'Found %d'</span>, nnz(fnode2vox)), Inf);
+0220     
+0221     <span class="comment">% vox node in tet</span>
+0222     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Find vox_nodes in tets...'</span>);
+0223     vnode2tet = <a href="#_sub7" class="code" title="subfunction rnode2tet = get_nodes_in_tets(fmdl,rmdl, opt)">get_nodes_in_tets</a>(fmdl,rmdl, opt);
+0224     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(sprintf(<span class="string">'Found %d'</span>, nnz(vnode2tet)), Inf);
+0225     
+0226     <span class="comment">% vox contained in tet</span>
+0227     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Find vox contained in tet...'</span>)
+0228     vox_in_tet = (m.node2vox' * vnode2tet) == 8;
+0229     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(sprintf(<span class="string">'Found %d'</span>,nnz(vox_in_tet)), Inf);
+0230     
+0231     <span class="comment">% tet contained in vox</span>
+0232     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Find tets contained in vox...'</span>);
+0233     tet_in_vox = (double(fmdl.node2elem') * fnode2vox) == 4;
+0234     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(sprintf(<span class="string">'Found %d'</span>,nnz(tet_in_vox)), Inf);
+0235     
+0236     
+0237     <span class="comment">% tets and vox that intersect</span>
+0238     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Find total vox v. tet intersections...'</span>);
+0239     vox2intTet =   m.vox2face * (rec2tedge&gt;0) * fmdl.edge2elem <span class="keyword">...</span>
+0240                  | m.vox2edge * (tri2vedge&gt;0)' * fmdl.elem2face' <span class="keyword">...</span>
+0241                  | m.vox2edge * tedge2vedge' * fmdl.edge2elem;
+0242     <span class="comment">% exclude complete inclusion</span>
+0243     vox2intTet = vox2intTet &amp; ~vox_in_tet &amp; ~tet_in_vox';
+0244     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(sprintf(<span class="string">'Found %d'</span>,nnz(vox2intTet)), Inf);
+0245     
+0246     <span class="keyword">catch</span> err
+0247        <span class="keyword">if</span> (strcmp(err.identifier,<span class="string">'MATLAB:nomem'</span>))
+0248           msg = sprintf(<span class="string">'%s'</span>, <span class="keyword">...</span>
+0249              <span class="string">'Matlab ran out of memory. Consider setting opt.save_memory &gt; 0.\n'</span>, <span class="keyword">...</span>
+0250              <span class="string">'See HELP MK_GRID_C2F for details.'</span>);
+0251           error(<span class="string">'EIDORS:mk_grid_c2f:nomem'</span>,msg);
+0252        <span class="keyword">else</span>
+0253           rethrow(err);
+0254        <span class="keyword">end</span>
+0255     <span class="keyword">end</span>
+0256     
+0257     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(<span class="string">'Calculate intersection volumes...'</span>);
+0258     <span class="comment">% sparse logical multiplication doesn't exist</span>
+0259     vox2intpt1 = logical(m.vox2face*rec2intpt1)'; 
+0260     tet2intpt1 = logical(fmdl.edge2elem'*tedge2intpt1)';
+0261 
+0262     tet2intpt2 = logical(fmdl.elem2face*tri2intpt2)';
+0263     vox2intpt2 = logical(m.vox2edge*vedge2intpt2)';
+0264 
+0265     tet2intpt3 = logical(fmdl.edge2elem'*tedge2intpt3)';
+0266     vox2intpt3 = logical(m.vox2edge*vedge2intpt3)';
+0267     
+0268     vox_todo = find(sum(vox2intTet,2)&gt;0);
+0269     C = []; F = []; V = [];
+0270     
+0271     id = 0; lvox = length(vox_todo);
+0272     mint = ceil(lvox/100);
+0273     <span class="keyword">for</span> v = vox_todo'
+0274         id = id+1;
+0275         <span class="keyword">if</span> mod(id,mint)==0, <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(id/lvox); <span class="keyword">end</span>
+0276         tet_todo = find(vox2intTet(v,:));
+0277         common_intpts1 = bsxfun(@and,vox2intpt1(:,v), tet2intpt1(:,tet_todo));
+0278         common_intpts2 = bsxfun(@and,vox2intpt2(:,v), tet2intpt2(:,tet_todo));
+0279         common_intpts3 = bsxfun(@and,vox2intpt3(:,v), tet2intpt3(:,tet_todo));
+0280         tet_nodes     = bsxfun(@and,fnode2vox(:,v), fmdl.node2elem(:,tet_todo));
+0281         vox_nodes     = bsxfun(@and,vnode2tet(:,tet_todo), m.node2vox(:,v));
+0282         C = [C; v*ones(numel(tet_todo),1)];
+0283         F = [F; tet_todo'];
+0284         last_v = numel(V);
+0285         V = [V; zeros(numel(tet_todo),1)]; <span class="comment">% pre-allocate</span>
+0286 
+0287         <span class="keyword">for</span> t = 1:numel(tet_todo)
+0288             pts = [ intpts1(common_intpts1(:,t),:);
+0289                     intpts2(common_intpts2(:,t),:);
+0290                     intpts3(common_intpts3(:,t),:);
+0291                     fmdl.nodes(tet_nodes(:,t),:);
+0292                     rmdl.nodes(vox_nodes(:,t),:)];
+0293             last_v = last_v + 1;
+0294             ok = false;
+0295             <span class="keyword">if</span> size(pts,1) &lt; 4 <span class="comment">% test if edge lies on the plane of the vox</span>
+0296                 <span class="comment">% check for edges along the x y or z axis</span>
+0297                 <span class="comment">% this includes coplanar faces</span>
+0298                 E = fmdl.edges(fmdl.elem2edge(tet_todo(t),:),:);
+0299                 P1 = fmdl.nodes(E(:,1),:);
+0300                 P2 = fmdl.nodes(E(:,2),:);
+0301                 <span class="comment">% this test is sensitive, but not specific</span>
+0302                 <span class="comment">% it should also check if both pts come from the same edge and</span>
+0303                 <span class="comment">% that edge fullfils the condition</span>
+0304                 D = P1-P2;
+0305                 ok = any(D(:) == 0); 
+0306             <span class="keyword">end</span> 
+0307             
+0308             <span class="keyword">if</span> ok, <span class="keyword">continue</span>, <span class="keyword">end</span> <span class="comment">% otherwise convhulln will throw an error</span>
+0309             <span class="keyword">try</span>
+0310                 <span class="comment">% move points to origin (helps for small elements at</span>
+0311                 <span class="comment">% large coordinates</span>
+0312                 ctr = mean(pts);
+0313                 pts = bsxfun(@minus,pts,ctr);
+0314                 scale = max(abs(pts(:)));
+0315                 <span class="keyword">if</span> scale == 0 <span class="comment">%happens when there's only one point</span>
+0316                    <span class="keyword">continue</span>
+0317                 <span class="keyword">end</span>
+0318                 <span class="comment">% scale largest coordinate to 1 (helps with precision)</span>
+0319                 pts = pts ./ scale;
+0320                 <span class="comment">% force thorough search for initinal simplex and</span>
+0321                 <span class="comment">% supress precision warnings</span>
+0322                 [K, V(last_v)] = convhulln(pts,{<span class="string">'Qt Pp Qs'</span>});
+0323                 V(last_v) = V(last_v) * scale^3; <span class="comment">% undo scaling</span>
+0324             <span class="keyword">catch</span> err
+0325                 ok = false;
+0326                 <span class="keyword">switch</span> err.identifier
+0327                     <span class="keyword">case</span> {<span class="string">'MATLAB:qhullmx:DegenerateData'</span>, <span class="string">'MATLAB:qhullmx:UndefinedError'</span>}
+0328                         <span class="comment">% check for edges along the x y or z axis</span>
+0329                         <span class="comment">% this includes coplanar faces</span>
+0330                         E = fmdl.edges(fmdl.elem2edge(tet_todo(t),:),:);
+0331                         P1 = fmdl.nodes(E(:,1),:);
+0332                         P2 = fmdl.nodes(E(:,2),:);
+0333                         <span class="comment">% this test is sensitive, but not specific</span>
+0334                         <span class="comment">% it should also check if both pts come from the same edge and</span>
+0335                         <span class="comment">% that edge fullfils the condition</span>
+0336                         D = P1-P2;
+0337                         ok = any(abs(D) &lt; eps);
+0338                         <span class="comment">% edge-edge intersections often appear to also</span>
+0339                         <span class="comment">% cross faces, there doesn't seem to be a good</span>
+0340                         <span class="comment">% specific way to catch that</span>
+0341                         u = <a href="../../eidors/overloads/uniquetol.html" class="code" title="function out = uniquetol(in, tol, varargin)">uniquetol</a>(pts*scale,eps,<span class="string">'ByRows'</span>,true,<span class="string">'DataScale'</span>, 1);
+0342                         ok = ok | size(u,1) &lt; 4;
+0343                 <span class="keyword">end</span>
+0344                 <span class="keyword">if</span> ~ok
+0345                     <span class="keyword">if</span> DEBUG || <a href="../../eidors/tools/eidors_debug.html" class="code" title="function out = eidors_debug(command, fstr)">eidors_debug</a>(<span class="string">'query'</span>,<span class="string">'mk_grid_c2f:convhulln'</span>);
+0346                         tet.nodes = fmdl.nodes;
+0347                         vox.nodes = rmdl.nodes;
+0348                         tet.type = <span class="string">'fwd_model'</span>;
+0349                         vox.type = <span class="string">'fwd_model'</span>;
+0350                         vox.elems = m.faces(logical(m.vox2face(v,:)),:);
+0351                         vox.boundary = vox.elems;
+0352                         tet.elems = fmdl.elems(tet_todo(t),:);
+0353                         clf
+0354                         <a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(vox)
+0355                         hold on
+0356                         h = <a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(tet);
+0357                         set(h,<span class="string">'EdgeColor'</span>,<span class="string">'b'</span>)
+0358                         pts = bsxfun(@plus,pts*scale,ctr);
+0359                         plot3(pts(:,1),pts(:,2),pts(:,3),<span class="string">'o'</span>);
+0360                         hold off
+0361                         axis auto
+0362                         keyboard
+0363                     <span class="keyword">else</span>
+0364                         fprintf(<span class="string">'\n'</span>);
+0365                         <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>([<span class="string">'convhulln has thrown an error. '</span> <span class="keyword">...</span>
+0366                             <span class="string">'Enable eidors_debug on mk_grid_c2f and re-run to see a debug plot'</span>],0);
+0367                         rethrow(err);
+0368                     <span class="keyword">end</span>
+0369                 <span class="keyword">end</span>
+0370             <span class="keyword">end</span>
+0371         <span class="keyword">end</span>
+0372     <span class="keyword">end</span>
+0373     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(Inf);
+0374     c2f = <a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(F,C,V,opt.nTet,opt.nVox);
+0375     
+0376     <span class="comment">% add vox contained in tet</span>
+0377     c2f = c2f + bsxfun(@times, <a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(vox_in_tet), m.volume)';
+0378     
+0379     <span class="comment">% normalize to tet volume</span>
+0380     vol = <a href="get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>(fmdl);
+0381     c2f = bsxfun(@rdivide,c2f,vol);
+0382 
+0383     <span class="comment">% add tets contained in vox</span>
+0384 
+0385     c2f = c2f + tet_in_vox;
+0386 
+0387 <span class="comment">%-------------------------------------------------------------------------%</span>
+0388 <span class="comment">% Crop obviously non-overlapping parts of the models to limit computation</span>
+0389 <a name="_sub4" href="#_subfunctions" class="code">function [fmdl, rmdl, opt, felem_idx] = crop_models(fmdl0,rmdl0,opt, relem_idx)</a>
+0390    
+0391    fmdl = fmdl0;
+0392    rmdl = rmdl0;
+0393    
+0394    opt.nVox = opt.Xsz*opt.Ysz*opt.Zsz;
+0395    idx = rmdl0.coarse2fine * relem_idx &gt; 0;
+0396    rmdl.elems = rmdl0.elems(idx,:);
+0397    [node_idx, m,n] = unique(rmdl.elems(:));
+0398    rmdl.elems = reshape(n,size(rmdl.elems));
+0399    rmdl.nodes = rmdl0.nodes(node_idx,:);
+0400    
+0401    fnode_above = fmdl0.nodes(:,3) &gt; opt.zvec(end);
+0402    <span class="comment">% matlab is so stupid!</span>
+0403    felem_above = all(reshape(fnode_above(fmdl0.elems), size(fmdl0.elems)),2);
+0404    
+0405    fnode_below = fmdl0.nodes(:,3) &lt; opt.zvec(1);
+0406    felem_below = all(reshape(fnode_below(fmdl0.elems), size(fmdl0.elems)),2);
+0407    
+0408    felem_idx   = ~(felem_below | felem_above);
+0409    fmdl.elems = fmdl0.elems(felem_idx,:);
+0410    fnode_idx = unique(fmdl.elems(:));
+0411    fnode_idx_map = zeros(size(fmdl0.nodes,1),1);
+0412    fnode_idx_map(fnode_idx) = 1:length(fnode_idx);
+0413    fmdl.elems = reshape(fnode_idx_map(fmdl.elems),size(fmdl.elems));
+0414    fmdl.edges = reshape(fnode_idx_map(fmdl0.edges),size(fmdl0.edges));
+0415    fmdl.nodes = fmdl0.nodes(fnode_idx,:);
+0416    fmdl.node2elem = fmdl0.node2elem(fnode_idx,felem_idx);
+0417    
+0418    
+0419    fface_idx = sum(fmdl0.elem2face(felem_idx,:))&gt;0;
+0420    fmdl.elem2face = fmdl0.elem2face(felem_idx,fface_idx);
+0421    felem_idx_map = felem_idx;
+0422    felem_idx_map(felem_idx) = 1:nnz(felem_idx);
+0423    felem_idx_map = [0; felem_idx_map];
+0424    fmdl.face2elem = fmdl0.face2elem(fface_idx,:);
+0425    fmdl.face2elem = reshape(felem_idx_map(fmdl.face2elem + 1),size(fmdl.face2elem));
+0426    fmdl.normals = fmdl0.normals(fface_idx,:);
+0427    fmdl.faces = fmdl0.faces(fface_idx,:);
+0428    fmdl.faces = reshape(fnode_idx_map(fmdl.faces),size(fmdl.faces));
+0429    
+0430    fedge_idx = unique(fmdl0.elem2edge(felem_idx,:));
+0431    fedge_idx_map = zeros(size(fmdl0.edges,1),1);
+0432    fedge_idx_map(fedge_idx) = 1:length(fedge_idx);
+0433    fmdl.elem2edge = fedge_idx_map(fmdl0.elem2edge(felem_idx,:));
+0434    fmdl.edge2elem = fmdl0.edge2elem(fedge_idx,felem_idx);
+0435    fmdl.edges = fmdl.edges(fedge_idx,:);
+0436    
+0437    opt.nTet = size(fmdl.elems,1);
+0438 
+0439 <span class="comment">%-------------------------------------------------------------------------%</span>
+0440 <span class="comment">% Prepare matrices for the voxel model</span>
+0441 <a name="_sub5" href="#_subfunctions" class="code">function fmdl = prepare_fmdl(fmdl)</a>
+0442     fmopt.elem2edge = true;
+0443     fmopt.edge2elem = true;
+0444     fmopt.face2elem = true;
+0445     fmopt.node2elem = true;
+0446     fmopt.normals   = true;
+0447     fmopt.linear_reorder = false; <span class="comment">% this is slow and not needed</span>
+0448     ll = <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,1);
+0449     fmdl = <a href="fix_model.html" class="code" title="function [mdl] = fix_model(mdl,opt)">fix_model</a>(fmdl,fmopt);
+0450     <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,ll);
+0451     fmdl.node2elem = logical(fmdl.node2elem);
+0452     nElem = size(fmdl.elems,1);
+0453     nFace = size(fmdl.faces,1);
+0454     fmdl.elem2face = <a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(repmat((1:nElem)',1,4),double(fmdl.elem2face),true,nElem,nFace);
+0455 
+0456 
+0457 <span class="comment">%-------------------------------------------------------------------------%</span>
+0458 <span class="comment">% Prepare matrices for the voxel model</span>
+0459 <a name="_sub6" href="#_subfunctions" class="code">function m = prepare_vox_mdl(rmdl,opt)</a>
+0460 
+0461     DEBUG = <a href="../../eidors/tools/eidors_debug.html" class="code" title="function out = eidors_debug(command, fstr)">eidors_debug</a>(<span class="string">'query'</span>,<span class="string">'mk_grid_c2f'</span>);
+0462 
+0463     [voxels, m.node2vox] = <a href="#_sub11" class="code" title="subfunction [voxels, node2vox] = mk_voxels(opt)">mk_voxels</a>(opt);
+0464     <span class="keyword">if</span> DEBUG || <a href="../../eidors/tools/eidors_debug.html" class="code" title="function out = eidors_debug(command, fstr)">eidors_debug</a>(<span class="string">'query'</span>,<span class="string">'mk_grid_c2f:mk_voxels'</span>)
+0465         <a href="#_sub16" class="code" title="subfunction show_voxels(rmdl,voxels)">show_voxels</a>(rmdl,voxels); title(<span class="string">'mk\_voxels'</span>);
+0466     <span class="keyword">end</span>
+0467 
+0468     m.faces = <a href="#_sub12" class="code" title="subfunction faces = mk_faces(voxels,opt)">mk_faces</a>(voxels,opt);
+0469     <span class="keyword">if</span> DEBUG || <a href="../../eidors/tools/eidors_debug.html" class="code" title="function out = eidors_debug(command, fstr)">eidors_debug</a>(<span class="string">'query'</span>,<span class="string">'mk_grid_c2f:mk_faces'</span>)
+0470         <a href="#_sub17" class="code" title="subfunction test_faces(rmdl, faces, opt)">test_faces</a>(rmdl,voxels(m.faces,:),opt); title(<span class="string">'mk\_faces'</span>);
+0471     <span class="keyword">end</span>
+0472 
+0473     m.vox2face = <a href="#_sub14" class="code" title="subfunction vox2face = mk_vox2face(opt)">mk_vox2face</a>(opt);
+0474     <span class="keyword">if</span> DEBUG || <a href="../../eidors/tools/eidors_debug.html" class="code" title="function out = eidors_debug(command, fstr)">eidors_debug</a>(<span class="string">'query'</span>,<span class="string">'mk_grid_c2f:mk_vox2face'</span>)
+0475         <span class="comment">% the numbers shown are useless, just check if all faces are present</span>
+0476         <a href="#_sub16" class="code" title="subfunction show_voxels(rmdl,voxels)">show_voxels</a>(rmdl,m.faces(any(m.vox2face),:));title(<span class="string">'mk\_vox2face'</span>);
+0477     <span class="keyword">end</span>
+0478     m.edges = <a href="#_sub13" class="code" title="subfunction edges = mk_edges(voxels, opt)">mk_edges</a>(voxels,opt);
+0479 
+0480     m.edge_length = rmdl.nodes(m.edges(:,1),:) - rmdl.nodes(m.edges(:,2),:);
+0481     m.edge_length = sqrt(sum(m.edge_length.^2,2));
+0482     
+0483     [m.vox2edge, m.volume]= <a href="#_sub15" class="code" title="subfunction [vox2edge, vol] = mk_vox2edge(m,opt)">mk_vox2edge</a>(m,opt);
+0484 
+0485 
+0486 <span class="comment">%-------------------------------------------------------------------------%</span>
+0487 <span class="comment">% Assign each rmdl node to the tet it is in (nodes on tet faces are counted</span>
+0488 <span class="comment">% mutltiple times)</span>
+0489 <a name="_sub7" href="#_subfunctions" class="code">function rnode2tet = get_nodes_in_tets(fmdl,rmdl, opt)</a>
+0490     
+0491     [A,b] = <a href="tet_to_inequal.html" class="code" title="function [A,b]=tet_to_inequal(v,e)">tet_to_inequal</a>(fmdl.nodes,fmdl.elems);
+0492     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(.01);
+0493     <span class="comment">% This is split to decrease the memory footprint</span>
+0494     rnode2tet = (bsxfun(@minus, A(1:4:<span class="keyword">end</span>,:)*rmdl.nodes',b(1:4:end)) &lt;= opt.tol_node2tet)';
+0495     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(.21);
+0496     <span class="keyword">for</span> i = 2:4 
+0497         rnode2tet = rnode2tet &amp; (bsxfun(@minus, A(i:4:<span class="keyword">end</span>,:)*rmdl.nodes',b(i:4:end)) &lt;= opt.tol_node2tet)'; 
+0498         <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(.21 + (i-1)*.23);
+0499     <span class="keyword">end</span>
+0500     
+0501     <span class="comment">% exclude coinciding nodes</span>
+0502     ex= bsxfun(@eq,rmdl.nodes(:,1),fmdl.nodes(:,1)') &amp; <span class="keyword">...</span>
+0503         bsxfun(@eq,rmdl.nodes(:,2),fmdl.nodes(:,2)') &amp; <span class="keyword">...</span>
+0504         bsxfun(@eq,rmdl.nodes(:,3),fmdl.nodes(:,3)');
+0505     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(.94);
+0506     rnode2tet(any(ex,2),:) = 0;
+0507     <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(1);
+0508     
+0509 
+0510 <span class="comment">%-------------------------------------------------------------------------%</span>
+0511 <span class="comment">% Assign each fmdl node to the vox it is in (nodes on vox faces are counted</span>
+0512 <span class="comment">% mutltiple times)</span>
+0513 <a name="_sub8" href="#_subfunctions" class="code">function [insnode] = get_nodes_in_voxels(fmdl,rmdl)</a>
+0514 
+0515     E = reshape(rmdl.elems',4*6,[])';
+0516     E = E(:,[1 2 3 4 8 12 16 23]);
+0517 
+0518     NE = size(E,1);
+0519     xnodes = reshape(rmdl.nodes(E,1),NE,[]);
+0520     ynodes = reshape(rmdl.nodes(E,2),NE,[]);
+0521     znodes = reshape(rmdl.nodes(E,3),NE,[]);
+0522     minx = min(xnodes,[],2);
+0523     maxx = max(xnodes,[],2);
+0524     miny = min(ynodes,[],2);
+0525     maxy = max(ynodes,[],2);
+0526     minz = min(znodes,[],2);
+0527     maxz = max(znodes,[],2);
+0528 
+0529     leftof  = bsxfun(@lt, fmdl.nodes(:,1), minx');
+0530     rightof = bsxfun(@gt, fmdl.nodes(:,1), maxx');
+0531     infront = bsxfun(@lt, fmdl.nodes(:,2), miny');
+0532     behind  = bsxfun(@gt, fmdl.nodes(:,2), maxy');
+0533     below   = bsxfun(@lt, fmdl.nodes(:,3), minz');
+0534     above   = bsxfun(@gt, fmdl.nodes(:,3), maxz');
+0535 
+0536     outnode = leftof | rightof | behind | infront | below | above;
+0537     insnode = <a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(~outnode);
+0538 
+0539 <span class="comment">%-------------------------------------------------------------------------%</span>
+0540 <span class="comment">% Calculate intersection points between vox faces and tet edges</span>
+0541 <a name="_sub9" href="#_subfunctions" class="code">function [intpts, face2edge, face2intpt, edge2intpt] = get_voxel_intersection_points(fmdl,faces,opt)</a>
+0542 edges = fmdl.edges;
+0543 nodes = fmdl.nodes;
+0544 dir   = nodes(edges(:,2),:) - nodes(edges(:,1),:);
+0545 intpts = [];
+0546 F = []; E = []; I = [];
+0547 
+0548 SZ = [opt.Xsz, opt.Ysz, opt.Zsz];
+0549 VEC = {opt.xvec, opt.yvec, opt.zvec};
+0550 <span class="comment">% show_voxels(rmdl, voxels(faces,:))</span>
+0551 
+0552 <span class="comment">%  mdl = rmdl;</span>
+0553 <span class="comment">%  mdl.elems = voxels(faces,:);</span>
+0554 <span class="comment">%  img = mk_image(mdl,1);</span>
+0555 todo = sum(SZ)+3;
+0556 id = 0;
+0557 step = ceil(todo/100);
+0558 
+0559 <span class="keyword">for</span> d = 1:3
+0560     <span class="keyword">for</span> x = 0:SZ(d)
+0561         id = id+1;
+0562         <span class="keyword">if</span> mod(id,step)==0, <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(id/todo); <span class="keyword">end</span>
+0563         <span class="comment">% plane-edge intersection</span>
+0564         t = (VEC{d}(x+1) - nodes(edges(:,1),d)) ./ dir(:,d);
+0565         crossing = t&gt;0 &amp; t&lt;1;
+0566         crossed  = find(crossing);
+0567         <span class="keyword">if</span> isempty(crossed), <span class="keyword">continue</span>, <span class="keyword">end</span>;
+0568         <span class="comment">% intersection points</span>
+0569         tmp   = nodes(edges(crossing,1),:) + bsxfun(@times,t(crossing),dir(crossing,:));
+0570         face_coord = zeros(length(crossed),3);
+0571         rmv = false(length(crossed),1);
+0572         <span class="keyword">for</span> i = 1:3
+0573             <span class="keyword">if</span> i == d
+0574                face_coord(:,i) = x+1;
+0575             <span class="keyword">else</span>
+0576                 face_coord(:,i) = sum(bsxfun(@times,diff(bsxfun(@lt, tmp(:,i), VEC{i}'),1,2),(1:SZ(i))),2);
+0577                 rmv = rmv | face_coord(:,i) == 0;
+0578             <span class="keyword">end</span>
+0579         <span class="keyword">end</span>
+0580         <span class="comment">% also reject intersections with voxel nodes and edges</span>
+0581         same_x = any(bsxfun(@eq,tmp(:,1),opt.xvec'),2);
+0582         same_y = any(bsxfun(@eq,tmp(:,2),opt.yvec'),2);
+0583         same_z = any(bsxfun(@eq,tmp(:,3),opt.zvec'),2);
+0584         rmv = rmv | (same_x + same_y + same_z) &gt; 1;
+0585         <span class="keyword">if</span> nnz(rmv) == numel(rmv), <span class="keyword">continue</span>, <span class="keyword">end</span>
+0586         tmp(rmv,:) = []; 
+0587         face_coord(rmv,:) = [];
+0588         crossed(rmv) = [];
+0589         face_coord = face_coord - 1;
+0590         face_idx = d + face_coord(:,1)*opt.xstep + face_coord(:,2)*opt.ystep + face_coord(:,3)*opt.zstep;
+0591         I = [I; (1:size(tmp,1))' + size(I,1)];
+0592         F = [F; face_idx];
+0593         E = [E; crossed];
+0594         intpts = [intpts; tmp];
+0595 <span class="comment">%         unique(face_idx)</span>
+0596 <span class="comment">%         img.elem_data(:) = 0;</span>
+0597 <span class="comment">%         img.elem_data(unique(face_idx)) = 1;</span>
+0598 <span class="comment">%         show_fem(img,[0 0 1]);</span>
+0599         <span class="comment">%     hold on</span>
+0600         <span class="comment">%     x1 =fmdl.nodes(fmdl.edges(crossing,1),1);</span>
+0601         <span class="comment">%     x2 =fmdl.nodes(fmdl.edges(crossing,2),1);</span>
+0602         <span class="comment">%     y1 =fmdl.nodes(fmdl.edges(crossing,1),2);</span>
+0603         <span class="comment">%     y2 =fmdl.nodes(fmdl.edges(crossing,2),2);</span>
+0604         <span class="comment">%     z1 =fmdl.nodes(fmdl.edges(crossing,1),3);</span>
+0605         <span class="comment">%     z2 =fmdl.nodes(fmdl.edges(crossing,2),3);</span>
+0606         <span class="comment">%     plot3([x1 x2]',[y1 y2]',[z1 z2]','b');</span>
+0607         <span class="comment">%     plot3(intpts(:,1),intpts(:,2),intpts(:,3),'ro','MarkerFaceColor','r');</span>
+0608         <span class="comment">%     hold off</span>
+0609         <span class="comment">%     axis auto</span>
+0610         <span class="comment">%     view(2)</span>
+0611         <span class="comment">%     pause</span>
+0612     <span class="keyword">end</span>
+0613 <span class="keyword">end</span>
+0614 face2edge = <a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(F,E,I,size(faces,1),size(edges,1));
+0615 face2intpt = <a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(F,I,ones(size(I)),size(faces,1),size(I,1));
+0616 edge2intpt  = <a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(E,I,ones(size(I)),size(edges,1),size(I,1));
+0617 
+0618 <span class="comment">%-------------------------------------------------------------------------%</span>
+0619 <span class="comment">% Calculate intersection points between tet faces and vox edges</span>
+0620 <a name="_sub10" href="#_subfunctions" class="code">function [intpts, tri2edge, tri2intpt, edge2intpt] = get_tet_intersection_points(fmdl,m,opt)</a>
+0621     
+0622     intpts = [];
+0623     T = []; E = []; I = [];
+0624     Xsz = opt.Xsz; Ysz = opt.Ysz; Zsz = opt.Zsz;
+0625     SZ = [opt.Xsz, opt.Ysz, opt.Zsz];
+0626     VEC = {opt.xvec, opt.yvec, opt.zvec};
+0627     STEP(1) = opt.xstep; 
+0628     STEP(2) = STEP(1)*(Xsz+1);
+0629     STEP(3) = STEP(2)*(Ysz+1);
+0630     
+0631     d = sum(fmdl.normals .* fmdl.nodes(fmdl.faces(:,1),:),2);
+0632 
+0633     line_axis = [3 1 2];
+0634     <span class="keyword">for</span> i = 1:3
+0635         <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(i,3);
+0636         <span class="comment">% define edge lines</span>
+0637         idx = 1:3;
+0638         op = line_axis(i);
+0639         idx(op) = [];
+0640         
+0641         pts = [repmat(VEC{idx(1)},SZ(idx(2))+1,1) kron(VEC{idx(2)},ones(SZ(idx(1))+1,1)) ];
+0642         pt_idx = uint32(repmat((0:SZ(idx(1)))',SZ(idx(2))+1,1)*STEP(idx(1)) <span class="keyword">...</span>
+0643                 + kron((0:SZ(idx(2)))', ones(SZ(idx(1))+1,1))*STEP(idx(2)));
+0644         
+0645         <span class="comment">% project on faces</span>
+0646         <span class="comment">% plane equation is ax+by+cz+d = 0, where d = -(ax0 + by0 + cz0)</span>
+0647         z = repmat(d,1,size(pts,1));
+0648         <span class="keyword">for</span> j = 1:2
+0649             z = z - bsxfun(@times,fmdl.normals(:,idx(j)),pts(:,j)');
+0650         <span class="keyword">end</span>
+0651         z = z ./ repmat(fmdl.normals(:,op),1,size(pts,1));
+0652         in = <a href="point_in_triangle.html" class="code" title="function out = point_in_triangle(P,E,V,epsilon, str)">point_in_triangle</a>(pts,fmdl.faces,fmdl.nodes(:,idx),-opt.tol_edge2tri)';
+0653 
+0654         
+0655         <span class="comment">% reject voxel nodes</span>
+0656         v = VEC{op}';
+0657         in = in &amp; ~reshape(any(bsxfun(@eq,z(:),v),2),size(in));
+0658         M = bsxfun(@lt, z(:),v);
+0659         M = xor(M(:,1:end-1), M(:,2:end));
+0660         edge_num = reshape(uint32(sum(bsxfun(@times,uint32(M),uint32(1:SZ(op))),2)), size(z));
+0661         in = in &amp; edge_num;
+0662         <span class="keyword">if</span> nnz(in) == 0, <span class="keyword">continue</span>, <span class="keyword">end</span>
+0663         edge_num(~in) = 0;
+0664 
+0665         edge_num(in) = (edge_num(in)-1) * STEP(op);
+0666         edge_idx = edge_num + bsxfun(@times,uint32(in), uint32(i) + pt_idx');
+0667 
+0668         [t, p] = find(in);
+0669         tmp = zeros(length(p),3);
+0670         tmp(:,idx) = pts(p,1:2);
+0671         tmp(:,op) = z(in);
+0672         
+0673         I = [I; (1:size(tmp,1))' + size(I,1)];
+0674         T = [T; t];
+0675         E = [E; edge_idx(in)];
+0676         intpts = [intpts; tmp];        
+0677     <span class="keyword">end</span>
+0678     
+0679     tri2edge = <a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(T,E,I,size(fmdl.faces,1),size(m.edges,1));
+0680     tri2intpt = <a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(T,I,ones(size(I)),size(fmdl.faces,1),size(I,1));
+0681     edge2intpt  = <a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(E,I,ones(size(I)),size(m.edges,1),size(I,1));
+0682 
+0683    
+0684 <span class="comment">%-------------------------------------------------------------------------%</span>
+0685 <span class="comment">% Make voxels</span>
+0686 <a name="_sub11" href="#_subfunctions" class="code">function [voxels, node2vox] = mk_voxels(opt)</a>
+0687     Xsz = opt.Xsz; Ysz = opt.Ysz; Zsz = opt.Zsz;
+0688     Xp = Xsz+1; Yp = Ysz+1; Zp = Zsz+1; <span class="comment">% number of planes</span>
+0689 
+0690     up = Xp*Yp;
+0691     vox = [ 1       1+up    1+up+Xp     1+Xp;
+0692             1       2       2+up        1+up;
+0693             1       1+Xp    2+Xp        2;
+0694             2       2+up    2+up+Xp     2+Xp;
+0695             1+Xp    2+Xp    2+up+Xp     1+up+Xp;
+0696             1+up    1+Xp+up 2+Xp+up     2+up];
+0697 
+0698     voxrow   = bsxfun(@plus, repmat(vox,     Xsz,1), kron(0:Xsz-1          ,ones(1,6))');
+0699     voxplane = bsxfun(@plus, repmat(voxrow,  Ysz,1), kron(Xp*(0:Ysz-1) , ones(1, 6*Xsz))');
+0700     voxels   = bsxfun(@plus, repmat(voxplane,Zsz,1), kron(up*(0:Zsz-1) , ones(1, 6*Xsz*Ysz))');
+0701     nVox     = Xsz * Ysz * Zsz;
+0702     node2vox = <a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(voxels(1:3:<span class="keyword">end</span>,:),kron((1:nVox)',ones(2,4)),1);
+0703     
+0704 <span class="comment">%-------------------------------------------------------------------------%</span>
+0705 <span class="comment">% Make faces</span>
+0706 <a name="_sub12" href="#_subfunctions" class="code">function faces = mk_faces(voxels,opt)</a>
+0707     Xsz = opt.Xsz; Ysz = opt.Ysz; Zsz = opt.Zsz;
+0708     
+0709     facerow     = [nonzeros(bsxfun(@plus,(1:3)',0:6:(Xsz-1)*6)); (Xsz-1)*6+4];
+0710     faceplane   = bsxfun(@plus,facerow,0:6*Xsz:6*Xsz*(Ysz-1));
+0711     <span class="comment">% cap duplicates faces in order to preserve nice indexing</span>
+0712     cap         = kron(ones(3,1),faceplane(2:3:<span class="keyword">end</span>,end)')+3;
+0713     faceplane   = [faceplane,[ cap(:); cap(end)]];
+0714     faces       = bsxfun(@plus, faceplane(:), 0:6*Xsz*Ysz:6*Xsz*Ysz*(Zsz-1));
+0715     <span class="comment">% cap duplicates faces in order to preserve nice indexing</span>
+0716     cap         = reshape(kron(ones(3,1), 3:3:3*Xsz*Ysz'),3*Xsz,[]);
+0717     cap         = bsxfun(@plus, cap, 0:Ysz-1);
+0718     cap(end+1,:)= cap(<span class="keyword">end</span>,:);
+0719     faces       = [faces(:); faces(cap(:),end)+3];
+0720     faces       = voxels(faces,:);
+0721     
+0722 <span class="comment">%-------------------------------------------------------------------------%</span>
+0723 <span class="comment">% Make edges</span>
+0724 <a name="_sub13" href="#_subfunctions" class="code">function edges = mk_edges(voxels, opt)</a>
+0725     Xsz = opt.Xsz; Ysz = opt.Ysz; Zsz = opt.Zsz;
+0726     
+0727     edgerow     = voxels([nonzeros(bsxfun(@plus,(1:3)',0:6:(Xsz-1)*6)); (Xsz-1)*6+4],1:2);
+0728     edgerow(end+1,:) = edgerow(<span class="keyword">end</span>,:);
+0729     edgerow(end+1,:) = voxels((Xsz-1)*6+4, [1 4]);
+0730     edgeplane = repmat(edgerow,Ysz+1,1) + kron((Xsz+1)*(0:Ysz)', ones(size(edgerow)));
+0731     <span class="comment">% replace ficticious edges with repetitions;</span>
+0732     edgeplane((size(edgerow,1)*Ysz +3):3:<span class="keyword">end</span>,:) = edgeplane((size(edgerow,1)*Ysz +2):3:<span class="keyword">end</span>,:);
+0733 
+0734     up = (Xsz+1)*(Ysz+1);
+0735     edges = repmat(edgeplane,Zsz+1,1) + kron((0:Zsz)'*up, ones(size(edgeplane)));
+0736     
+0737     <span class="comment">% replace ficticious edges with repetitions;</span>
+0738     start = (size(edgeplane,1)*Zsz);
+0739     edges( (start +1):3:<span class="keyword">end</span>,:) = edges( (start +2):3:<span class="keyword">end</span>,:);
+0740     start = (size(edgeplane,1)*Zsz) + 3*Xsz;
+0741     step  = size(edgerow,1);
+0742     edges( (start +1):step:<span class="keyword">end</span>,:) = edges( (start +3):step:<span class="keyword">end</span>,:);
+0743     edges( (start +2):step:<span class="keyword">end</span>,:) = edges( (start +3):step:<span class="keyword">end</span>,:);
+0744     edges( end-2:<span class="keyword">end</span>,:) = edges(end-5:end-3,:);
+0745 
+0746 <span class="comment">%-------------------------------------------------------------------------%</span>
+0747 <span class="comment">% Make mapping between voxels and faces</span>
+0748 <a name="_sub14" href="#_subfunctions" class="code">function vox2face = mk_vox2face(opt)</a>
+0749     Xsz = opt.Xsz; Ysz = opt.Ysz; Zsz = opt.Zsz;
+0750     xstep = opt.xstep; ystep = opt.ystep; zstep = opt.zstep;
+0751     
+0752     vox = [1 2 3 1+xstep 2+ystep 3+zstep];
+0753     voxrow = bsxfun(@plus,(0:Xsz-1)'*xstep,vox)';
+0754     voxplane = bsxfun(@plus,(0:Ysz-1)*ystep,voxrow(:));
+0755     voxvol   = bsxfun(@plus,(0:Zsz-1)*zstep,voxplane(:));
+0756     voxvol   = reshape(voxvol, 6, [])';
+0757     I = kron((1:size(voxvol,1))',ones(1,6));
+0758     nFaces  = Zsz*(Ysz+1)*(3*Xsz+1) + Ysz*(3*Xsz+1);
+0759     nVox    = Xsz*Ysz*Zsz;
+0760     vox2face = <a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(I,voxvol,ones(size(I)),nVox,nFaces);   
+0761     
+0762 <span class="comment">%-------------------------------------------------------------------------%</span>
+0763 <span class="comment">% Make mapping between voxels and edges</span>
+0764 <a name="_sub15" href="#_subfunctions" class="code">function [vox2edge, vol] = mk_vox2edge(m,opt)</a>
+0765     Xsz = opt.Xsz; Ysz = opt.Ysz; Zsz = opt.Zsz;
+0766     xstep = opt.xstep; ystep = xstep*(Xsz+1); zstep = ystep*(Ysz+1);
+0767     
+0768     vox = [1 2 3 1+xstep 3+xstep 1+ystep 2+ystep 1+ystep+xstep <span class="keyword">...</span>
+0769            2+zstep 3+zstep 3+zstep+xstep 2+zstep+ystep];
+0770     voxrow = bsxfun(@plus,(0:Xsz-1)'*xstep,vox)';
+0771     voxplane = bsxfun(@plus,(0:Ysz-1)*ystep,voxrow(:));
+0772     voxvol   = bsxfun(@plus,(0:Zsz-1)*zstep,voxplane(:));
+0773     voxvol   = reshape(voxvol, 12, [])';
+0774     I = kron((1:size(voxvol,1))',ones(1,12));
+0775     nEdges  = 3*(Zsz+1)*(Ysz+1)*(Xsz+1);
+0776     nVox    = Xsz*Ysz*Zsz;
+0777     vox2edge = <a href="../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(I,voxvol,ones(size(I)),nVox,nEdges);
+0778     vol =      m.edge_length(voxvol(:,1)) <span class="keyword">...</span>
+0779             .* m.edge_length(voxvol(:,2)) <span class="keyword">...</span>
+0780             .* m.edge_length(voxvol(:,3));
+0781     
+0782     
+0783 <span class="comment">%-------------------------------------------------------------------------%</span>
+0784 <span class="comment">% Show voxels</span>
+0785 <a name="_sub16" href="#_subfunctions" class="code">function show_voxels(rmdl,voxels)    </a>
+0786     mdl=rmdl;
+0787     mdl.elems = voxels;
+0788     mdl.boundary = mdl.elems;
+0789     clf
+0790     <a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(mdl,[0 0 1]);
+0791 
+0792 <span class="comment">%-------------------------------------------------------------------------%</span>
+0793 <span class="comment">% Test indexing of faces on planes by showing random x, y and z plane</span>
+0794 <a name="_sub17" href="#_subfunctions" class="code">function test_faces(rmdl, faces, opt)</a>
+0795     mdl = rmdl;
+0796     mdl.elems = faces;
+0797     mdl.boundary = mdl.elems;
+0798     img = <a href="mk_image.html" class="code" title="function img= mk_image(mdl, elem_data, params, name)">mk_image</a>(mdl,0);
+0799     img.elem_data(opt.xplane + (randi(opt.Xsz+1)-1)*opt.xstep) = 1;
+0800     img.elem_data(opt.yplane + (randi(opt.Ysz+1)-1)*opt.ystep) = 2;
+0801     img.elem_data(opt.zplane + (randi(opt.Zsz+1)-1)*opt.zstep) = 3;
+0802     <a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(img,[0 0 1]);
+0803 
+0804 <span class="comment">%-------------------------------------------------------------------------%</span>
+0805 <span class="comment">% Center scale models</span>
+0806 <a name="_sub18" href="#_subfunctions" class="code">function[fmdl,rmdl] = center_scale_models(fmdl,rmdl, opt)</a>
+0807     ctr = mean([min(rmdl.nodes);max(rmdl.nodes)]);
+0808     rmdl.nodes = bsxfun(@minus,rmdl.nodes,ctr);
+0809     fmdl.nodes = bsxfun(@minus,fmdl.nodes,ctr);
+0810     <span class="keyword">if</span> isfield(opt,<span class="string">'do_not_scale'</span>) &amp;&amp; opt.do_not_scale    
+0811         <span class="keyword">return</span>
+0812     <span class="keyword">end</span>
+0813     maxnode = min( max(abs(rmdl.nodes(:))), max(abs(fmdl.nodes(:))));
+0814     scale = 1/maxnode;
+0815     rmdl.nodes = scale*rmdl.nodes;
+0816     fmdl.nodes = scale*fmdl.nodes;
+0817     <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'models scaled by %g'</span>, scale,2);
+0818     
+0819 <span class="comment">%-------------------------------------------------------------------------%</span>
+0820 <span class="comment">% Parse option struct</span>
+0821  <a name="_sub19" href="#_subfunctions" class="code">function opt = parse_opts(fmdl,rmdl, opt)</a>
+0822 
+0823     opt.xvec = unique(rmdl.nodes(:,1));
+0824     opt.yvec = unique(rmdl.nodes(:,2));
+0825     opt.zvec = unique(rmdl.nodes(:,3));
+0826     opt.Xsz  = numel(opt.xvec)-1;
+0827     opt.Ysz  = numel(opt.yvec)-1;
+0828     opt.Zsz  = numel(opt.zvec)-1;
+0829     opt.xstep = 3;
+0830     opt.ystep = opt.xstep*opt.Xsz+1;
+0831     opt.zstep = opt.ystep*(opt.Ysz+1);
+0832     xrow    = 1 + (0:opt.Ysz-1)*opt.ystep;
+0833     opt.xplane  = bsxfun(@plus, (0:opt.Zsz-1)'*opt.zstep,xrow);
+0834     yrow    = 2 + (0:opt.Xsz-1)*opt.xstep;
+0835     opt.yplane  = bsxfun(@plus, (0:opt.Zsz-1)'*opt.zstep,yrow);
+0836     zrow    = 3 + (0:opt.Xsz-1)*opt.xstep;
+0837     opt.zplane  = bsxfun(@plus, (0:opt.Ysz-1)'*opt.ystep,zrow);
+0838     opt.nVox = opt.Xsz*opt.Ysz*opt.Zsz;
+0839     opt.nTet = size(fmdl.elems,1);
+0840     
+0841     <span class="keyword">if</span> ~isfield(opt, <span class="string">'tol_node2tet'</span>);
+0842         opt.tol_node2tet = eps; <span class="comment">% * max(rmdl_rng,fmdl_rng)^3;</span>
+0843     <span class="keyword">end</span>
+0844     <span class="keyword">if</span> ~isfield(opt, <span class="string">'tol_edge2edge'</span>)
+0845         opt.tol_edge2edge = 6*sqrt(3)*eps(min(max(abs(fmdl.nodes(:))),max(abs(rmdl.nodes(:)))));
+0846     <span class="keyword">end</span>
+0847     <span class="keyword">if</span> ~isfield(opt, <span class="string">'tol_edge2tri'</span>)
+0848         opt.tol_edge2tri = eps; <span class="comment">%1e-10</span>
+0849     <span class="keyword">end</span>
+0850     <span class="keyword">if</span> ~isfield(opt, <span class="string">'save_memory'</span>)
+0851        opt.save_memory = 0;
+0852     <span class="keyword">end</span>
+0853     <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'@@ node2tet  tolerance = %g'</span>, opt.tol_node2tet,2);
+0854     <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'@@ edge2edge tolerance = %g'</span>, opt.tol_edge2edge,2);
+0855     <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'@@ edge2tri  tolerance = %g'</span>, opt.tol_edge2tri,2);
+0856 
+0857 <span class="comment">%-------------------------------------------------------------------------%</span>
+0858 <span class="comment">% fprintf wrapper to use eidors log_level</span>
+0859 <a name="_sub20" href="#_subfunctions" class="code">function logmsg(varargin)</a>
+0860     <span class="keyword">if</span> <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>) &gt;= 2
+0861         fprintf(varargin{:});
+0862     <span class="keyword">end</span>
+0863 
+0864     
+0865 <span class="comment">%-------------------------------------------------------------------------%</span>
+0866 <span class="comment">% Perfom unit tests</span>
+0867 <a name="_sub21" href="#_subfunctions" class="code">function do_unit_test</a>
+0868     <a href="#_sub23" class="code" title="subfunction do_small_test">do_small_test</a>;
+0869     <a href="#_sub24" class="code" title="subfunction do_realistic_test">do_realistic_test</a>;
+0870     figure
+0871     <a href="#_sub22" class="code" title="subfunction do_case_tests">do_case_tests</a>;
+0872     <a href="#_sub25" class="code" title="subfunction do_edge2edge_timing_test">do_edge2edge_timing_test</a>;
+0873     
+0874 <span class="comment">%-------------------------------------------------------------------------%</span>
+0875 <span class="comment">% Test individual intersections</span>
+0876 <a name="_sub22" href="#_subfunctions" class="code">function do_case_tests</a>
+0877     ll = <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>);
+0878     <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,1);
+0879     vox = <a href="mk_grid_model.html" class="code" title="function [cmdl, c2f]= mk_grid_model(fmdl, xvec, yvec, zvec);">mk_grid_model</a>([],0:1,0:1,0:1);
+0880     tet.type = <span class="string">'fwd_model'</span>;
+0881     tet.elems = [1 2 3 4];
+0882 
+0883     X = 4; Y = 6;
+0884     <span class="keyword">for</span> i = 1:30
+0885         tet.nodes = [0 0 0; 0 1 0; 1 0 0; 0 0 1];
+0886         fprintf(<span class="string">'%d\n'</span>,i);
+0887         <span class="keyword">switch</span> i
+0888             <span class="keyword">case</span> 1 <span class="comment">% nothing in common</span>
+0889                 txt = <span class="string">'Nothing in common'</span>;
+0890                 tet.nodes = tet.nodes + 2;
+0891                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+0892                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+0893                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0894                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+0895                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0896                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+0897                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0898                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+0899 
+0900             <span class="keyword">case</span> 2 <span class="comment">% common node</span>
+0901                 tet.nodes = tet.nodes + 1;
+0902                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+0903                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+0904                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'Comm node tedge2rec'</span>,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0905                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+0906                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'Comm node vedge2tri'</span>,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0907                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+0908                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'Comm node edge2edge'</span>,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0909                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+0910                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'Comm node tnode2vox'</span>,fnode2vox,[1;0;0;0],0); <span class="comment">% 1 point</span>
+0911                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+0912                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'Comm node vnode2tet'</span>,nnz(rnode2tet),0,0);  <span class="comment">% nothing</span>
+0913                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+0914 
+0915             <span class="keyword">case</span> 3 <span class="comment">% tet_edge v vox_node</span>
+0916                 txt = <span class="string">'tet_edge v vox_node'</span>;
+0917                 tet.nodes(:,1:2) = tet.nodes(:,1:2) - 0.5;
+0918                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+0919                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+0920                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0921                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+0922                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0923                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+0924                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0925                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+0926                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),0,0); <span class="comment">% nothing</span>
+0927                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+0928                 res = zeros(8,1); res(1) = 1;
+0929                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,rnode2tet,res,0);  <span class="comment">% 1 point</span>
+0930                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+0931 
+0932             <span class="keyword">case</span> 4 <span class="comment">% tet_edge v vox_edge</span>
+0933                 txt = <span class="string">'tet_edge v vox_edge'</span>;
+0934                 tet.nodes(:,1:2) = tet.nodes(:,1:2) - 0.5;
+0935                 tet.nodes(:,3)   = tet.nodes(:,3)   + 0.5;
+0936                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+0937                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+0938                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0939                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+0940                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0941                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+0942                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),1,0); <span class="comment">% 1 point</span>
+0943                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+0944                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),0,0); <span class="comment">% nothing</span>
+0945                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+0946                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),0,0); <span class="comment">% nothing</span>
+0947                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+0948 
+0949             <span class="keyword">case</span> 5 <span class="comment">% tet_edge on vox_face</span>
+0950                 txt = <span class="string">'tet_edge on vox_face'</span>;
+0951                 tet.nodes(:,1:2) = tet.nodes(:,1:2) - 0.3;
+0952                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+0953                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+0954                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0955                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+0956                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),1,0); <span class="comment">% 1 point</span>
+0957                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+0958                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),2,0); <span class="comment">% 2 points</span>
+0959                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+0960                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),0,0); <span class="comment">% nothing</span>
+0961                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+0962                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),1,0); <span class="comment">% 1 point</span>
+0963                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+0964 
+0965             <span class="keyword">case</span> 6 
+0966                 txt = <span class="string">'vox_node on tet_face'</span>;
+0967                 tet.nodes(:,1:2) = tet.nodes(:,1:2) - 0.3;
+0968                 tet.nodes(:,3)   = tet.nodes(:,3) -0.4;
+0969                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+0970                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+0971                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0972                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+0973                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0974                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+0975                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0976                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+0977                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),0,0); <span class="comment">% nothing</span>
+0978                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+0979                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),1,0); <span class="comment">% 1 point</span>
+0980                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+0981 
+0982             <span class="keyword">case</span> 7
+0983                 txt = <span class="string">'tet_node on vox_face'</span>;
+0984                 tet.nodes(:,1) = tet.nodes(:,1) - 1;
+0985                 tet.nodes(:,2:3)  = tet.nodes(:,2:3) + .5;
+0986                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+0987                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+0988                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0989                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+0990                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0991                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+0992                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+0993                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+0994                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),1,0); <span class="comment">% 1 point</span>
+0995                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+0996                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),0,0); <span class="comment">% nothing</span>
+0997                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+0998 
+0999 
+1000             <span class="keyword">case</span> 8
+1001                 txt = <span class="string">'tet_node on vox_edge'</span>;
+1002                 tet.nodes(:,1) = tet.nodes(:,1) - 1;
+1003                 tet.nodes(:,2)  = tet.nodes(:,2) + .5;
+1004                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+1005                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+1006                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1007                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+1008                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1009                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+1010                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1011                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+1012                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),1,0); <span class="comment">% 1 point</span>
+1013                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+1014                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),0,0); <span class="comment">% nothing</span>
+1015                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+1016 
+1017             <span class="keyword">case</span> 9
+1018                 txt = <span class="string">'all nodes common'</span>;
+1019                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+1020                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+1021                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1022                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+1023                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1024                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+1025                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1026                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+1027                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),4,0); <span class="comment">% 4 points</span>
+1028                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+1029                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),0,0); <span class="comment">% nothing</span>
+1030                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+1031 
+1032             <span class="keyword">case</span> 10
+1033                 txt = <span class="string">'tet in vox'</span>;
+1034                 tet.nodes = .25 + .5*tet.nodes;
+1035                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+1036                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+1037                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1038                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+1039                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1040                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+1041                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1042                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+1043                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),4,0); <span class="comment">% 4 points</span>
+1044                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+1045                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),0,0); <span class="comment">% nothing</span>
+1046                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+1047                 c2f = <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+1048                 max_vox = max(vox.nodes);
+1049                 min_vox = min(vox.nodes);
+1050                 edges = max_vox-min_vox;
+1051                 vox_vol = edges(:,1) .* edges(:,2) .* edges(:,3);
+1052                 tet_vol = <a href="get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>(tet);
+1053                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,c2f, 1, 0);
+1054 
+1055             <span class="keyword">case</span> 11
+1056                 txt = <span class="string">'vox in tet'</span>;
+1057                 tet.nodes =  4*tet.nodes - .25;
+1058                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+1059                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+1060                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1061                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+1062                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1063                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+1064                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1065                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+1066                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),0,0);  <span class="comment">% nothing</span>
+1067                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+1068                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),8,0); <span class="comment">% 8 points</span>
+1069                 c2f = <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+1070                 max_vox = max(vox.nodes);
+1071                 min_vox = min(vox.nodes);
+1072                 edges = max_vox-min_vox;
+1073                 vox_vol = edges(:,1) .* edges(:,2) .* edges(:,3);
+1074                 tet_vol = <a href="get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>(tet);
+1075                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,c2f, vox_vol / tet_vol, 0);
+1076 
+1077 
+1078             <span class="keyword">case</span> 12 
+1079                 txt = <span class="string">'tet_edge v. vox_face'</span>;
+1080                 tet.nodes(:,1:2) = tet.nodes(:,1:2) - 0.3;
+1081                 tet.nodes(:,3)   = tet.nodes(:,3) + .4;
+1082                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+1083                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+1084                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),2,0); <span class="comment">% 2 points</span>
+1085                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+1086                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),2,0); <span class="comment">% 2 points</span>
+1087                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+1088                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1089                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+1090                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),0,0); <span class="comment">% nothing</span>
+1091                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+1092                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),0,0); <span class="comment">% nothing</span>
+1093                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+1094 
+1095 
+1096             <span class="keyword">case</span> 13
+1097                 txt = <span class="string">'everything'</span>;
+1098                 tet.nodes = tet.nodes + 0.7;
+1099                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+1100                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+1101                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),3,0); <span class="comment">% 3 points</span>
+1102                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+1103                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),3,0); <span class="comment">% 3 points</span>
+1104                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+1105                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1106                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+1107                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),1,0); <span class="comment">% 1 point</span>
+1108                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+1109                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),1,0); <span class="comment">% 1 point</span>
+1110                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+1111 
+1112                 <span class="comment">%------- degenerate cases-----------%</span>
+1113             <span class="keyword">case</span> 14 <span class="comment">% common edge</span>
+1114                 txt = <span class="string">'DG1: Common edge'</span>;
+1115                 tet.nodes(:,1:2) = tet.nodes(:,1:2) + 1;
+1116                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+1117                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+1118                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1119                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+1120                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1121                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+1122                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1123                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+1124                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,fnode2vox,[1;0;0;1],0); <span class="comment">% 2 points</span>
+1125                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+1126                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),0,0);  <span class="comment">% nothing</span>
+1127                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+1128 
+1129             <span class="keyword">case</span> 15 <span class="comment">% common edge</span>
+1130                 txt = <span class="string">'DG2: Common edge'</span>;
+1131                 tet.nodes(:,1:2) = tet.nodes(:,1:2) + 1;
+1132                 tet.nodes(:,3) = tet.nodes(:,3) + 0.5;
+1133                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+1134                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+1135                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1136                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+1137                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1138                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+1139                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1140                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+1141                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),1,0); <span class="comment">% 1 point</span>
+1142                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+1143                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),1,0);  <span class="comment">% 1 point</span>
+1144                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+1145 
+1146              <span class="keyword">case</span> 16 <span class="comment">% common edge</span>
+1147                 txt = <span class="string">'DG3: Common edge'</span>;
+1148                 tet.nodes(:,1:2) = tet.nodes(:,1:2) + 1;
+1149                 z = tet.nodes(:,3) == 0;
+1150                 tet.nodes(z,3) = -.5;
+1151                 tet.nodes(~z,3) = 1.5;
+1152                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+1153                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+1154                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1155                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+1156                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1157                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+1158                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1159                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+1160                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),0,0); <span class="comment">% nothing</span>
+1161                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+1162                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),2,0);  <span class="comment">% 2 points</span>
+1163                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+1164 
+1165             <span class="keyword">case</span> 17 <span class="comment">% edge on face</span>
+1166                 txt = <span class="string">'DG4: edge on face'</span>;
+1167                 tet.nodes = [0 0 0; 1 .5 0; 0 1 0; 1 .5 1];
+1168                 tet.nodes(:,1) = tet.nodes(:,1) - 1;
+1169                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+1170                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+1171                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1172                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+1173                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1174                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+1175                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1176                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+1177                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),2,0); <span class="comment">% 2 points</span>
+1178                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+1179                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),0,0);  <span class="comment">% nothing</span>
+1180                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+1181 
+1182             <span class="keyword">case</span> 18 <span class="comment">% edge2edge only</span>
+1183                 txt = <span class="string">'DG5: edge2edge only'</span>;
+1184                 tet.nodes = [0 0 0; 1 .5 0; 0 1 0; 1 .5 1];
+1185                 tet.nodes(:,1) = tet.nodes(:,1) - 1;
+1186                 z = tet.nodes(:,3) == 0;
+1187                 tet.nodes(z,3) = -.5;
+1188                 tet.nodes(~z,3) = 1.5;
+1189                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+1190                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+1191                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1192                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+1193                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1194                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+1195                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),2,0); <span class="comment">% 2 points</span>
+1196                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+1197                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),0,0); <span class="comment">% nothing</span>
+1198                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+1199                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),0,0);  <span class="comment">% nothing</span>
+1200                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+1201 
+1202             <span class="keyword">case</span> 19 <span class="comment">% edge on face</span>
+1203                 txt = <span class="string">'DG6: edge on face'</span>;
+1204                 tet.nodes = [0 0 0; 1 .5 0; 0 1 0; 1 .5 1];
+1205                 tet.nodes(:,1) = tet.nodes(:,1) - 1;
+1206                 tet.nodes(:,3) = tet.nodes(:,3) - .5;
+1207                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+1208                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+1209                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1210                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+1211                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1212                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+1213                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),1,0); <span class="comment">% 1 point</span>
+1214                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+1215                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),1,0); <span class="comment">% 1 points</span>
+1216                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+1217                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),0,0);  <span class="comment">% nothing</span>
+1218                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+1219 
+1220             <span class="keyword">case</span> 20 <span class="comment">%face on face</span>
+1221                 txt = <span class="string">'DG7: face on face'</span>;
+1222                 tet.nodes(:,1) = tet.nodes(:,1) + 1;
+1223                 tet.nodes(:,2) = tet.nodes(:,2) + 0.5;
+1224                 tet.nodes(:,3) = tet.nodes(:,3) + 0.5;
+1225                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+1226                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+1227                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1228                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+1229                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1230                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+1231                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(unique(intpts,<span class="string">'rows'</span>),1),2,0); <span class="comment">% 2 unique points (these edges are counted 3 times, but vox2edge takes care of this)</span>
+1232                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+1233                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),1,0); <span class="comment">% 1 point</span>
+1234                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+1235                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),1,0);  <span class="comment">% 1 point</span>
+1236                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+1237 
+1238            <span class="keyword">case</span> 21 <span class="comment">%face on face</span>
+1239                 txt = <span class="string">'DG8: face on face'</span>;
+1240                 tet.nodes(:,1) = tet.nodes(:,1) + 1;
+1241                 tet.nodes(:,2) = tet.nodes(:,2) + 0.4;
+1242                 tet.nodes(:,3) = tet.nodes(:,3) - 0.6;
+1243                 subplot(X,Y,i), <a href="#_sub31" class="code" title="subfunction show_test(vox,tet)">show_test</a>(vox,tet);
+1244                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub28" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)">test_rec_tedge_intersections</a>(vox,tet);
+1245                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1246                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub29" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)">test_tet_vedge_intersections</a>(vox,tet);
+1247                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(intpts,1),0,0); <span class="comment">% nothing</span>
+1248                 [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(vox,tet);
+1249                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,size(unique(intpts,<span class="string">'rows'</span>),1),2,0); <span class="comment">% 2 unique points (these edges are counted 3 times, but vox2edge takes care of this)</span>
+1250                 [fnode2vox] = <a href="#_sub27" class="code" title="subfunction [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)">test_tnode_in_vox</a>(vox,tet);
+1251                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(fnode2vox),1,0); <span class="comment">% 1 point</span>
+1252                 rnode2tet = <a href="#_sub26" class="code" title="subfunction rnode2tet = test_vnode_in_tet(rmdl,fmdl)">test_vnode_in_tet</a>(vox,tet);
+1253                 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(txt,nnz(rnode2tet),0,0);  <span class="comment">% nothing</span>
+1254                 <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(tet,vox);
+1255 
+1256             <span class="keyword">otherwise</span>
+1257                 <span class="keyword">break</span>;
+1258         <span class="keyword">end</span>
+1259     <span class="keyword">end</span>
+1260     <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,ll);
+1261 
+1262 <a name="_sub23" href="#_subfunctions" class="code">function do_small_test</a>
+1263    fmdl= <a href="../../eidors/meshing/netgen/ng_mk_cyl_models.html" class="code" title="function [fmdl,mat_idx] = ng_mk_cyl_models(cyl_shape, elec_pos,elec_shape, extra_ng_code);">ng_mk_cyl_models</a>([2,2,.1],[16,1],[.1,0,.025]);
+1264    xvec = [-1.5:1:1.5];
+1265    yvec = [-1.6:.8:1.6];
+1266    zvec = -1:1:2;
+1267    rmdl = <a href="mk_grid_model.html" class="code" title="function [cmdl, c2f]= mk_grid_model(fmdl, xvec, yvec, zvec);">mk_grid_model</a>([],xvec,yvec,zvec);
+1268 
+1269    <a href="../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a> clear
+1270    tic
+1271    c2f_a = <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(fmdl, rmdl);
+1272    toc
+1273    <a href="../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a> clear
+1274    tic
+1275    opt.save_memory = 2;
+1276    c2f_b = <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(fmdl, rmdl, opt);
+1277    toc
+1278    <a href="../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a> clear
+1279    tic
+1280    c2f_c = <a href="mk_coarse_fine_mapping.html" class="code" title="function [mapping, outside] = mk_coarse_fine_mapping( f_mdl, c_mdl );">mk_coarse_fine_mapping</a>(fmdl, rmdl);
+1281    toc
+1282    assert(any(c2f_a(:) ~= c2f_b(:)) == 0);
+1283    <span class="comment">% the old function cannot be tested this way, it doesn't give the right</span>
+1284    <span class="comment">% answer</span>
+1285    <span class="comment">% assert(any(c2f_a(:) ~= c2f_c(:)) == 0);</span>
+1286    
+1287 <a name="_sub24" href="#_subfunctions" class="code">function do_realistic_test</a>
+1288 fmdl= <a href="../../eidors/meshing/netgen/ng_mk_cyl_models.html" class="code" title="function [fmdl,mat_idx] = ng_mk_cyl_models(cyl_shape, elec_pos,elec_shape, extra_ng_code);">ng_mk_cyl_models</a>([2,2,.1],[16,1],[.1,0,.025]);
+1289 xvec = [-1.5 -.5:.2:.5 1.5];
+1290 yvec = [-1.6 -1:.2:1 1.6];
+1291 zvec = 0:.25:2;
+1292 rmdl = <a href="mk_grid_model.html" class="code" title="function [cmdl, c2f]= mk_grid_model(fmdl, xvec, yvec, zvec);">mk_grid_model</a>([],xvec,yvec,zvec);
+1293 
+1294 tic
+1295 opt.save_memory = 0;
+1296 c2f_a = <a href="mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>(fmdl, rmdl,opt);
+1297 t = toc;
+1298 fprintf(<span class="string">'Analytic: t=%f s\n'</span>,t);
+1299 
+1300 tic
+1301 c2f_n = <a href="mk_coarse_fine_mapping.html" class="code" title="function [mapping, outside] = mk_coarse_fine_mapping( f_mdl, c_mdl );">mk_coarse_fine_mapping</a>(fmdl,rmdl);
+1302 t = toc;
+1303 fprintf(<span class="string">'Approximate: t=%f s\n'</span>,t);
+1304 
+1305 
+1306 tetvol = <a href="get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>(fmdl);
+1307 opt = <a href="#_sub19" class="code" title="subfunction opt = parse_opts(fmdl,rmdl, opt)">parse_opts</a>(fmdl,rmdl);
+1308 m = <a href="#_sub6" class="code" title="subfunction m = prepare_vox_mdl(rmdl,opt)">prepare_vox_mdl</a>(rmdl,opt);
+1309 
+1310 
+1311 f2c_a = bsxfun(@times, c2f_a, tetvol);
+1312 f2c_a = bsxfun(@rdivide,f2c_a', m.volume); 
+1313 img = <a href="mk_image.html" class="code" title="function img= mk_image(mdl, elem_data, params, name)">mk_image</a>(rmdl,0);
+1314 img.elem_data = f2c_a*ones(size(fmdl.elems,1),1);
+1315 subplot(132)
+1316 <a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(img);
+1317 
+1318 f2c_n = bsxfun(@times, c2f_n, tetvol);
+1319 f2c_n = bsxfun(@rdivide,f2c_n', m.volume); 
+1320 img = <a href="mk_image.html" class="code" title="function img= mk_image(mdl, elem_data, params, name)">mk_image</a>(rmdl,0);
+1321 img.elem_data = f2c_n*ones(size(fmdl.elems,1),1);
+1322 subplot(133)
+1323 <a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(img);
+1324 subplot(131);
+1325 h = <a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(fmdl);
+1326 set(h,<span class="string">'LineWidth'</span>,0.1)
+1327 hold on
+1328 h = <a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(rmdl);
+1329 set(h,<span class="string">'EdgeColor'</span>,<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,2);
+1330 hold off
+1331 
+1332 <a name="_sub25" href="#_subfunctions" class="code">function do_edge2edge_timing_test</a>
+1333     fmdl= <a href="../../eidors/meshing/netgen/ng_mk_cyl_models.html" class="code" title="function [fmdl,mat_idx] = ng_mk_cyl_models(cyl_shape, elec_pos,elec_shape, extra_ng_code);">ng_mk_cyl_models</a>([2,2],[8,1],[.15,0,.05]);
+1334     xvec = linspace(-2,2,33);
+1335     yvec = linspace(-2,2,33);
+1336     zvec = 0:.5:2;
+1337     rmdl = <a href="mk_grid_model.html" class="code" title="function [cmdl, c2f]= mk_grid_model(fmdl, xvec, yvec, zvec);">mk_grid_model</a>([],xvec,yvec,zvec);
+1338     tic
+1339     <a href="#_sub30" class="code" title="subfunction [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)">test_tedge2vedge_intersections</a>(rmdl,fmdl);
+1340     toc
+1341     
+1342 <a name="_sub26" href="#_subfunctions" class="code">function rnode2tet = test_vnode_in_tet(rmdl,fmdl)</a>
+1343     opt  = <a href="#_sub19" class="code" title="subfunction opt = parse_opts(fmdl,rmdl, opt)">parse_opts</a>(fmdl,rmdl);
+1344     fmdl = <a href="#_sub5" class="code" title="subfunction fmdl = prepare_fmdl(fmdl)">prepare_fmdl</a>(fmdl);
+1345     rnode2tet = <a href="#_sub7" class="code" title="subfunction rnode2tet = get_nodes_in_tets(fmdl,rmdl, opt)">get_nodes_in_tets</a>(fmdl,rmdl, opt);
+1346 
+1347 <a name="_sub27" href="#_subfunctions" class="code">function [fnode2vox] = test_tnode_in_vox(rmdl,fmdl)</a>
+1348     fmdl = <a href="#_sub5" class="code" title="subfunction fmdl = prepare_fmdl(fmdl)">prepare_fmdl</a>(fmdl);
+1349     [fnode2vox] = <a href="#_sub8" class="code" title="subfunction [insnode] = get_nodes_in_voxels(fmdl,rmdl)">get_nodes_in_voxels</a>(fmdl,rmdl);
+1350     
+1351 <a name="_sub28" href="#_subfunctions" class="code">function [intpts, face2edge, face2intpt, edge2intpt] = test_rec_tedge_intersections(rmdl,fmdl)</a>
+1352     opt = <a href="#_sub19" class="code" title="subfunction opt = parse_opts(fmdl,rmdl, opt)">parse_opts</a>(fmdl,rmdl);
+1353     m = <a href="#_sub6" class="code" title="subfunction m = prepare_vox_mdl(rmdl,opt)">prepare_vox_mdl</a>(rmdl,opt);
+1354     fmdl = <a href="#_sub5" class="code" title="subfunction fmdl = prepare_fmdl(fmdl)">prepare_fmdl</a>(fmdl);
+1355     [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub9" class="code" title="subfunction [intpts, face2edge, face2intpt, edge2intpt] = get_voxel_intersection_points(fmdl,faces,opt)">get_voxel_intersection_points</a>(fmdl,m.faces,opt);
+1356         
+1357 <a name="_sub29" href="#_subfunctions" class="code">function [intpts, face2edge, face2intpt, edge2intpt] = test_tet_vedge_intersections(rmdl,fmdl)</a>
+1358     opt = <a href="#_sub19" class="code" title="subfunction opt = parse_opts(fmdl,rmdl, opt)">parse_opts</a>(fmdl,rmdl);
+1359     m = <a href="#_sub6" class="code" title="subfunction m = prepare_vox_mdl(rmdl,opt)">prepare_vox_mdl</a>(rmdl,opt);
+1360     fmdl = <a href="#_sub5" class="code" title="subfunction fmdl = prepare_fmdl(fmdl)">prepare_fmdl</a>(fmdl);
+1361     [intpts, face2edge, face2intpt, edge2intpt] = <a href="#_sub10" class="code" title="subfunction [intpts, tri2edge, tri2intpt, edge2intpt] = get_tet_intersection_points(fmdl,m,opt)">get_tet_intersection_points</a>(fmdl,m,opt);
+1362     
+1363 <a name="_sub30" href="#_subfunctions" class="code">function [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = test_tedge2vedge_intersections(rmdl,fmdl)</a>
+1364     opt = <a href="#_sub19" class="code" title="subfunction opt = parse_opts(fmdl,rmdl, opt)">parse_opts</a>(fmdl,rmdl);
+1365     m = <a href="#_sub6" class="code" title="subfunction m = prepare_vox_mdl(rmdl,opt)">prepare_vox_mdl</a>(rmdl,opt);
+1366     fmdl = <a href="#_sub5" class="code" title="subfunction fmdl = prepare_fmdl(fmdl)">prepare_fmdl</a>(fmdl);
+1367     [intpts, tedge2vedge, tedge2intpt, vedge2intpt] = <a href="find_edge2edge_intersections.html" class="code" title="function [pts,FE2CE,FE2pts,CE2pts] = find_edge2edge_intersections(FE,FN,CE,CN, epsilon)">find_edge2edge_intersections</a>(fmdl.edges,fmdl.nodes,m.edges,rmdl.nodes, opt.tol_node2tet);
+1368 
+1369 <a name="_sub31" href="#_subfunctions" class="code">function show_test(vox,tet)</a>
+1370     <a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(vox);
+1371     hold on
+1372     h = <a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(tet);
+1373     set(h, <span class="string">'EdgeColor'</span>,<span class="string">'b'</span>);
+1374     hold off
+1375     axis auto</pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

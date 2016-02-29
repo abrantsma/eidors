@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of show_slices_move</title>
+  <meta name="keywords" content="show_slices_move">
+  <meta name="description" content="SHOW_SLICES_MOVE   Shows planar slices of a 3D FEM with movement vectors">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">eidors</a> &gt; <a href="#">graphics</a> &gt; <a href="index.html">matlab</a> &gt; show_slices_move.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/graphics/matlab&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>show_slices_move
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>SHOW_SLICES_MOVE   Shows planar slices of a 3D FEM with movement vectors</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function show_slices_move( img, move, move_scale ) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> SHOW_SLICES_MOVE   Shows planar slices of a 3D FEM with movement vectors
+ if electrodes are visible on the slice.
+ Args:     img  - eidors_obj type image
+           move - new position vectors for nodes [x,y,z] after movement</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>	[colours,scl_data]= calc_colours(img, set_value, do_colourbar)</li><li><a href="show_slices.html" class="code" title="function out_img= show_slices( img, levels )">show_slices</a>	out_img = show_slices (img, levels ) show slices at levels of an</li><li><a href="../../../eidors/solvers/forward/fwd_model_parameters.html" class="code" title="function param = fwd_model_parameters( fwd_model )">fwd_model_parameters</a>	FWD_MODEL_PARAMETERS: data= fwd_solve_1st_order( fwd_model, image)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function hh= working_quiver( varargin )</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function show_slices_move( img, move, move_scale )</a>
+0002 <span class="comment">% SHOW_SLICES_MOVE   Shows planar slices of a 3D FEM with movement vectors</span>
+0003 <span class="comment">% if electrodes are visible on the slice.</span>
+0004 <span class="comment">% Args:     img  - eidors_obj type image</span>
+0005 <span class="comment">%           move - new position vectors for nodes [x,y,z] after movement</span>
+0006 
+0007 <span class="comment">% $Id: show_slices_move.m 4230 2013-06-20 13:06:27Z bgrychtol $</span>
+0008 
+0009 num_levs = 3;
+0010 
+0011 mdl = img.fwd_model;
+0012 elecs = length(mdl.electrode);
+0013 pos = zeros(elecs,3);
+0014 <span class="keyword">if</span> exist(<span class="string">'move'</span>) &amp;&amp; size(move,1) == size(mdl.nodes,1)
+0015     move_nodes = move;
+0016     move= zeros(elecs,3);
+0017 <span class="keyword">end</span>
+0018 <span class="keyword">for</span> e = 1:elecs;
+0019     <span class="keyword">if</span> isfield(mdl.electrode(e),<span class="string">'pos'</span>)
+0020        pos(e,:) = mean(mdl.electrode(e).pos);
+0021     <span class="keyword">else</span>
+0022        elec_nodes = mdl.electrode(e).nodes;
+0023        pos(e,:) = mean(mdl.nodes(elec_nodes,:),1);
+0024     <span class="keyword">end</span>
+0025     <span class="keyword">if</span> exist(<span class="string">'move_nodes'</span>);
+0026         move(e,:) = mean( move_nodes(elec_nodes,:), 1);
+0027     <span class="keyword">end</span>
+0028 <span class="keyword">end</span>
+0029 
+0030 elec_zmax = max(pos(:,3));
+0031 elec_zmin = min(pos(:,3));
+0032 
+0033 levels = inf*ones(num_levs,3);
+0034 levels(:,3) = [elec_zmax; elec_zmax-(elec_zmax - elec_zmin)/2; elec_zmin];
+0035 levels(:,4) = ones(num_levs,1);
+0036 levels(:,5) = (1:num_levs)';
+0037 
+0038 <a href="show_slices.html" class="code" title="function out_img= show_slices( img, levels )">show_slices</a>( img, levels );
+0039 
+0040 isize = <a href="calc_colours.html" class="code" title="function [colours,scl_data]= calc_colours(img, set_value, do_colourbar)">calc_colours</a>(<span class="string">'npoints'</span>);
+0041 toplayer = pos(:,3) &lt; levels(2,3); <span class="comment">% origin is top-left corner of image</span>
+0042 xofs = .5 + isize*(.5);
+0043 xscale = (100/104)*isize/2;
+0044 yofs = .5 + isize*(.5 + (num_levs-1)*toplayer);
+0045 yscale = -(100/104)*isize/2;
+0046 vx = pos(:,1) * xscale + xofs;
+0047 vy = pos(:,2) * yscale + yofs;
+0048 ecolour = [0,.3,0];
+0049 hh= line(vx, vy);
+0050 set(hh, <span class="string">'LineStyle'</span>,<span class="string">'none'</span>,<span class="string">'Marker'</span>,<span class="string">'.'</span>, <span class="keyword">...</span>
+0051     <span class="string">'MarkerSize'</span>,10,<span class="string">'MarkerEdgeColor'</span>,ecolour);
+0052 
+0053 pp = <a href="../../../eidors/solvers/forward/fwd_model_parameters.html" class="code" title="function param = fwd_model_parameters( fwd_model )">fwd_model_parameters</a>( mdl );
+0054 <span class="keyword">if</span> nargin == 1;
+0055     move = [];
+0056 <span class="keyword">end</span>
+0057 <span class="keyword">if</span> length(img.elem_data) &gt; pp.n_elem
+0058     move = reshape( <span class="keyword">...</span>
+0059         img.elem_data( pp.n_elem+(1:pp.n_elec*pp.n_dims) ), <span class="keyword">...</span>
+0060         pp.n_elec, pp.n_dims);
+0061 <span class="keyword">end</span>
+0062 
+0063 <span class="keyword">if</span> ~isempty( move )
+0064     nodes = img.fwd_model.nodes;
+0065 
+0066     <span class="comment">% zero mean movement for each electrode row; this is not quite legit</span>
+0067     idx = 1:16;
+0068     move(idx,:) = move(idx,:)- ones(16,1)*mean(move(idx,:));
+0069     <span class="keyword">if</span> length(img.fwd_model.electrode) == 32
+0070         idx = 17:32;
+0071         move(idx,:) = move(idx,:)- ones(16,1)*mean(move(idx,:));
+0072     <span class="keyword">end</span>
+0073     hold on;
+0074     <span class="keyword">if</span> nargin &lt; 3
+0075         move_scale = 20*isize;
+0076     <span class="keyword">end</span>
+0077     hh = <a href="#_sub1" class="code" title="subfunction hh= working_quiver( varargin )">working_quiver</a>( vx, vy, move_scale*move(:,1), <span class="keyword">...</span>
+0078         - move_scale*move(:,2), 0 );
+0079     set(hh,<span class="string">'Color'</span>, [0,.3,0], <span class="string">'LineWidth'</span>, 2, <span class="string">'Clipping'</span>, <span class="string">'off'</span>);
+0080     hold off;
+0081 <span class="keyword">end</span>
+0082 
+0083 <a name="_sub1" href="#_subfunctions" class="code">function hh= working_quiver( varargin )</a>
+0084 <span class="comment">% WORKING_QUIVER   Matlab has made a completely imcompatible</span>
+0085 <span class="comment">% quiver function which you can't call properly with different</span>
+0086 <span class="comment">% versions of matlab.</span>
+0087 
+0088 v = version;
+0089 octave = exist(<span class="string">'OCTAVE_VERSION'</span>) | str2num(v(1)) &lt; 7;
+0090 <span class="keyword">if</span> octave
+0091     hh = quiver( varargin{:} );
+0092 <span class="keyword">else</span>
+0093     hh = quiver(<span class="string">'v6'</span>, varargin{:} );
+0094 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

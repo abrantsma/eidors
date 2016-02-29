@@ -1,0 +1,348 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of fminsearch_octave</title>
+  <meta name="keywords" content="fminsearch_octave">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">eidors</a> &gt; <a href="index.html">overloads</a> &gt; fminsearch_octave.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/overloads&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>fminsearch_octave
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/models/mk_GREIT_model.html" class="code" title="function [imdl, weight]= mk_GREIT_model( fmdl, radius, weight, options )">mk_GREIT_model</a>	MK_GREIT_MODEL: make EIDORS inverse models using the GREIT approach</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [x, fval] = fminsearch (fun, x0, options = [])</a></li><li><a href="#_sub2" class="code">function [stopit, savit, dirn, trace, tol, maxiter] = parse_options( options, x );</a></li><li><a href="#_sub3" class="code">function [x, fmax, nf] = nmsmax(fun, x, options, savit, varargin)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 ## Copyright (C) 2003,2012 Andy Adler &lt;andy@analyti.ca&gt;
+0002 ## Copyright (C) 2002 N.J.Higham
+0003 ##
+0004 ## This file is part of Octave.
+0005 ##
+0006 ## Octave is free software; you can redistribute it and/or modify it
+0007 ## under the terms of the GNU General Public License as published by
+0008 ## the Free Software Foundation; either version 3 of the License, or (at
+0009 ## your option) any later version.
+0010 ##
+0011 ## Octave is distributed in the hope that it will be useful, but
+0012 ## WITHOUT ANY WARRANTY; without even the implied warranty of
+0013 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+0014 ## General Public License <span class="keyword">for</span> more details.
+0015 ##
+0016 ## You should have received a copy of the GNU General Public License
+0017 ## along with Octave; see the file COPYING.  If not, see
+0018 ## &lt;http://www.gnu.org/licenses/&gt;.
+0019 
+0020 
+0021 ## -*- texinfo -*-
+0022 ## @deftypefn {Function File} {@var{x} =} <a href="#_sub1" class="code" title="subfunction [x, fval] = fminsearch (fun, x0, options = [])">fminsearch</a> (@var{fun}, @var{x0})
+0023 ## @deftypefnx {Function File} {[@var{x}, @var{fval}] =} <a href="#_sub1" class="code" title="subfunction [x, fval] = fminsearch (fun, x0, options = [])">fminsearch</a> (@var{fun}, @var{x0}, @var{options})
+0024 ##
+0025 ## Attempts to find a value of @var{x} which minimizes the <span class="keyword">function</span> @var{fun}.
+0026 ## The search is initialized at the point @var{x0} and iterates using the Nelder &amp;
+0027 ## Mead Simplex algorithm. Options <span class="keyword">for</span> the search are provided in the parameter
+0028 ## @var{options} using the <span class="keyword">function</span> @code{optimset}. Currently, @{<a href="#_sub1" class="code" title="subfunction [x, fval] = fminsearch (fun, x0, options = [])">fminsearch</a>}
+0029 ## accepts the options: @code{TolX}, @code{MaxFunEvals}, @code{MaxIter}, @code{Display}.
+0030 ## For description of these options, see @ref{doc-optimset,,optimset}.
+0031 ##
+0032 ## On exit, the <span class="keyword">function</span> returns @var{x}, the approximate minimum point
+0033 ## and @var{fval}, the <span class="keyword">function</span> value thereof.
+0034 ##
+0035 ## @example
+0036 ## Example usage:
+0037 ##   <a href="#_sub1" class="code" title="subfunction [x, fval] = fminsearch (fun, x0, options = [])">fminsearch</a>(inline(<span class="string">'(x(1)-5).^2+(x(2)-8).^4'</span>,<span class="string">'x'</span>),[0;0])
+0038 ## or
+0039 ##   c=5;d=8;<a href="#_sub1" class="code" title="subfunction [x, fval] = fminsearch (fun, x0, options = [])">fminsearch</a>(@(x) (x(1)-c).^2+(x(2)-d).^4,[0;0])
+0040 ## @end example
+0041 ## @seealso{fminbnd}
+0042 ## @end deftypefn
+0043 
+0044 ## TODO: Doesn't support the syntax: <a href="#_sub1" class="code" title="subfunction [x, fval] = fminsearch (fun, x0, options = [])">fminsearch</a> (problem)
+0045 
+0046 <a name="_sub0" href="#_subfunctions" class="code">function [x, fval] = fminsearch (fun, x0, options = [])</a>
+0047 
+0048   <span class="keyword">if</span> (nargin &lt; 2)
+0049     print_usage ();
+0050   endif
+0051 
+0052   <span class="keyword">if</span> (isempty(options));
+0053     options = struct()
+0054   <span class="keyword">end</span>
+0055 
+0056   x = <a href="#_sub3" class="code" title="subfunction [x, fmax, nf] = nmsmax(fun, x, options, savit, varargin)">nmsmax</a>(fun,  x0, options);
+0057 
+0058   <span class="keyword">if</span> (nargin &gt;= 2)
+0059      fval = feval (fun, x);
+0060   endif
+0061 
+0062 endfunction
+0063 
+0064 ##NMSMAX  Nelder-Mead simplex method <span class="keyword">for</span> direct search optimization.
+0065 ##        [x, fmax, nf] = NMSMAX(FUN, x0, STOPIT, SAVIT) attempts to
+0066 ##        maximize the <span class="keyword">function</span> FUN, using the starting vector x0.
+0067 ##        The Nelder-Mead direct search method is used.
+0068 ##        Output arguments:
+0069 ##               x    = vector yielding largest <span class="keyword">function</span> value found,
+0070 ##               fmax = <span class="keyword">function</span> value at x,
+0071 ##               nf   = number of <span class="keyword">function</span> evaluations.
+0072 ##        The iteration is terminated when either
+0073 ##               - the relative size of the simplex is &lt;= STOPIT(1)
+0074 ##                 (default 1e-3),
+0075 ##               - STOPIT(2) <span class="keyword">function</span> evaluations have been performed
+0076 ##                 (default inf, i.e., no limit), or
+0077 ##               - a <span class="keyword">function</span> value equals or exceeds STOPIT(3)
+0078 ##                 (default inf, i.e., no test on <span class="keyword">function</span> values).
+0079 ##        The form of the initial simplex is determined by STOPIT(4):
+0080 ##           STOPIT(4) = 0: regular simplex (sides of equal length, the default)
+0081 ##           STOPIT(4) = 1: right-angled simplex.
+0082 ##        Progress of the iteration is not shown <span class="keyword">if</span> STOPIT(5) = 0 (default 1).
+0083 ##           STOPIT(6) indicates the direction (ie. minimization or 
+0084 ##                   maximization.) Default is 1, maximization.
+0085 ##                   set STOPIT(6)=-1 <span class="keyword">for</span> minimization
+0086 ##        If a non-empty fourth parameter string SAVIT is present, then
+0087 ##        `SAVE SAVIT x fmax nf' is executed after each inner iteration.
+0088 ##        NB: x0 can be a matrix.  In the output argument, in SAVIT saves,
+0089 ##            and in <span class="keyword">function</span> calls, x has the same shape as x0.
+0090 ##        NMSMAX(fun, x0, STOPIT, SAVIT, P1, P2,<span class="keyword">...</span><span class="comment">) allows additional</span>
+0091 ##        arguments to be passed to fun, via feval(fun,x,P1,P2,<span class="keyword">...</span><span class="comment">).</span>
+0092 ## References:
+0093 ## N. J. Higham, Optimization by direct search in matrix computations,
+0094 ##    SIAM J. Matrix Anal. Appl, 14(2): 317-333, 1993.
+0095 ## C. T. Kelley, Iterative Methods <span class="keyword">for</span> Optimization, Society <span class="keyword">for</span> Industrial
+0096 ##    and Applied Mathematics, Philadelphia, PA, 1999.
+0097 
+0098 # From Matrix Toolbox 
+0099 # Copyright (C) 2002 N.J.Higham
+0100 # www.maths.man.ac.uk/~higham/mctoolbox
+0101 #
+0102 # Modifications <span class="keyword">for</span> octave by A.Adler 2003
+0103 
+0104 <a name="_sub1" href="#_subfunctions" class="code">function [stopit, savit, dirn, trace, tol, maxiter] = parse_options( options, x );</a>
+0105 
+0106   <span class="comment">% Tolerance for cgce test based on relative size of simplex.</span>
+0107   stopit(1) = optimget(options, <span class="string">'TolX'</span>, 1e-4);
+0108   tol = stopit(1);
+0109 
+0110   <span class="comment">% Max no. of f-evaluations.</span>
+0111   stopit(2) = optimget(options, <span class="string">'MaxFunEvals'</span>, length(x)*200);
+0112 
+0113   <span class="comment">% Max no. of iterations</span>
+0114   maxiter = optimget(options, <span class="string">'MaxIter'</span>, length(x)*200);
+0115 
+0116   <span class="comment">% Default target for f-values.</span>
+0117   stopit(3) = inf;  <span class="comment">% TODO: expose this parameter to the outside</span>
+0118 
+0119   <span class="comment">% Default initial simplex.</span>
+0120   stopit(4) = 0;    <span class="comment">% TODO: expose this parameter to the outside</span>
+0121 
+0122   <span class="comment">% Default: show progress.</span>
+0123   Display = optimget(options, <span class="string">'Display'</span>, <span class="string">'notify'</span>);
+0124   <span class="keyword">switch</span> Display;
+0125     <span class="keyword">case</span> {<span class="string">'iter'</span>,<span class="string">'iter-detailed'</span>};
+0126       stopit(5) = 1; 
+0127     <span class="keyword">otherwise</span>;
+0128       stopit(5) = 0; 
+0129   <span class="keyword">end</span>
+0130   trace  = stopit(5);
+0131 
+0132   <span class="comment">% Use function to minimize, not maximize</span>
+0133   stopit(6) = -1;
+0134   dirn= stopit(6);
+0135 
+0136   <span class="comment">% File name for snapshots.</span>
+0137   savit = [];    <span class="comment">% TODO: expose this parameter to the outside</span>
+0138 
+0139 endfunction
+0140 
+0141 <a name="_sub2" href="#_subfunctions" class="code">function [x, fmax, nf] = nmsmax(fun, x, options, savit, varargin)</a>
+0142 
+0143   x0 = x(:);  <span class="comment">% Work with column vector internally.</span>
+0144   n = length(x0);
+0145 
+0146   [stopit, savit, dirn, trace, tol, maxiter] = <a href="#_sub2" class="code" title="subfunction [stopit, savit, dirn, trace, tol, maxiter] = parse_options( options, x );">parse_options</a>( options, x );
+0147 
+0148   V = [zeros(n,1) eye(n)];
+0149   f = zeros(n+1,1);
+0150   V(:,1) = x0;
+0151   f(1) = dirn*feval(fun,x,varargin{:});
+0152   fmax_old = f(1);
+0153 
+0154   <span class="keyword">if</span> trace, fprintf(<span class="string">'f(x0) = %9.4e\n'</span>, f(1)), <span class="keyword">end</span>
+0155 
+0156   k = 0; m = 0;
+0157 
+0158   <span class="comment">% Set up initial simplex.</span>
+0159   scale = max(norm(x0,inf),1);
+0160   <span class="keyword">if</span> (stopit(4) == 0)
+0161     <span class="comment">% Regular simplex - all edges have same length.</span>
+0162     <span class="comment">% Generated from construction given in reference [18, pp. 80-81] of [1].</span>
+0163     alpha = scale / (n*sqrt(2)) * [ sqrt(n+1)-1+n  sqrt(n+1)-1 ];
+0164     V(:,2:n+1) = (x0 + alpha(2)*ones(n,1)) * ones(1,n);
+0165     <span class="keyword">for</span> j = 2:n+1
+0166       V(j-1,j) = x0(j-1) + alpha(1);
+0167       x(:) = V(:,j);
+0168       f(j) = dirn*feval(fun,x,varargin{:});
+0169     <span class="keyword">end</span>
+0170   <span class="keyword">else</span>
+0171     <span class="comment">% Right-angled simplex based on co-ordinate axes.</span>
+0172     alpha = scale*ones(n+1,1);
+0173     <span class="keyword">for</span> j=2:n+1
+0174       V(:,j) = x0 + alpha(j)*V(:,j);
+0175       x(:) = V(:,j);
+0176       f(j) = dirn*feval(fun,x,varargin{:});
+0177     <span class="keyword">end</span>
+0178   <span class="keyword">end</span>
+0179   nf = n+1;
+0180   how = <span class="string">'initial  '</span>;
+0181 
+0182   [temp,j] = sort(f);
+0183   j = j(n+1:-1:1);
+0184   f = f(j); V = V(:,j);
+0185 
+0186   alpha = 1;  beta = 1/2;  gamma = 2;
+0187 
+0188   <span class="keyword">while</span> 1    <span class="comment">%%%%%% Outer (and only) loop.</span>
+0189     k = k+1;
+0190 
+0191     <span class="keyword">if</span> k &gt; maxiter
+0192       msg = [<span class="string">'Exceeded maximum iterations...quitting\n'</span>];
+0193       <span class="keyword">break</span>  <span class="comment">% Quit.</span>
+0194     <span class="keyword">end</span>
+0195 
+0196     fmax = f(1);
+0197     <span class="keyword">if</span> fmax &gt; fmax_old
+0198       <span class="keyword">if</span> ~isempty(savit)
+0199         x(:) = V(:,1); eval([<span class="string">'save '</span> savit <span class="string">' x fmax nf'</span>])
+0200       <span class="keyword">end</span>
+0201     <span class="keyword">end</span>
+0202     <span class="keyword">if</span> trace
+0203       fprintf(<span class="string">'Iter. %2.0f,'</span>, k)
+0204       fprintf([<span class="string">'  how = '</span> how <span class="string">'  '</span>]);
+0205       fprintf(<span class="string">'nf = %3.0f,  f = %9.4e  (%2.1f%%)\n'</span>, nf, fmax, <span class="keyword">...</span>
+0206               100*(fmax-fmax_old)/(abs(fmax_old)+eps))
+0207     <span class="keyword">end</span>
+0208     fmax_old = fmax;
+0209 
+0210     <span class="comment">%%% Three stopping tests from MDSMAX.M</span>
+0211 
+0212     <span class="comment">% Stopping Test 1 - f reached target value?</span>
+0213     <span class="keyword">if</span> fmax &gt;= stopit(3)
+0214       msg = [<span class="string">'Exceeded target...quitting\n'</span>];
+0215       <span class="keyword">break</span>  <span class="comment">% Quit.</span>
+0216     <span class="keyword">end</span>
+0217 
+0218     <span class="comment">% Stopping Test 2 - too many f-evals?</span>
+0219     <span class="keyword">if</span> nf &gt;= stopit(2)
+0220       msg = [<span class="string">'Max no. of function evaluations exceeded...quitting\n'</span>];
+0221       <span class="keyword">break</span>  <span class="comment">% Quit.</span>
+0222     <span class="keyword">end</span>
+0223 
+0224     <span class="comment">% Stopping Test 3 - converged?   This is test (4.3) in [1].</span>
+0225     v1 = V(:,1);
+0226     size_simplex = norm(V(:,2:n+1)-v1(:,ones(1,n)),1) / max(1, norm(v1,1));
+0227     <span class="keyword">if</span> size_simplex &lt;= tol
+0228       msg = sprintf(<span class="string">'Simplex size %9.4e &lt;= %9.4e...quitting\n'</span>, <span class="keyword">...</span>
+0229                      size_simplex, tol);
+0230       <span class="keyword">break</span>  <span class="comment">% Quit.</span>
+0231     <span class="keyword">end</span>
+0232 
+0233     <span class="comment">%  One step of the Nelder-Mead simplex algorithm</span>
+0234     <span class="comment">%  NJH: Altered function calls and changed CNT to NF.</span>
+0235     <span class="comment">%       Changed each `fr &lt; f(1)' type test to `&gt;' for maximization</span>
+0236     <span class="comment">%       and re-ordered function values after sort.</span>
+0237 
+0238     vbar = (sum(V(:,1:n)')/n)';  <span class="comment">% Mean value</span>
+0239     vr = (1 + alpha)*vbar - alpha*V(:,n+1);
+0240     x(:) = vr;
+0241     fr = dirn*feval(fun,x,varargin{:});
+0242     nf = nf + 1;
+0243     vk = vr;  fk = fr; how = <span class="string">'reflect, '</span>;
+0244     <span class="keyword">if</span> ( fr &gt; f(n) )
+0245       <span class="keyword">if</span> ( fr &gt; f(1) )
+0246         ve = gamma*vr + (1-gamma)*vbar;
+0247         x(:) = ve;
+0248         fe = dirn*feval(fun,x,varargin{:});
+0249         nf = nf + 1;
+0250         <span class="keyword">if</span> fe &gt; f(1)
+0251           vk = ve; fk = fe;
+0252           how = <span class="string">'expand,  '</span>;
+0253         <span class="keyword">end</span>
+0254       <span class="keyword">end</span>
+0255     <span class="keyword">else</span>
+0256       vt = V(:,n+1); ft = f(n+1);
+0257       <span class="keyword">if</span> fr &gt; ft
+0258         vt = vr;  ft = fr;
+0259       <span class="keyword">end</span>
+0260       vc = beta*vt + (1-beta)*vbar;
+0261       x(:) = vc;
+0262       fc = dirn*feval(fun,x,varargin{:});
+0263       nf = nf + 1;
+0264       <span class="keyword">if</span> ( fc &gt; f(n) )
+0265         vk = vc; fk = fc;
+0266         how = <span class="string">'contract,'</span>;
+0267       <span class="keyword">else</span>
+0268         <span class="keyword">for</span> j = 2:n
+0269           V(:,j) = (V(:,1) + V(:,j))/2;
+0270           x(:) = V(:,j);
+0271           f(j) = dirn*feval(fun,x,varargin{:});
+0272         <span class="keyword">end</span>
+0273         nf = nf + n-1;
+0274         vk = (V(:,1) + V(:,n+1))/2;
+0275         x(:) = vk;
+0276         fk = dirn*feval(fun,x,varargin{:});
+0277         nf = nf + 1;
+0278         how = <span class="string">'shrink,  '</span>;
+0279       <span class="keyword">end</span>
+0280     <span class="keyword">end</span>
+0281     V(:,n+1) = vk;
+0282     f(n+1) = fk;
+0283     [temp,j] = sort(f);
+0284     j = j(n+1:-1:1);
+0285     f = f(j); V = V(:,j);
+0286 
+0287   <span class="keyword">end</span>   <span class="comment">%%%%%% End of outer (and only) loop.</span>
+0288 
+0289   <span class="comment">% Finished.</span>
+0290   <span class="keyword">if</span> trace, fprintf(msg), <span class="keyword">end</span>
+0291   x(:) = V(:,1);
+0292 endfunction
+0293 
+0294 <span class="comment">%!shared opt0</span>
+0295 <span class="comment">%!assert ( fminsearch(@sin, 3, optimset('MaxIter',3)),  4.8750,  1e-4)</span>
+0296 <span class="comment">%!assert ( fminsearch(@sin, 3, optimset('MaxIter',30)),  4.7124, 1e-4)</span>
+0297 <span class="comment">%!shared c</span>
+0298 <span class="comment">%! c = 1.5;</span>
+0299 <span class="comment">%!assert ( fminsearch(@(x) x(1).^2+c*x(2).^2,[1;1]), [0;0], 1e-4)</span></pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

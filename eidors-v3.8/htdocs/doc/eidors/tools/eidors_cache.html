@@ -1,0 +1,713 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of eidors_cache</title>
+  <meta name="keywords" content="eidors_cache">
+  <meta name="description" content="EIDORS_CACHE Control eidors caching">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">eidors</a> &gt; <a href="index.html">tools</a> &gt; eidors_cache.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/tools&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>eidors_cache
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>EIDORS_CACHE Control eidors caching</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function varargout=eidors_cache( command, varargin ) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> EIDORS_CACHE Control eidors caching
+ Usage: eidors_cache( command, limit ) for cache management
+ Usage: eidors_cache(@function_handle, {params1, ... }) for shorthand
+        chashing in m-files
+
+ USAGE:
+   eidors_cache( 'clear_all' ) 
+   eidors_cache  clear
+
+   eidors_cache( 'clear_old'. timestamp );
+   eidors_cache( 'clear_new', timestamp );
+      - clear all variables older (or newer) than timestamp
+      - example:
+         time_now= now;
+         lots_of_eidors_calcs % don't need to cache this stuff
+         eidors_cache('clear_new',time_now);
+
+   eidors_cache( 'clear_max', memory_in_bytes );
+      - clear cache so it has less than memory_in_bytes
+
+   eidors_cache( 'cache_size', memory_in_bytes );
+      - set max cache size to be memory_in_bytes
+      - without 2nd arg will return current cache_size
+
+   eidors_cache( 'clear_name', cache_name )
+      - eg. eidors_cache( 'clear_name', 'inv_solve_diff_GN_one_step')
+      - clear all variables with name 
+
+   eidors_cache( 'clear_model_library' );
+      - clear the eidors model library directory
+      - NOTE: this function is experimental. 
+      - TODO: add a way to specify what to clear
+  
+   eidors_cache( 'boost_priority', value)
+      - modify the priority of the next cached items
+      - low priority variables will be deleted first when memory is tight
+
+   eidors_cache( 'off' )
+   eidors_cache( 'disable' )
+   eidors_cache( 'off', 'function_name' )
+      - new values are not added to cache
+      - requests for cached values return []
+      - if specified, only applies to a specific function
+
+   eidors_cache( 'on' )
+   eidors_cache( 'enable' )
+   eidors_cache( 'on', 'function_name' )
+      - re-enables caching
+      - if specified, only applies to a specific function
+
+   eidors_cache( 'status' )
+      - queries the caching status
+      - 0  : all off
+      - 1  : all on
+      - 0.5: off for some functions
+
+   eidors_cache( 'debug_on' )
+   eidors_cache( 'debug_on', 'function_name' )
+      - enables debug output
+      - if specified, only applies to a specific function
+      - will print a message everytime an object is removed from cache
+
+   eidors_cache( 'debug_off' )
+   eidors_cache( 'debug_off', 'function_name' );
+      - disables debug output
+      - if specified, only applies to a specific function
+
+   eidors_cache( 'debug_status' )
+      - queries debug status
+      - output analogous to cache status above
+
+   v1 = eidors_cache( @function_handle, {param1, param2, ...})
+   [v1, v2, ...] = eidors_cache( @function_handle, {param1, param2, ...})
+   [v1, v2, ...] = eidors_cache( ... , opt)
+      Shorthand interface for caching the output of a specific function.
+      Specify all arguments to the function as a cell array. They will all
+      be used for as a caching object by default. The following options
+      are available:
+        opt.cache_obj
+            - a single value, or a cell array of values to cache on, 
+              rather than all the inputs (e.g. not all values of an input
+              struct may be used in the function)
+        opt.boost_priority
+            - priority boost to use for that function
+        opt.fstr
+            - name to use for the cached result
+        opt.log_level
+            - message level to use with eidors_msg. By default, it's 4 for
+              'setting cache' and 3 for 'using cached value'
+
+   eidors_cache( 'cache_path' )
+   eidors_cache( 'cache_path', '/path/to/cache/path' )
+       - get and set cache_path, a path to a writable
+           directory in which eidors can store files
+
+   eidors_cache( 'eidors_path' )
+   eidors_cache( 'eidors_path', '/path/to/eidors/' )
+       - /path/to/eidors is the path in which eidors_startup.m is found
+
+ See also EIDORS_OBJ</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>	EIDORS_MSG eidors progress and status messages</li><li><a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>	EIDORS_OBJ: 'constructor' to create a eidors structure</li><li><a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>	EIDORS_CACHE Control eidors caching</li><li><a href="unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>	UNIT_TEST_CMP: compare matrices in eidors output</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>	EIDORS_OBJ: 'constructor' to create a eidors structure</li><li><a href="../../eidors/eidors_startup.html" class="code" title="function eidors_startup( path_array )">eidors_startup</a>	Script to start EIDORS</li><li><a href="../../eidors/graphics/matlab/mdl_slice_mapper.html" class="code" title="function map = mdl_slice_mapper( fmdl, maptype );">mdl_slice_mapper</a>	MDL_SLICE_MAPPER: map pixels to FEM elements or nodes</li><li><a href="../../eidors/graphics/matlab/mdl_slice_mesher.html" class="code" title="function [nimg out] = mdl_slice_mesher(fmdl,level,varargin)">mdl_slice_mesher</a>	MDL_SLICE_MESHER A slice of a 3D FEM as a 2D FEM</li><li><a href="../../eidors/meshing/calc_mesh_quality.html" class="code" title="function [Q mdl] = calc_mesh_quality(mdl, show)">calc_mesh_quality</a>	CALC_MESH_QUALITY Various measures of mesh quality.</li><li><a href="../../eidors/meshing/gmsh/call_gmsh.html" class="code" title="function status= call_gmsh(geo_file, dim,extra)">call_gmsh</a>	call_gmsh: call Gmsh to create a vol_file from a geo_file</li><li><a href="../../eidors/meshing/netgen/call_netgen.html" class="code" title="function status= call_netgen(geo_file, vol_file, msz_file, finelevel)">call_netgen</a>	CALL_NETGEN: call netgen to create a vol_file from a geo_file</li><li><a href="../../eidors/meshing/netgen/ng_mk_2d_model.html" class="code" title="function mdl = ng_mk_2d_model(varargin)">ng_mk_2d_model</a>	NG_MG_2D_MODELS create a 2D mesh with Netgen via the in2d interface</li><li><a href="../../eidors/models/analytic_2d_circle.html" class="code" title="function V = analytic_2d_circle(I, params)">analytic_2d_circle</a>	V = analytic_2d_circle(J, [s_h, s_i, b, a, angl])</li><li><a href="../../eidors/models/fix_model.html" class="code" title="function [mdl] = fix_model(mdl,opt)">fix_model</a>	FIX_MODEL: Add useful fields to a model</li><li><a href="../../eidors/models/get_elem_volume.html" class="code" title="function VOL = get_elem_volume( fwd_model, map_node )">get_elem_volume</a>	GET_ELEM_VOLUME: VOL = get_elem_volume(fwd_model, map_node )</li><li><a href="../../eidors/models/interp_mesh.html" class="code" title="function mdl_pts = interp_mesh( mdl, n_interp)">interp_mesh</a>	INTERP_MESH: calculate interpolation points onto mdl elements</li><li><a href="../../eidors/models/mk_GREIT_model.html" class="code" title="function [imdl, weight]= mk_GREIT_model( fmdl, radius, weight, options )">mk_GREIT_model</a>	MK_GREIT_MODEL: make EIDORS inverse models using the GREIT approach</li><li><a href="../../eidors/models/mk_c2f_circ_mapping.html" class="code" title="function [mapping failed] = mk_c2f_circ_mapping( mdl, xyzr );">mk_c2f_circ_mapping</a>	MK_C2F_CIRC_MAPPING: create a mapping matrix from circles/spheres to FEM</li><li><a href="../../eidors/models/mk_coarse_fine_mapping.html" class="code" title="function [mapping, outside] = mk_coarse_fine_mapping( f_mdl, c_mdl );">mk_coarse_fine_mapping</a>	MK_COARSE_FINE_MAPPING: create a mapping matrix from coarse to fine FEM</li><li><a href="../../eidors/models/mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>	MK_GRID_C2F - calculate a coarse2fine mapping for grid coarse models.</li><li><a href="../../eidors/models/mk_pixel_slice.html" class="code" title="function [imdl fmdl] = mk_pixel_slice(imdl,level,opt)">mk_pixel_slice</a>	MK_PIXEL_SLICE create a pixel model to reconstruct on</li><li><a href="../../eidors/models/mk_tet_c2f.html" class="code" title="function [c2f] = mk_tet_c2f(fmdl, rmdl, opt)">mk_tet_c2f</a>	MK_TET_C2F - calculate a coarse2fine mapping for two tet-based models.</li><li><a href="../../eidors/models/mk_tri_c2f.html" class="code" title="function c2f = mk_tri_c2f(fmdl,rmdl,opt)">mk_tri_c2f</a>	MK_TRI_C2F</li><li><a href="../../eidors/models/mk_voxel_volume.html" class="code" title="function [imdl, fmdl] = mk_voxel_volume(varargin)">mk_voxel_volume</a>	MK_VOXEL_VOLUME create a voxel model to reconstruct on</li><li><a href="../../eidors/models/simulate_2d_movement.html" class="code" title="function [vh,vi,xyr_pt]= simulate_2d_movement( n_sims, fmdl, rad_pr, movefcn )">simulate_2d_movement</a>	SIMULATE_2D_MOVEMENT simulate rotational movement in 2D</li><li><a href="../../eidors/models/simulate_3d_movement.html" class="code" title="function [vh,vi,xyzr_pt]= simulate_3d_movement( n_sims, fmdl, rad_pr,movefcn )">simulate_3d_movement</a>	SIMULATE_3D_MOVEMENT simulate rotational movement in 3D</li><li><a href="../../eidors/solvers/calc_JiRtRJt.html" class="code" title="function [JiRtRJt,iRtRJt] = calc_JiRtRJt( inv_model, varargin )">calc_JiRtRJt</a>	[JiRtRJt,iRtRJt] = calc_JiRtRJt( inv_model, varargin )</li><li><a href="../../eidors/solvers/calc_R_prior.html" class="code" title="function R_prior = calc_R_prior( inv_model, varargin )">calc_R_prior</a>	R = calc_R_prior( inv_model, varargin )</li><li><a href="../../eidors/solvers/calc_RtR_prior.html" class="code" title="function RtR_prior = calc_RtR_prior( inv_model )">calc_RtR_prior</a>	RtR = calc_RtR_prior( inv_model )</li><li><a href="../../eidors/solvers/calc_hyperparameter.html" class="code" title="function hyperparameter = calc_hyperparameter( inv_model )">calc_hyperparameter</a>	CALC_HYPERPARAMETER: calculate hyperparameter value</li><li><a href="../../eidors/solvers/calc_jacobian.html" class="code" title="function J = calc_jacobian( fwd_model, img)">calc_jacobian</a>	CALC_JACOBIAN: calculate jacobian from an inv_model</li><li><a href="../../eidors/solvers/calc_jacobian_bkgnd.html" class="code" title="function img_bkgnd = calc_jacobian_bkgnd( inv_model )">calc_jacobian_bkgnd</a>	CALC_JACOBIAN_BKGND: calculate background image around</li><li><a href="../../eidors/solvers/calc_meas_icov.html" class="code" title="function meas_icov = calc_meas_icov( inv_model )">calc_meas_icov</a>	meas_icov = calc_meas_icov( inv_model )</li><li><a href="../../eidors/solvers/calc_system_mat.html" class="code" title="function system_mat = calc_system_mat( fwd_model, img)">calc_system_mat</a>	CALC_SYSTEM_MAT: calculate FEM system matrix from fwd_model and image</li><li><a href="../../eidors/solvers/forward/calc_transferimpedance.html" class="code" title="function transfimp = calc_transferimpedance( img)">calc_transferimpedance</a>	CALC_TRANSFERIMPEDANCE: Calculates transfer impedance matrix</li><li><a href="../../eidors/solvers/forward/fem_1st_to_higher_order.html" class="code" title="function [boundary,elems,nodes]=fem_1st_to_higher_order(fwd_model)">fem_1st_to_higher_order</a>	FEM_1ST_TO_HIGH_ORDER:  Modify the FEM for high order FEM called as</li><li><a href="../../eidors/solvers/forward/fwd_model_parameters.html" class="code" title="function param = fwd_model_parameters( fwd_model )">fwd_model_parameters</a>	FWD_MODEL_PARAMETERS: data= fwd_solve_1st_order( fwd_model, image)</li><li><a href="../../eidors/solvers/forward/fwd_solve_1st_order.html" class="code" title="function data =fwd_solve_1st_order(fwd_model, img)">fwd_solve_1st_order</a>	FWD_SOLVE_1ST_ORDER: data= fwd_solve_1st_order( img)</li><li><a href="../../eidors/solvers/forward/system_mat_fields.html" class="code" title="function FC= system_mat_fields( fwd_model )">system_mat_fields</a>	SYSTEM_MAT_FIELDS: fields (elem to nodes) fraction of system mat</li><li><a href="../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>	FWD_SOLVE: calculate data from a fwd_model object and an image</li><li><a href="../../eidors/solvers/inv_solve.html" class="code" title="function img = inv_solve( inv_model, data1, data2)">inv_solve</a>	INV_SOLVE: calculate imag from an inv_model and data</li><li><a href="../../eidors/solvers/inverse/GREIT_desired_img_original.html" class="code" title="function PSF= GREIT_desired_img_original(xyc, radius, opt)">GREIT_desired_img_original</a>	GREIT_DESIRED_IMG_ORIGINAL The original desired solution for GREIT</li><li><a href="../../eidors/solvers/inverse/GREIT_desired_img_sigmoid.html" class="code" title="function PSF = GREIT_desired_img_sigmoid(xyz,radius, opt)">GREIT_desired_img_sigmoid</a>	GREIT_DESIRED_IMG_SIGMOID sigmoid-decay desired image function for GREIT</li><li><a href="../../eidors/solvers/inverse/calc_noise_figure.html" class="code" title="function [NF,SE] = calc_noise_figure( inv_model, hp, iterations)">calc_noise_figure</a>	CALC_NOISE_FIGURE: calculate the noise amplification (NF) of an algorithm</li><li><a href="../../eidors/solvers/inverse/choose_noise_figure.html" class="code" title="function HP= choose_noise_figure( inv_model );">choose_noise_figure</a>	CHOOSE_NOISE_FIGURE: choose hyperparameter based on NF calculation</li><li><a href="../../eidors/solvers/inverse/inv_solve_diff_GN_one_step.html" class="code" title="function img= inv_solve_diff_GN_one_step( inv_model, data1, data2)">inv_solve_diff_GN_one_step</a>	INV_SOLVE_DIFF_GN_ONE_STEP inverse solver using approach of Adler&Guardo 1996</li><li><a href="../../eidors/solvers/inverse/inv_solve_time_prior.html" class="code" title="function img= inv_solve_time_prior( inv_model, data1, data2)">inv_solve_time_prior</a>	INV_SOLVE_TIME_PRIOR inverse solver to account for time differences</li><li><a href="../../eidors/solvers/inverse/inv_solve_trunc_iterative.html" class="code" title="function img= inv_solve_trunc_iterative( inv_model, data1, data2)">inv_solve_trunc_iterative</a>	INV_SOLVE_TRUNC_ITERATIVE using Morozov truncated iteration</li><li><a href="../../eidors/solvers/inverse/nodal_solve.html" class="code" title="function img= nodal_solve( inv_model, data1, data2)">nodal_solve</a>	NODAL_SOLVE inverse solver using approach of Adler&Guardo 1996</li><li><a href="../../eidors/solvers/inverse/prior_covar.html" class="code" title="function Reg= prior_covar( inv_model )">prior_covar</a>	PRIOR_COVAR image prior with distance-based interelement covar</li><li><a href="../../eidors/solvers/inverse/prior_gaussian_HPF.html" class="code" title="function Reg= prior_gaussian_HPF( inv_model );">prior_gaussian_HPF</a>	PRIOR_GAUSSIAN_HPF calculate image prior</li><li><a href="../../eidors/solvers/inverse/prior_laplace.html" class="code" title="function Reg= prior_laplace( inv_model );">prior_laplace</a>	PRIOR_LAPLACE calculate image prior</li><li><a href="../../eidors/tests/cache_limit_test.html" class="code" title="function cache_limit_test">cache_limit_test</a>	Test cache deletes in the right order</li><li><a href="../../eidors/tests/calc_model_prior_test.html" class="code" title="function ok= calc_model_prior_test;">calc_model_prior_test</a>	Verify model prior calcs</li><li><a href="../../eidors/tests/test_c2f_jacobian.html" class="code" title="function test_c2f_jacobian">test_c2f_jacobian</a>	Test calc of jacobian given coarse to fine mapping</li><li><a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>	EIDORS_CACHE Control eidors caching</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [objid, sizes, clearidx] = clear_names_cache( name );</a></li><li><a href="#_sub2" class="code">function [objid, times, sizes, prios, priidx, names] = get_names_times;</a></li><li><a href="#_sub3" class="code">function remove_objids( objid, sizes, idx)</a></li><li><a href="#_sub4" class="code">function varargout = cache_shorthand(fhandle, varargin)</a></li><li><a href="#_sub5" class="code">function output = mk_varargout_str(N)</a></li><li><a href="#_sub6" class="code">function debug_msg(id,action)</a></li><li><a href="#_sub7" class="code">function do_unit_test</a></li><li><a href="#_sub8" class="code">function [v1 v2] = test_function(a,b,c,d)</a></li><li><a href="#_sub9" class="code">function test_debug</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function varargout=eidors_cache( command, varargin )</a>
+0002 <span class="comment">% EIDORS_CACHE Control eidors caching</span>
+0003 <span class="comment">% Usage: eidors_cache( command, limit ) for cache management</span>
+0004 <span class="comment">% Usage: eidors_cache(@function_handle, {params1, ... }) for shorthand</span>
+0005 <span class="comment">%        chashing in m-files</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% USAGE:</span>
+0008 <span class="comment">%   eidors_cache( 'clear_all' )</span>
+0009 <span class="comment">%   eidors_cache  clear</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%   eidors_cache( 'clear_old'. timestamp );</span>
+0012 <span class="comment">%   eidors_cache( 'clear_new', timestamp );</span>
+0013 <span class="comment">%      - clear all variables older (or newer) than timestamp</span>
+0014 <span class="comment">%      - example:</span>
+0015 <span class="comment">%         time_now= now;</span>
+0016 <span class="comment">%         lots_of_eidors_calcs % don't need to cache this stuff</span>
+0017 <span class="comment">%         eidors_cache('clear_new',time_now);</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%   eidors_cache( 'clear_max', memory_in_bytes );</span>
+0020 <span class="comment">%      - clear cache so it has less than memory_in_bytes</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">%   eidors_cache( 'cache_size', memory_in_bytes );</span>
+0023 <span class="comment">%      - set max cache size to be memory_in_bytes</span>
+0024 <span class="comment">%      - without 2nd arg will return current cache_size</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">%   eidors_cache( 'clear_name', cache_name )</span>
+0027 <span class="comment">%      - eg. eidors_cache( 'clear_name', 'inv_solve_diff_GN_one_step')</span>
+0028 <span class="comment">%      - clear all variables with name</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">%   eidors_cache( 'clear_model_library' );</span>
+0031 <span class="comment">%      - clear the eidors model library directory</span>
+0032 <span class="comment">%      - NOTE: this function is experimental.</span>
+0033 <span class="comment">%      - TODO: add a way to specify what to clear</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">%   eidors_cache( 'boost_priority', value)</span>
+0036 <span class="comment">%      - modify the priority of the next cached items</span>
+0037 <span class="comment">%      - low priority variables will be deleted first when memory is tight</span>
+0038 <span class="comment">%</span>
+0039 <span class="comment">%   eidors_cache( 'off' )</span>
+0040 <span class="comment">%   eidors_cache( 'disable' )</span>
+0041 <span class="comment">%   eidors_cache( 'off', 'function_name' )</span>
+0042 <span class="comment">%      - new values are not added to cache</span>
+0043 <span class="comment">%      - requests for cached values return []</span>
+0044 <span class="comment">%      - if specified, only applies to a specific function</span>
+0045 <span class="comment">%</span>
+0046 <span class="comment">%   eidors_cache( 'on' )</span>
+0047 <span class="comment">%   eidors_cache( 'enable' )</span>
+0048 <span class="comment">%   eidors_cache( 'on', 'function_name' )</span>
+0049 <span class="comment">%      - re-enables caching</span>
+0050 <span class="comment">%      - if specified, only applies to a specific function</span>
+0051 <span class="comment">%</span>
+0052 <span class="comment">%   eidors_cache( 'status' )</span>
+0053 <span class="comment">%      - queries the caching status</span>
+0054 <span class="comment">%      - 0  : all off</span>
+0055 <span class="comment">%      - 1  : all on</span>
+0056 <span class="comment">%      - 0.5: off for some functions</span>
+0057 <span class="comment">%</span>
+0058 <span class="comment">%   eidors_cache( 'debug_on' )</span>
+0059 <span class="comment">%   eidors_cache( 'debug_on', 'function_name' )</span>
+0060 <span class="comment">%      - enables debug output</span>
+0061 <span class="comment">%      - if specified, only applies to a specific function</span>
+0062 <span class="comment">%      - will print a message everytime an object is removed from cache</span>
+0063 <span class="comment">%</span>
+0064 <span class="comment">%   eidors_cache( 'debug_off' )</span>
+0065 <span class="comment">%   eidors_cache( 'debug_off', 'function_name' );</span>
+0066 <span class="comment">%      - disables debug output</span>
+0067 <span class="comment">%      - if specified, only applies to a specific function</span>
+0068 <span class="comment">%</span>
+0069 <span class="comment">%   eidors_cache( 'debug_status' )</span>
+0070 <span class="comment">%      - queries debug status</span>
+0071 <span class="comment">%      - output analogous to cache status above</span>
+0072 <span class="comment">%</span>
+0073 <span class="comment">%   v1 = eidors_cache( @function_handle, {param1, param2, ...})</span>
+0074 <span class="comment">%   [v1, v2, ...] = eidors_cache( @function_handle, {param1, param2, ...})</span>
+0075 <span class="comment">%   [v1, v2, ...] = eidors_cache( ... , opt)</span>
+0076 <span class="comment">%      Shorthand interface for caching the output of a specific function.</span>
+0077 <span class="comment">%      Specify all arguments to the function as a cell array. They will all</span>
+0078 <span class="comment">%      be used for as a caching object by default. The following options</span>
+0079 <span class="comment">%      are available:</span>
+0080 <span class="comment">%        opt.cache_obj</span>
+0081 <span class="comment">%            - a single value, or a cell array of values to cache on,</span>
+0082 <span class="comment">%              rather than all the inputs (e.g. not all values of an input</span>
+0083 <span class="comment">%              struct may be used in the function)</span>
+0084 <span class="comment">%        opt.boost_priority</span>
+0085 <span class="comment">%            - priority boost to use for that function</span>
+0086 <span class="comment">%        opt.fstr</span>
+0087 <span class="comment">%            - name to use for the cached result</span>
+0088 <span class="comment">%        opt.log_level</span>
+0089 <span class="comment">%            - message level to use with eidors_msg. By default, it's 4 for</span>
+0090 <span class="comment">%              'setting cache' and 3 for 'using cached value'</span>
+0091 <span class="comment">%</span>
+0092 <span class="comment">%   eidors_cache( 'cache_path' )</span>
+0093 <span class="comment">%   eidors_cache( 'cache_path', '/path/to/cache/path' )</span>
+0094 <span class="comment">%       - get and set cache_path, a path to a writable</span>
+0095 <span class="comment">%           directory in which eidors can store files</span>
+0096 <span class="comment">%</span>
+0097 <span class="comment">%   eidors_cache( 'eidors_path' )</span>
+0098 <span class="comment">%   eidors_cache( 'eidors_path', '/path/to/eidors/' )</span>
+0099 <span class="comment">%       - /path/to/eidors is the path in which eidors_startup.m is found</span>
+0100 <span class="comment">%</span>
+0101 <span class="comment">% See also EIDORS_OBJ</span>
+0102 
+0103 <span class="comment">% (C) 2005-2013 Andy Adler and Bartlomiej Grychtol.</span>
+0104 <span class="comment">% License: GPL version 2</span>
+0105 <span class="comment">% $Id: eidors_cache.m 4938 2015-05-08 16:57:08Z aadler $</span>
+0106 
+0107 <span class="comment">% Comments</span>
+0108 <span class="comment">% Want to clear specific structures</span>
+0109 <span class="comment">%      to clear old variables</span>
+0110 <span class="comment">%      to clear specific parts of structures</span>
+0111 
+0112 <span class="keyword">if</span> nargin==1 &amp;&amp; isstr(command) &amp;&amp; strcmp(command,<span class="string">'UNIT_TEST'</span>);
+0113       <a href="#_sub7" class="code" title="subfunction do_unit_test">do_unit_test</a>; <span class="keyword">return</span>; <span class="keyword">end</span>
+0114 
+0115 <span class="keyword">global</span> eidors_objects;
+0116 <span class="keyword">if</span> nargin&lt;1
+0117    fprintf(<span class="string">'EIDORS_CACHE: current max memory = %.0f MB\n'</span>, <span class="keyword">...</span>
+0118          eidors_objects.max_cache_size/(1024*1024)); 
+0119    ww= whos(<span class="string">'eidors_objects'</span>);
+0120    fprintf(<span class="string">'EIDORS_CACHE: cache memory used = %.0f MB\n'</span>, <span class="keyword">...</span>
+0121          ww.bytes/(1024*1024)); 
+0122    fprintf(<span class="string">'EIDORS_CACHE: current priority = %d\n'</span>, <span class="keyword">...</span>
+0123          eidors_objects.cache_priority); 
+0124    <span class="keyword">return</span>;
+0125 <span class="keyword">elseif</span> nargin &gt; 1 
+0126    limit = varargin{1};
+0127 <span class="keyword">end</span>
+0128 
+0129 <span class="keyword">if</span> isa(command, <span class="string">'function_handle'</span>)
+0130       str = func2str(command);
+0131       <span class="keyword">if</span> str(1) == <span class="string">'@'</span>
+0132          error(<span class="string">'Cannot cache anonymous functions'</span>);
+0133       <span class="keyword">end</span>
+0134 <span class="keyword">end</span>
+0135 
+0136 <span class="keyword">if</span> isa(command, <span class="string">'function_handle'</span>) || (ischar(command) &amp;&amp; exist(command) == 2) <span class="comment">% an m-file</span>
+0137    output = <a href="#_sub5" class="code" title="subfunction output = mk_varargout_str(N)">mk_varargout_str</a>(nargout);
+0138    eval(sprintf(<span class="string">'%s = %s'</span>, output, <span class="string">'cache_shorthand(command, varargin{:});'</span>));
+0139    <span class="keyword">return</span>
+0140 <span class="keyword">end</span>
+0141 
+0142     
+0143 <span class="keyword">switch</span> command
+0144    <span class="keyword">case</span> <span class="string">'init'</span>
+0145       eidors_objects.cache_enable = 1;
+0146       eidors_objects.cache_disabled_on = [];
+0147       eidors_objects.cache_debug_enable = 0;
+0148       eidors_objects.cache_debug_enabled_on = [];
+0149       
+0150    <span class="keyword">case</span> <span class="string">'clear_all'</span>
+0151       [objid, times, sizes, prios, priidx] = get_names_times;
+0152       <a href="#_sub3" class="code" title="subfunction remove_objids( objid, sizes, idx)">remove_objids</a>( objid, sizes,  1:length(sizes) );
+0153 
+0154    <span class="keyword">case</span> <span class="string">'clear'</span>
+0155      <span class="keyword">switch</span> nargin
+0156        <span class="keyword">case</span> 2
+0157         <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'clear_name'</span>,limit);
+0158        <span class="keyword">case</span> 1
+0159         <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'clear_all'</span>);
+0160        <span class="keyword">otherwise</span>
+0161          error(<span class="string">'Wrong number of inputs'</span>);
+0162      <span class="keyword">end</span>
+0163       
+0164    <span class="keyword">case</span> <span class="string">'cache_size'</span>
+0165       <span class="keyword">if</span> nargin==2
+0166       <span class="keyword">if</span> ischar(limit); limit= str2num(limit); <span class="keyword">end</span>
+0167          eidors_objects.max_cache_size = limit;
+0168       <span class="keyword">else</span>
+0169          varargout{1}= eidors_objects.max_cache_size;
+0170       <span class="keyword">end</span>
+0171 
+0172    <span class="keyword">case</span> <span class="string">'cache_path'</span>
+0173       <span class="keyword">if</span> nargin == 1
+0174          varargout{1}= eidors_objects.cache_path;
+0175       <span class="keyword">else</span>
+0176          eidors_objects.cache_path = varargin{1};
+0177       <span class="keyword">end</span>
+0178 
+0179    <span class="keyword">case</span> <span class="string">'eidors_path'</span>
+0180       <span class="keyword">if</span> nargin == 1
+0181          varargout{1}= eidors_objects.eidors_path;
+0182       <span class="keyword">else</span>
+0183          eidors_objects.eidors_path = varargin{1};
+0184       <span class="keyword">end</span>
+0185    <span class="keyword">case</span> {<span class="string">'disable'</span> <span class="string">'off'</span>}
+0186        <span class="keyword">if</span> nargin == 1
+0187            eidors_objects.cache_enable = 0;
+0188            eidors_objects.cache_disabled_on = {};
+0189        <span class="keyword">else</span>
+0190            eidors_objects.cache_enable = 0.5;
+0191            <span class="keyword">if</span> isfield(eidors_objects,<span class="string">'cache_disabled_on'</span>)
+0192             <span class="keyword">if</span> ~any(strcmp(eidors_objects.cache_disabled_on, limit))
+0193                 eidors_objects.cache_disabled_on = [<span class="keyword">...</span>
+0194                     eidors_objects.cache_disabled_on; {limit}];
+0195             <span class="keyword">end</span>
+0196            <span class="keyword">else</span>
+0197                eidors_objects.cache_disabled_on =  {limit};
+0198            <span class="keyword">end</span>
+0199        <span class="keyword">end</span>
+0200    <span class="keyword">case</span> {<span class="string">'enable'</span> <span class="string">'on'</span>}
+0201        <span class="keyword">if</span> nargin == 1
+0202            eidors_objects.cache_enable = 1;
+0203            eidors_objects.cache_disabled_on = {};
+0204        <span class="keyword">else</span>
+0205            <span class="keyword">if</span> isfield(eidors_objects,<span class="string">'cache_disabled_on'</span>)
+0206                idx = strcmp(eidors_objects.cache_disabled_on, limit);
+0207                eidors_objects.cache_disabled_on(idx) = [];
+0208            <span class="keyword">else</span> 
+0209                eidors_objects.cache_disabled_on = [];
+0210            <span class="keyword">end</span>
+0211            <span class="keyword">if</span> isempty(eidors_objects.cache_disabled_on)
+0212                eidors_objects.cache_enable = 1;
+0213            <span class="keyword">end</span>
+0214        <span class="keyword">end</span>
+0215    <span class="keyword">case</span> <span class="string">'status'</span>
+0216       <span class="keyword">if</span> nargin == 1
+0217          <span class="keyword">try</span>
+0218             varargout{1} = eidors_objects.cache_enable;
+0219          <span class="keyword">catch</span>
+0220             varargout{1} = 1;
+0221          <span class="keyword">end</span>
+0222       <span class="keyword">else</span>
+0223          <span class="keyword">if</span> isfield(eidors_objects,<span class="string">'cache_disabled_on'</span>)
+0224             idx = strcmp(eidors_objects.cache_disabled_on, limit);
+0225             varargout{1} = double(~any(idx));
+0226          <span class="keyword">end</span>
+0227       <span class="keyword">end</span>
+0228    <span class="keyword">case</span> <span class="string">'debug_status'</span>
+0229       <span class="keyword">if</span> nargin == 1
+0230          varargout{1} = eidors_objects.cache_debug_enable;
+0231       <span class="keyword">else</span>
+0232          <span class="keyword">if</span> isfield(eidors_objects,<span class="string">'cache_debug_enabled_on'</span>)
+0233             idx = strcmp(eidors_objects.cache_debug_enabled_on, limit);
+0234             varargout{1} = double(any(idx)) | eidors_objects.cache_debug_enable==1;
+0235          <span class="keyword">end</span>
+0236       <span class="keyword">end</span>
+0237    <span class="keyword">case</span> <span class="string">'debug_on'</span>
+0238        <span class="keyword">if</span> nargin == 1
+0239            eidors_objects.cache_debug_enable = 1;
+0240            eidors_objects.cache_debug_enabled_on = {};
+0241        <span class="keyword">else</span>
+0242            eidors_objects.cache_debug_enable = 0.5;
+0243            <span class="keyword">if</span> isfield(eidors_objects,<span class="string">'cache_debug_enabled_on'</span>)
+0244             <span class="keyword">if</span> ~any(strcmp(eidors_objects.cache_debug_enabled_on, limit))
+0245                 eidors_objects.cache_debug_enabled_on = [<span class="keyword">...</span>
+0246                     eidors_objects.cache_debug_enabled_on; {limit}];
+0247             <span class="keyword">end</span>
+0248            <span class="keyword">else</span>
+0249                eidors_objects.cache_debug_enabled_on =  {limit};
+0250            <span class="keyword">end</span>
+0251        <span class="keyword">end</span>
+0252    <span class="keyword">case</span> <span class="string">'debug_off'</span>
+0253       <span class="keyword">if</span> nargin == 1
+0254          eidors_objects.cache_debug_enable = 0;
+0255          eidors_objects.cache_debug_enabled_on = {};
+0256       <span class="keyword">else</span>
+0257          <span class="keyword">if</span> isfield(eidors_objects,<span class="string">'cache_debug_enabled_on'</span>)
+0258             idx = strcmp(eidors_objects.cache_debug_enabled_on, limit);
+0259             eidors_objects.cache_debug_enabled_on(idx) = [];
+0260          <span class="keyword">else</span>
+0261             eidors_objects.cache_debug_enabled_on = [];
+0262          <span class="keyword">end</span>
+0263          <span class="keyword">if</span> isempty(eidors_objects.cache_debug_enabled_on)
+0264             eidors_objects.cache_debug_enable = 0;
+0265          <span class="keyword">end</span>
+0266       <span class="keyword">end</span>
+0267    <span class="keyword">case</span> <span class="string">'boost_priority'</span>
+0268       <span class="keyword">try</span>
+0269          varargout{1}= eidors_objects.cache_priority;
+0270       <span class="keyword">catch</span>
+0271          varargout{1}= 0; <span class="comment">% default priority</span>
+0272       <span class="keyword">end</span>
+0273       <span class="keyword">if</span> nargin==2
+0274       <span class="keyword">if</span> ischar(limit); limit= str2num(limit); <span class="keyword">end</span>
+0275          varargout{1} = varargout{1} + limit;
+0276       <span class="keyword">end</span>
+0277       eidors_objects.cache_priority = varargout{1};
+0278 
+0279    <span class="keyword">case</span> {<span class="string">'list'</span>, <span class="string">'show_objs'</span>}
+0280       [objid, times, sizes, prios, priidx, names] = get_names_times;
+0281       
+0282       idx = 1:length(times);
+0283       <span class="keyword">if</span> nargin == 2
+0284         idx = find(arrayfun(@(c) ismember(limit, c{:}), names));
+0285       <span class="keyword">end</span>
+0286       
+0287       <span class="keyword">for</span> i=idx
+0288          fprintf(<span class="string">'%s b=%9.0d p=%02d, i=%05d: %s { %s }\n'</span>, datestr(times(i),<span class="string">'yyyy-mm-dd HH:MM:SS.FFF'</span>), <span class="keyword">...</span><span class="comment"> %today</span>
+0289              sizes(i), prios(i), priidx(i), objid{i}, names{i}{:} );
+0290       <span class="keyword">end</span>
+0291 
+0292       
+0293       
+0294    <span class="keyword">case</span> <span class="string">'clear_max'</span>
+0295       <span class="keyword">if</span> ischar(limit); limit= str2num(limit); <span class="keyword">end</span>
+0296 <span class="comment">% This will remove just in order of priidx.</span>
+0297 <span class="comment">%     remove_objids( objid, sizes,  find(cumsum(sizes) &gt; limit) );</span>
+0298 <span class="comment">% Remove in order of time + priority</span>
+0299       [objid, times, sizes, prios, priidx] = get_names_times;
+0300       tot=     cumsum(sizes(priidx)); 
+0301       remove = find(tot &gt; limit);
+0302       rmidx=   priidx(remove);
+0303       <a href="#_sub3" class="code" title="subfunction remove_objids( objid, sizes, idx)">remove_objids</a>( objid, sizes,  rmidx);
+0304 
+0305    <span class="keyword">case</span> <span class="string">'clear_old'</span>
+0306       <span class="keyword">if</span> ischar(limit); limit= str2num(limit); <span class="keyword">end</span>
+0307       [objid, times, sizes, prios, priidx] = get_names_times;
+0308       <a href="#_sub3" class="code" title="subfunction remove_objids( objid, sizes, idx)">remove_objids</a>( objid, sizes, <span class="keyword">...</span>
+0309          find(times &lt; limit));
+0310 
+0311    <span class="keyword">case</span> <span class="string">'clear_new'</span>
+0312       <span class="keyword">if</span> ischar(limit); limit= str2num(limit); <span class="keyword">end</span>
+0313       [objid, times, sizes, prios, priidx] = get_names_times;
+0314       <a href="#_sub3" class="code" title="subfunction remove_objids( objid, sizes, idx)">remove_objids</a>( objid, sizes,  <span class="keyword">...</span>
+0315          find(times &gt; limit) );
+0316 
+0317    <span class="keyword">case</span> <span class="string">'clear_model_library'</span>
+0318       <span class="comment">%TODO: add ways to select what to delete</span>
+0319       delete([eidors_objects.model_cache,<span class="string">'/*.mat'</span>]);
+0320 
+0321    <span class="keyword">case</span> <span class="string">'clear_name'</span>
+0322       [objid, sizes, clearidx] = <a href="#_sub1" class="code" title="subfunction [objid, sizes, clearidx] = clear_names_cache( name );">clear_names_cache</a>( limit );
+0323       <a href="#_sub3" class="code" title="subfunction remove_objids( objid, sizes, idx)">remove_objids</a>( objid, sizes, clearidx);
+0324       
+0325    <span class="keyword">case</span> <span class="string">'dump'</span>
+0326       varargout{1} = eidors_objects;
+0327       
+0328    <span class="keyword">case</span> <span class="string">'load'</span>
+0329       eidors_objects = limit;
+0330       
+0331    <span class="keyword">otherwise</span>
+0332       error(<span class="string">'command %s not understood'</span>,command);
+0333 <span class="keyword">end</span>
+0334 
+0335 
+0336 <a name="_sub1" href="#_subfunctions" class="code">function [objid, sizes, clearidx] = clear_names_cache( name );</a>
+0337    objid={}; times=[]; clearidx= [];
+0338    <span class="keyword">global</span> eidors_objects;
+0339    <span class="keyword">if</span> isempty(eidors_objects); <span class="keyword">return</span>; <span class="keyword">end</span>
+0340    idx=1;
+0341    <span class="keyword">for</span> fn= fieldnames(eidors_objects)'
+0342       fn1= fn{1};
+0343       <span class="keyword">if</span> fn1(1:3)== <span class="string">'id_'</span>
+0344          objid{idx}= fn1;
+0345          obj = getfield(eidors_objects, fn1 );
+0346          ww= whos(<span class="string">'obj'</span>);
+0347          sizes(idx) = ww.bytes;
+0348 
+0349          cache= getfield(obj,<span class="string">'cache'</span>);
+0350          <span class="keyword">if</span> isfield(getfield(obj,<span class="string">'cache'</span>), name);
+0351            clearidx(end+1) = idx;
+0352          <span class="keyword">end</span>
+0353 
+0354          idx= idx+1;
+0355       <span class="keyword">end</span>
+0356    <span class="keyword">end</span>
+0357 
+0358 <span class="comment">% priidx is priority index, where 1 prio is 0.1 of a day</span>
+0359 <a name="_sub2" href="#_subfunctions" class="code">function [objid, times, sizes, prios, priidx, names] = get_names_times;</a>
+0360    objid={}; times=[]; sizes=[]; pri=[]; prios=[]; priidx=[];names={};
+0361    <span class="keyword">global</span> eidors_objects;
+0362    <span class="keyword">if</span> isempty(eidors_objects); <span class="keyword">return</span>; <span class="keyword">end</span>
+0363    idx=1;
+0364    <span class="keyword">for</span> fn= fieldnames(eidors_objects)'
+0365       fn1= fn{1};
+0366       <span class="keyword">if</span> fn1(1:3)== <span class="string">'id_'</span>
+0367          objid{idx}= fn1;
+0368 
+0369          obj = getfield(eidors_objects, fn1 );
+0370          <span class="keyword">try</span>
+0371             times(idx) = obj.last_used;
+0372          <span class="keyword">catch</span>
+0373             times(idx) = 0; <span class="comment">% old</span>
+0374          <span class="keyword">end</span>
+0375          <span class="keyword">try</span>
+0376             prios(idx) = obj.priority;
+0377          <span class="keyword">catch</span>
+0378             prios(idx) = 0; <span class="comment">% default</span>
+0379          <span class="keyword">end</span>
+0380          names(idx) = {fieldnames(obj.cache)};
+0381          ww= whos(<span class="string">'obj'</span>);
+0382          sizes(idx) = ww.bytes;
+0383 
+0384          idx= idx+1;
+0385       <span class="keyword">end</span>
+0386    <span class="keyword">end</span>
+0387 
+0388    <span class="comment">% sort from recent (high) to old (low)</span>
+0389    [times, idx] = sort(-times);
+0390    times= -times;
+0391    objid= objid(idx);
+0392    sizes= sizes(idx);
+0393    prios= prios(idx);
+0394    names= names(idx);
+0395    <span class="comment">% sort from high to low priority and recent (high) to old (low)</span>
+0396    [jnk, priidx] = sortrows([-prios(:), -times(:)]);
+0397 
+0398 <a name="_sub3" href="#_subfunctions" class="code">function remove_objids( objid, sizes, idx)</a>
+0399    <span class="keyword">global</span> eidors_objects;
+0400    
+0401    <span class="keyword">switch</span> <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'debug_status'</span>)
+0402       <span class="keyword">case</span> 1
+0403          <span class="keyword">for</span> i = 1:length(idx)
+0404             <a href="#_sub6" class="code" title="subfunction debug_msg(id,action)">debug_msg</a>(objid{idx(i)},<span class="string">'removed'</span>);
+0405          <span class="keyword">end</span>
+0406       <span class="keyword">case</span> 0.5
+0407          <span class="keyword">for</span> i = 1:length(idx)
+0408             flds = fieldnames(eidors_objects.(objid{idx(i)}).cache);
+0409             <span class="keyword">for</span> j = 1:numel(flds)
+0410                <span class="keyword">if</span> <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'debug_status'</span>,flds)
+0411                   <a href="#_sub6" class="code" title="subfunction debug_msg(id,action)">debug_msg</a>(objid{idx(i)}, <span class="string">'removed'</span>);
+0412                   <span class="keyword">break</span>
+0413                <span class="keyword">end</span>
+0414             <span class="keyword">end</span>
+0415          <span class="keyword">end</span>
+0416    <span class="keyword">end</span>
+0417    
+0418    eidors_objects= rmfield( eidors_objects, objid( idx ) );
+0419    <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'Removed %d objects with %d bytes from cache'</span>, <span class="keyword">...</span>
+0420           length(idx), sum(sizes(idx)), 2 );
+0421 
+0422        
+0423 <a name="_sub4" href="#_subfunctions" class="code">function varargout = cache_shorthand(fhandle, varargin)</a>
+0424 <span class="comment">% Will cache on all function inputs, unless opt.cache_obj is specified</span>
+0425    args = varargin{1};
+0426    <span class="keyword">if</span> ~iscell(args)
+0427       args = {args};
+0428    <span class="keyword">end</span>
+0429    
+0430    <span class="keyword">if</span> nargin &gt;2
+0431       opt = varargin{2};
+0432    <span class="keyword">else</span>
+0433       opt = struct;
+0434    <span class="keyword">end</span>
+0435    <span class="keyword">if</span> ischar(opt)
+0436       fstr = opt; clear opt;
+0437       opt.fstr = fstr;
+0438    <span class="keyword">end</span>
+0439    <span class="keyword">if</span> isfield(opt, <span class="string">'cache_obj'</span>);
+0440       cache_obj = opt.cache_obj;
+0441       <span class="keyword">if</span> ~iscell(cache_obj)
+0442          cache_obj = {cache_obj};
+0443       <span class="keyword">end</span>
+0444    <span class="keyword">else</span>
+0445       cache_obj = args;
+0446    <span class="keyword">end</span>
+0447    <span class="keyword">try</span>
+0448       fstr = opt.fstr;
+0449    <span class="keyword">catch</span>
+0450       fstr = func2str(fhandle);
+0451    <span class="keyword">end</span>
+0452    <span class="keyword">if</span> isfield(opt, <span class="string">'log_level'</span>)
+0453        level_in = opt.log_level;
+0454        level_out = opt.log_level;
+0455    <span class="keyword">else</span>
+0456        level_in = 4;
+0457        level_out = 3;
+0458    <span class="keyword">end</span>
+0459    
+0460    varargout = <a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'get-cache'</span>, cache_obj, fstr );
+0461    <span class="keyword">if</span> numel(varargout) &lt; nargout
+0462       <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'@@ (Re)calculating %s'</span>,fstr, level_in);
+0463       output = <a href="#_sub5" class="code" title="subfunction output = mk_varargout_str(N)">mk_varargout_str</a>(nargout);
+0464       varargout = cell(0);
+0465       eval(sprintf(<span class="string">'%s = %s'</span>, output, <span class="string">'feval(fhandle,args{:});'</span>));
+0466       
+0467       <span class="keyword">if</span> isfield(opt,<span class="string">'boost_priority'</span>);
+0468          <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'boost_priority'</span>,opt.boost_priority);
+0469       <span class="keyword">end</span>
+0470       
+0471       <a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'set-cache'</span>, cache_obj, fstr, varargout);
+0472       
+0473       <span class="keyword">if</span> isfield(opt,<span class="string">'boost_priority'</span>);
+0474          <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'boost_priority'</span>,-opt.boost_priority);
+0475       <span class="keyword">end</span>
+0476       <span class="keyword">return</span>
+0477    <span class="keyword">end</span>
+0478    <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'%s: Using cached value'</span>,fstr,level_out);
+0479 
+0480 <a name="_sub5" href="#_subfunctions" class="code">function output = mk_varargout_str(N)</a>
+0481 output = <span class="string">'['</span>;
+0482 <span class="keyword">for</span> i = 1:N
+0483    output = [ output sprintf(<span class="string">'varargout{%d} '</span>,i)];
+0484 <span class="keyword">end</span>
+0485 output = [ output <span class="string">']'</span> ];
+0486 
+0487 <a name="_sub6" href="#_subfunctions" class="code">function debug_msg(id,action)</a>
+0488 <span class="keyword">global</span> eidors_objects;
+0489 name = fieldnames(eidors_objects.(id).cache);
+0490 fprintf(<span class="string">'EIDORS_CACHE: %s %s {'</span>, action, id);
+0491 fprintf(<span class="string">' %s'</span>, name{:});
+0492 fprintf(<span class="string">' }\n'</span>);
+0493 <span class="comment">% dbstack could be useful too</span>
+0494 
+0495 <a name="_sub7" href="#_subfunctions" class="code">function do_unit_test</a>
+0496 
+0497    ll= <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>);
+0498    <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,5);
+0499    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>
+0500    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'clear_all'</span>);
+0501    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>
+0502    <a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'set-cache'</span>, rand(1) , <span class="string">'t1'</span>, rand(2e3));
+0503    <a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'set-cache'</span>, rand(1) , <span class="string">'t2'</span>, rand(2e3));
+0504    <a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'set-cache'</span>, rand(1) , <span class="string">'t3'</span>, rand(2e3));
+0505    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'clear_name'</span>,<span class="string">'t3'</span>);
+0506    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>
+0507    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'clear_max'</span>, 34e6);
+0508    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>
+0509    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'boost_priority'</span>, 1);
+0510    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>
+0511    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'boost_priority'</span>, -1);
+0512    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>
+0513    [v1] = <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(@<a href="#_sub8" class="code" title="subfunction [v1 v2] = test_function(a,b,c,d)">test_function</a>,{3,4});
+0514    [v2] = <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(@<a href="#_sub8" class="code" title="subfunction [v1 v2] = test_function(a,b,c,d)">test_function</a>,{3,4});
+0515    <a href="unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'shorthand 1 param:'</span>,v1,v2);
+0516    [v3 v4] = <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(@<a href="#_sub8" class="code" title="subfunction [v1 v2] = test_function(a,b,c,d)">test_function</a>,{3,4});
+0517    <a href="unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'Expect Fail'</span>, v3, v4,-inf);
+0518    [v5 v6 ] = <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(@<a href="#_sub8" class="code" title="subfunction [v1 v2] = test_function(a,b,c,d)">test_function</a>,{3,4});
+0519    <a href="unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'shorthand 2 params:'</span>,v4, v6);
+0520    [v5 v6 ] = <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(@<a href="#_sub8" class="code" title="subfunction [v1 v2] = test_function(a,b,c,d)">test_function</a>,{3,4, 5}); <span class="comment">%this should re-calc</span>
+0521    opt.cache_obj = 5;
+0522    [v5 v6 ] = <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(@<a href="#_sub8" class="code" title="subfunction [v1 v2] = test_function(a,b,c,d)">test_function</a>,{3,4, 5}, opt); <span class="comment">%this should re-calc</span>
+0523    [v7 v8 ] = <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(@<a href="#_sub8" class="code" title="subfunction [v1 v2] = test_function(a,b,c,d)">test_function</a>,{1,2, 3}, opt); <span class="comment">%this should NOT</span>
+0524    <a href="unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'shorthand cache_obj:'</span>,v6, v8);
+0525    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a> clear_all
+0526    opt = struct;
+0527    [v7 v8 ] = <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(@<a href="#_sub8" class="code" title="subfunction [v1 v2] = test_function(a,b,c,d)">test_function</a>,{1,2, 3}, opt); <span class="comment">%this should NOT</span>
+0528    opt.boost_priority = 2;
+0529    [v7 v8 ] = <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(@<a href="#_sub8" class="code" title="subfunction [v1 v2] = test_function(a,b,c,d)">test_function</a>,{3,4, 5}, opt); <span class="comment">%this should NOT</span>
+0530    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a> show_objs
+0531    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>
+0532    <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'log_level'</span>,ll);
+0533    <span class="keyword">try</span>
+0534       <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(@(x) x^2, 3);
+0535    <span class="keyword">catch</span>
+0536       <a href="../../eidors/eidors_msg.html" class="code" title="function log_level= eidors_msg( message, varargin )">eidors_msg</a>(<span class="string">'Error on anonymous function: correct'</span>,2);
+0537    <span class="keyword">end</span>
+0538    <a href="#_sub9" class="code" title="subfunction test_debug">test_debug</a>
+0539    
+0540 <a name="_sub8" href="#_subfunctions" class="code">function [v1 v2] = test_function(a,b,c,d)</a>
+0541    v1 = rand(1);
+0542    v2 = rand(1);
+0543    
+0544 <a name="_sub9" href="#_subfunctions" class="code">function test_debug</a>
+0545    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a> clear
+0546    <a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'set-cache'</span>,{5}, <span class="string">'test1'</span>,50);
+0547    <a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'set-cache'</span>,{5}, <span class="string">'test2'</span>,500);
+0548    <a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'set-cache'</span>,{10}, <span class="string">'test1'</span>,100);
+0549    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a> show_objs
+0550    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a> debug_off
+0551    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a> debug_on test2
+0552    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a> clear_name test2
+0553    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a> show_objs
+0554 <span class="comment">%    eidors_obj('set-cache',{5}, 'test1',50);</span>
+0555    <a href="../../eidors/eidors_obj.html" class="code" title="function obj_id= eidors_obj(type,name, varargin );">eidors_obj</a>(<span class="string">'set-cache'</span>,{5}, <span class="string">'test2'</span>,500);
+0556    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a> debug_off
+0557    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a> debug_on test1
+0558    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a> clear_name test2
+0559    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'clear_max'</span>,0)
+0560    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(<span class="string">'show_objs'</span>)
+0561    <a href="eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a> debug_off
+0562    
+0563    
+0564    
+0565 <span class="comment">%    obj= eidors_obj('get-cache',{5}, 'test1');</span></pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

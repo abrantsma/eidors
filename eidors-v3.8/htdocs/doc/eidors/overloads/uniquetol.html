@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of uniquetol</title>
+  <meta name="keywords" content="uniquetol">
+  <meta name="description" content="C = uniquetol(A,TOL):  unique values in A using tolerance TOL.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">eidors</a> &gt; <a href="index.html">overloads</a> &gt; uniquetol.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/overloads&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>uniquetol
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>C = uniquetol(A,TOL):  unique values in A using tolerance TOL.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function out = uniquetol(in, tol, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> C = uniquetol(A,TOL):  unique values in A using tolerance TOL.
+ For recent versions (&gt;=2015a) call built in function. Otherwise
+ find a alternate solve, using either different matlab builtin
+ functions, or the uniquetol provided by code (C) Siyi Deng 2010.
+
+ Only provides the functions of 
+   C = uniquetol(A,tol,'ByRows',true,'DataScale',1);</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="uniquetol.html" class="code" title="function out = uniquetol(in, tol, varargin)">uniquetol</a>	C = uniquetol(A,TOL):  unique values in A using tolerance TOL.</li><li><a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>	UNIT_TEST_CMP: compare matrices in eidors output</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/models/mk_grid_c2f.html" class="code" title="function [c2f, m] = mk_grid_c2f(fmdl, rmdl, opt)">mk_grid_c2f</a>	MK_GRID_C2F - calculate a coarse2fine mapping for grid coarse models.</li><li><a href="../../eidors/models/mk_tet_c2f.html" class="code" title="function [c2f] = mk_tet_c2f(fmdl, rmdl, opt)">mk_tet_c2f</a>	MK_TET_C2F - calculate a coarse2fine mapping for two tet-based models.</li><li><a href="../../eidors/models/mk_tri_c2f.html" class="code" title="function c2f = mk_tri_c2f(fmdl,rmdl,opt)">mk_tri_c2f</a>	MK_TRI_C2F</li><li><a href="uniquetol.html" class="code" title="function out = uniquetol(in, tol, varargin)">uniquetol</a>	C = uniquetol(A,TOL):  unique values in A using tolerance TOL.</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [z,ii,jj] = uniquetol_repl(x,tol,varargin)</a></li><li><a href="#_sub2" class="code">function do_unit_test</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function out = uniquetol(in, tol, varargin)</a>
+0002 <span class="comment">% C = uniquetol(A,TOL):  unique values in A using tolerance TOL.</span>
+0003 <span class="comment">% For recent versions (&gt;=2015a) call built in function. Otherwise</span>
+0004 <span class="comment">% find a alternate solve, using either different matlab builtin</span>
+0005 <span class="comment">% functions, or the uniquetol provided by code (C) Siyi Deng 2010.</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% Only provides the functions of</span>
+0008 <span class="comment">%   C = uniquetol(A,tol,'ByRows',true,'DataScale',1);</span>
+0009 
+0010 <span class="comment">% (C) Andy Adler 2015 Licenced under GPL v2 or v3</span>
+0011 <span class="comment">% $Id: uniquetol.m 4953 2015-05-09 12:49:33Z aadler $</span>
+0012 
+0013 <span class="keyword">if</span> isstr(in) &amp;&amp; strcmp(in,<span class="string">'UNIT_TEST'</span>); <a href="#_sub2" class="code" title="subfunction do_unit_test">do_unit_test</a>; <span class="keyword">return</span>; <span class="keyword">end</span>
+0014 DEBUG = 0; <span class="comment">% IF == ## then only this test</span>
+0015 
+0016 <span class="keyword">if</span> (~DEBUG &amp;&amp; exist(<span class="string">'uniquetol'</span>,<span class="string">'builtin'</span>)) || (DEBUG == 1)
+0017    <span class="keyword">if</span> DEBUG;   disp(<span class="string">'using builtin uniquetol'</span>); <span class="keyword">end</span>
+0018    out = builtin(<span class="string">'uniquetol'</span>,in, tol, varargin{:});
+0019    <span class="keyword">return</span>;
+0020 <span class="keyword">end</span>
+0021 
+0022 <span class="comment">% Now we provide a backup, but only if byrows and Datascale</span>
+0023 <span class="keyword">if</span> length(varargin)&lt;4
+0024    error(<span class="string">'ByRows and DataScale must be provided'</span>)
+0025 <span class="keyword">end</span>
+0026 <span class="keyword">for</span> i=1:2:length(varargin);
+0027    <span class="keyword">switch</span> varargin{i}
+0028      <span class="keyword">case</span> <span class="string">'ByRows'</span>
+0029        <span class="keyword">if</span> ~varargin{i+1};   error(<span class="string">'Only support the ByRows option'</span>); <span class="keyword">end</span>
+0030      <span class="keyword">case</span> <span class="string">'DataScale'</span>
+0031        <span class="keyword">if</span> varargin{i+1}~=1; error(<span class="string">'DataScale must by 1'</span>); <span class="keyword">end</span>
+0032      <span class="keyword">otherwise</span> 
+0033        error(<span class="string">'Option %s not supported'</span>,varargin{i});
+0034    <span class="keyword">end</span>
+0035 <span class="keyword">end</span>
+0036 
+0037 <span class="keyword">if</span> (~DEBUG &amp;&amp; exist(<span class="string">'_mergesimpts'</span>,<span class="string">'builtin'</span>)) || (DEBUG == 2)
+0038    <span class="keyword">if</span> DEBUG;   disp(<span class="string">'using _mergesimpts'</span>); <span class="keyword">end</span>
+0039    out = builtin(<span class="string">'_mergesimpts'</span>,in,tol,<span class="string">'first'</span>);
+0040    <span class="keyword">return</span>;
+0041 <span class="keyword">end</span>
+0042 
+0043 <span class="keyword">if</span> DEBUG;   disp(<span class="string">'using uniquetol_repl'</span>); <span class="keyword">end</span>
+0044 out = <a href="#_sub1" class="code" title="subfunction [z,ii,jj] = uniquetol_repl(x,tol,varargin)">uniquetol_repl</a>(in,tol,<span class="string">'rows'</span>,<span class="string">'first'</span>);
+0045 <span class="comment">%   UNIQUETOL(...,'ROWS')</span>
+0046 
+0047 <a name="_sub1" href="#_subfunctions" class="code">function [z,ii,jj] = uniquetol_repl(x,tol,varargin)</a>
+0048 <span class="comment">%UNIQUETOL Unique element within a tolerance.</span>
+0049 <span class="comment">%   [Y,I,J] = UNIQUETOL(X,TOL) is very similar to UNIQUE, but allows an</span>
+0050 <span class="comment">%   additional tolerance input, TOL. TOL can be taken as the total absolute</span>
+0051 <span class="comment">%   difference between similar elements. TOL must be a none negative</span>
+0052 <span class="comment">%   scalar. If not provided, TOL is assumed to be 0, which makes UNIQUETOL</span>
+0053 <span class="comment">%   identical to UNIQUE.</span>
+0054 <span class="comment">%</span>
+0055 <span class="comment">%   UNIQUETOL(...,'ROWS')</span>
+0056 <span class="comment">%   UNIQUETOL(...,'FIRST')</span>
+0057 <span class="comment">%   UNIQUETOL(...,'LAST')</span>
+0058 <span class="comment">%   These expressions are identical to the UNIQUE counterparts.</span>
+0059 <span class="comment">%</span>
+0060 <span class="comment">%   See also UNIQUE.</span>
+0061 
+0062 <span class="comment">% Siyi Deng; 03-19-2010; 05-15-2010; 10-29-2010;</span>
+0063 
+0064 <span class="comment">% Licence:</span>
+0065 <span class="comment">% Copyright (c) 2010, Siyi Deng</span>
+0066 <span class="comment">% All rights reserved.</span>
+0067 <span class="comment">%</span>
+0068 <span class="comment">% Redistribution and use in source and binary forms, with or without</span>
+0069 <span class="comment">% modification, are permitted provided that the following conditions are</span>
+0070 <span class="comment">% met:</span>
+0071 <span class="comment">%</span>
+0072 <span class="comment">%     * Redistributions of source code must retain the above copyright</span>
+0073 <span class="comment">%       notice, this list of conditions and the following disclaimer.</span>
+0074 <span class="comment">%     * Redistributions in binary form must reproduce the above copyright</span>
+0075 <span class="comment">%       notice, this list of conditions and the following disclaimer in</span>
+0076 <span class="comment">%       the documentation and/or other materials provided with the distribution</span>
+0077 <span class="comment">%</span>
+0078 <span class="comment">% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</span>
+0079 <span class="comment">% AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span>
+0080 <span class="comment">% IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+0081 <span class="comment">% ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE</span>
+0082 <span class="comment">% LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR</span>
+0083 <span class="comment">% CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF</span>
+0084 <span class="comment">% SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS</span>
+0085 <span class="comment">% INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN</span>
+0086 <span class="comment">% CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)</span>
+0087 <span class="comment">% ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+0088 <span class="comment">% POSSIBILITY OF SUCH DAMAGE.</span>
+0089 
+0090 <span class="keyword">if</span> size(x,1) == 1, x = x(:); <span class="keyword">end</span>
+0091 <span class="keyword">if</span> nargin &lt; 2 || isempty(tol) || tol == 0
+0092     [z,ii,jj] = unique(x,varargin{:});
+0093     <span class="keyword">return</span>;
+0094 <span class="keyword">end</span>
+0095 [y,ii,jj] = unique(x,varargin{:});
+0096 <span class="keyword">if</span> size(x,2) &gt; 1
+0097     [~,ord] = sort(sum(x.^2,1),2,<span class="string">'descend'</span>);
+0098     [y,io] = sortrows(y,ord);
+0099     [~,jo] = sort(io);
+0100     ii = ii(io);
+0101     jj = jo(jj);
+0102 <span class="keyword">end</span>
+0103 d = sum(abs(diff(y,1,1)),2);
+0104 
+0105 isTol = [true;d &gt; tol];
+0106 z = y(isTol,:);
+0107 bin = cumsum(isTol); <span class="comment">% [n,bin] = histc(y,z);</span>
+0108 jj = bin(jj);
+0109 ii = ii(isTol);
+0110 
+0111 <span class="comment">% UNIQUETOL;</span>
+0112    
+0113 <a name="_sub2" href="#_subfunctions" class="code">function do_unit_test</a>
+0114    x = [1 2; 1.06 2; 1.1 2; 1.1 2.03];
+0115 
+0116    <span class="keyword">for</span> tol = logspace(-4,1,5);
+0117       uu = <a href="uniquetol.html" class="code" title="function out = uniquetol(in, tol, varargin)">uniquetol</a>(x,tol,<span class="string">'ByRows'</span>,true,<span class="string">'DataScale'</span>,1);
+0118       um = builtin(<span class="string">'_mergesimpts'</span>,x,tol,<span class="string">'first'</span>);
+0119       ur = <a href="#_sub1" class="code" title="subfunction [z,ii,jj] = uniquetol_repl(x,tol,varargin)">uniquetol_repl</a>(x,tol,<span class="string">'rows'</span>,<span class="string">'first'</span>);
+0120       <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(sprintf(<span class="string">'um=uu %f'</span>,tol),uu,um);
+0121       <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(sprintf(<span class="string">'um=ur %f'</span>,tol),uu,um);
+0122    <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

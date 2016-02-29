@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of fwd_solve_higher_order</title>
+  <meta name="keywords" content="fwd_solve_higher_order">
+  <meta name="description" content="Solve for voltages (nodes/electrodes) for a forward model.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">eidors</a> &gt; <a href="../index.html">solvers</a> &gt; <a href="index.html">forward</a> &gt; fwd_solve_higher_order.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/solvers/forward&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>fwd_solve_higher_order
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Solve for voltages (nodes/electrodes) for a forward model.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function[data] = fwd_solve_higher_order(fwd_model,img) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">Solve for voltages (nodes/electrodes) for a forward model. 
+M Crabb - 29.06.2012</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="../../../eidors/algorithms/left_divide.html" class="code" title="function [V] = left_divide(E,I,tol,pp,V)">left_divide</a>	[V] = left_divide(E,I,tol,pp,V);</li><li><a href="../../../eidors/solvers/calc_system_mat.html" class="code" title="function system_mat = calc_system_mat( fwd_model, img)">calc_system_mat</a>	CALC_SYSTEM_MAT: calculate FEM system matrix from fwd_model and image</li><li><a href="fem_1st_to_higher_order.html" class="code" title="function [boundary,elems,nodes]=fem_1st_to_higher_order(fwd_model)">fem_1st_to_higher_order</a>	FEM_1ST_TO_HIGH_ORDER:  Modify the FEM for high order FEM called as</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function[data] = fwd_solve_higher_order(fwd_model,img)</a>
+0002 <span class="comment">%Solve for voltages (nodes/electrodes) for a forward model.</span>
+0003 <span class="comment">%M Crabb - 29.06.2012</span>
+0004 
+0005 <span class="keyword">if</span> nargin == 1
+0006    img= fwd_model;
+0007 <span class="keyword">elseif</span>  strcmp(getfield(warning(<span class="string">'query'</span>,<span class="string">'EIDORS:DeprecatedInterface'</span>),<span class="string">'state'</span>),<span class="string">'on'</span>)
+0008    warning(<span class="string">'EIDORS:DeprecatedInterface'</span>, <span class="keyword">...</span>
+0009       [<span class="string">'Calling FWD_SOLVE_HIGHER_ORDER with two arguments is deprecated and will cause'</span> <span class="keyword">...</span>
+0010        <span class="string">' an error in a future version. First argument ignored.'</span>]);
+0011 <span class="keyword">end</span>
+0012 
+0013 fwd_model= img.fwd_model;
+0014 
+0015 <span class="comment">%Modify the forward model to be of my type</span>
+0016 <span class="keyword">if</span> ~isfield(fwd_model,<span class="string">'approx_type'</span>)    || <span class="keyword">...</span>
+0017    strcmp(fwd_model.approx_type,<span class="string">'tri3'</span>) || <span class="keyword">...</span>
+0018    strcmp(fwd_model.approx_type,<span class="string">'tet4'</span>)   
+0019     <span class="comment">%Do nothing</span>
+0020 <span class="keyword">else</span>
+0021     [bound,elem,nodes] = <a href="fem_1st_to_higher_order.html" class="code" title="function [boundary,elems,nodes]=fem_1st_to_higher_order(fwd_model)">fem_1st_to_higher_order</a>(fwd_model);
+0022     fwd_model.boundary=bound; fwd_model.elems=elem; fwd_model.nodes=nodes;
+0023     <span class="comment">%We need to update fwd_model of img too for system_mat</span>
+0024     img.fwd_model=fwd_model;
+0025 <span class="keyword">end</span>
+0026 
+0027 <span class="comment">%Calculate the total stiffness matrix</span>
+0028 s_mat = <a href="../../../eidors/solvers/calc_system_mat.html" class="code" title="function system_mat = calc_system_mat( fwd_model, img)">calc_system_mat</a>(img); At=s_mat.E;
+0029 
+0030 <span class="comment">%Find electrode stucture and no.of electrodes and initialize vector</span>
+0031 <span class="comment">%Find stim strucutre and no. stimulations</span>
+0032 <span class="comment">%Find node structure and find no.nodes</span>
+0033 elecstruc=fwd_model.electrode; nelecs=size(elecstruc,2);
+0034 stimstruc=fwd_model.stimulation; nstims=size(stimstruc,2); 
+0035 nodestruc=fwd_model.nodes; nnodes=size(nodestruc,1); 
+0036 
+0037 <span class="comment">%Find total number of measurements</span>
+0038 nmeass=0;
+0039 <span class="keyword">for</span> k=1:nstims
+0040     stimkmeasmatrix = stimstruc(k).meas_pattern;
+0041     nmeass=nmeass+size(stimkmeasmatrix,1);
+0042 <span class="keyword">end</span>
+0043 
+0044 <span class="comment">%Complete or Point? Check first electrode (no mized models) and this changes</span>
+0045 <span class="comment">%the index vector of what 'node' number corresponds to an electrode</span>
+0046 elecnode=zeros(1,nelecs);
+0047 <span class="keyword">if</span>(size(elecstruc(1).nodes,2)==1 &amp;&amp; size(elecstruc(1).nodes,1)==1) <span class="comment">%POINT</span>
+0048     <span class="keyword">for</span> i=1:nelecs
+0049         <span class="comment">%POINT - Assign electrode index at correct node</span>
+0050         elecnode(i)=elecstruc(i).nodes;
+0051     <span class="keyword">end</span>
+0052     <span class="comment">%Assign correct size unknowns and right hand side matrix</span>
+0053     rhsdata=zeros(nnodes,nstims); 
+0054     nodeunknowns=zeros(nnodes,nstims); 
+0055 <span class="keyword">else</span>
+0056     <span class="keyword">for</span> i=1:nelecs
+0057         <span class="comment">%COMPLETE - Assign electrode at bottom of list</span>
+0058         elecnode(i)=nnodes+i;
+0059     <span class="keyword">end</span>
+0060     <span class="comment">%Assign correct size right hand side matrix</span>
+0061     rhsdata=zeros(nnodes+nelecs,nstims); 
+0062     nodeunknowns=zeros(nnodes+nelecs,nstims); 
+0063 <span class="keyword">end</span>
+0064 
+0065 <span class="comment">%Assign currents at correct point in rhs matrix using index vector</span>
+0066 <span class="keyword">for</span> ii=1:nstims
+0067     <span class="comment">%The vector of current values for stimulation</span>
+0068     curnode=stimstruc(ii).stim_pattern;
+0069     <span class="keyword">for</span> i=1:nelecs
+0070         rhsdata(elecnode(i),ii)=curnode(i);
+0071     <span class="keyword">end</span>
+0072 <span class="keyword">end</span>
+0073 
+0074 <span class="comment">%Create index vector and eliminate ground node equation from index</span>
+0075 groundnode=fwd_model.gnd_node; idx=1:size(At,1); idx(groundnode)=[];
+0076 
+0077 <span class="comment">%Solve the simulated linear system with index</span>
+0078 nodeunknowns(idx,:)=<a href="../../../eidors/algorithms/left_divide.html" class="code" title="function [V] = left_divide(E,I,tol,pp,V)">left_divide</a>(At(idx,idx),rhsdata(idx,:));
+0079 
+0080 
+0081 <span class="comment">%Find electrode voltages and store in matrix</span>
+0082 <span class="comment">%Calculate electrode voltages using index vector elecnode(i)</span>
+0083 velec=zeros(nelecs,nstims);
+0084 <span class="keyword">for</span> i=1:nelecs
+0085     <span class="comment">%This is the indexed entries in nodeunknowns</span>
+0086     velec(i,:)=nodeunknowns(elecnode(i),:);
+0087 <span class="keyword">end</span>
+0088 
+0089 <span class="comment">%Get the measured voltages</span>
+0090 vmeaselec=zeros(nmeass,1); idx=0;
+0091 <span class="keyword">for</span> ii=1:nstims
+0092     meas_pat=stimstruc(ii).meas_pattern; <span class="comment">%Measurement patterns</span>
+0093     n_meas=size(meas_pat,1); <span class="comment">%Number of measures</span>
+0094     vmeaselec(idx + (1:n_meas) ) = meas_pat*velec(:,ii); <span class="comment">%Diff data</span>
+0095     idx=idx+n_meas; <span class="comment">%Increase counter</span>
+0096 <span class="keyword">end</span>
+0097 
+0098 <span class="comment">%Return the electrode voltages in data structure</span>
+0099 data.meas= vmeaselec;
+0100 data.time= NaN; <span class="comment">% unknown</span>
+0101 data.name= <span class="string">'solved by fwd_solve_higher_order'</span>;
+0102 data.quantity = <span class="string">'voltage'</span>;
+0103 <span class="keyword">try</span>; <span class="keyword">if</span> img.fwd_solve.get_all_meas == 1
+0104    data.volt = nodeunknowns(1:nnodes,:); <span class="comment">% but not on CEM nodes</span>
+0105 <span class="keyword">end</span>; <span class="keyword">end</span>
+0106 <span class="keyword">try</span>; <span class="keyword">if</span> img.fwd_solve.get_all_nodes== 1
+0107    data.volt = nodeunknowns;             <span class="comment">% all, including CEM nodes</span>
+0108 <span class="keyword">end</span>; <span class="keyword">end</span>
+0109 
+0110 
+0111 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

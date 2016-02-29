@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of prior_gaussian_HPF</title>
+  <meta name="keywords" content="prior_gaussian_HPF">
+  <meta name="description" content="PRIOR_GAUSSIAN_HPF calculate image prior">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">eidors</a> &gt; <a href="../index.html">solvers</a> &gt; <a href="index.html">inverse</a> &gt; prior_gaussian_HPF.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/solvers/inverse&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>prior_gaussian_HPF
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>PRIOR_GAUSSIAN_HPF calculate image prior</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function Reg= prior_gaussian_HPF( inv_model ); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> PRIOR_GAUSSIAN_HPF calculate image prior
+ Reg= prior_gaussian_HPF( inv_model )
+ Reg        =&gt; output regularization term
+ inv_model  =&gt; inverse model struct
+ Parameters:
+   diam_frac= inv_model.fwd_model.prior_gaussian_HPF.diam_frac DEFAULT 0.1
+
+ CITATION_REQUEST:
+ AUTHOR: A Adler &amp; R Guardo
+ YEAR: 1996
+ TITLE: Electrical impedance tomography: regularized imaging and contrast
+ detection 
+ JOURNAL: IEEE transactions on medical imaging
+ VOL: 15
+ NUM: 2
+ PAGE: 170–9
+ LINK: http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=491418</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="../../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>	SPARSE Create sparse matrix (EIDORS overload).</li><li><a href="../../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>	EIDORS_CACHE Control eidors caching</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="../../../eidors/deprecated/gaussian_HPF_prior.html" class="code" title="function Reg= gaussian_HPF_prior( inv_model );">gaussian_HPF_prior</a>	GAUSSIAN_HPF_PRIOR calculate image prior</li><li><a href="../../../eidors/tests/calc_model_prior_test.html" class="code" title="function ok= calc_model_prior_test;">calc_model_prior_test</a>	Verify model prior calcs</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function filt= calc_Gaussian_HPF( fmdl, diam_frac)</a></li><li><a href="#_sub2" class="code">function [x,xc,y,yc] = interp_points(NODE,ELEM,np);</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function Reg= prior_gaussian_HPF( inv_model );</a>
+0002 <span class="comment">% PRIOR_GAUSSIAN_HPF calculate image prior</span>
+0003 <span class="comment">% Reg= prior_gaussian_HPF( inv_model )</span>
+0004 <span class="comment">% Reg        =&gt; output regularization term</span>
+0005 <span class="comment">% inv_model  =&gt; inverse model struct</span>
+0006 <span class="comment">% Parameters:</span>
+0007 <span class="comment">%   diam_frac= inv_model.fwd_model.prior_gaussian_HPF.diam_frac DEFAULT 0.1</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% CITATION_REQUEST:</span>
+0010 <span class="comment">% AUTHOR: A Adler &amp; R Guardo</span>
+0011 <span class="comment">% YEAR: 1996</span>
+0012 <span class="comment">% TITLE: Electrical impedance tomography: regularized imaging and contrast</span>
+0013 <span class="comment">% detection</span>
+0014 <span class="comment">% JOURNAL: IEEE transactions on medical imaging</span>
+0015 <span class="comment">% VOL: 15</span>
+0016 <span class="comment">% NUM: 2</span>
+0017 <span class="comment">% PAGE: 170–9</span>
+0018 <span class="comment">% LINK: http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=491418</span>
+0019 
+0020 
+0021 <span class="comment">% (C) 2005 Andy Adler. License: GPL version 2 or version 3</span>
+0022 <span class="comment">% $Id: prior_gaussian_HPF.m 4832 2015-03-29 21:13:53Z bgrychtol-ipa $</span>
+0023 
+0024 fwd_model= inv_model.fwd_model;
+0025 <span class="keyword">try</span> 
+0026     diam_frac= fwd_model.prior_gaussian_HPF.diam_frac;
+0027 <span class="keyword">catch</span>
+0028     diam_frac= 0.1;
+0029 <span class="keyword">end</span>
+0030 
+0031 copt.cache_obj= {fwd_model.nodes, fwd_model.elems, diam_frac};
+0032 copt.fstr = <span class="string">'prior_gaussian_HPF'</span>;
+0033 Reg = <a href="../../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(@<a href="#_sub1" class="code" title="subfunction filt= calc_Gaussian_HPF( fmdl, diam_frac)">calc_Gaussian_HPF</a>, {fwd_model, diam_frac}, copt );
+0034 
+0035 
+0036 <span class="comment">% Calculate Gaussian HP Filter as per Adler &amp; Guardo 96</span>
+0037 <span class="comment">% parameter is diam_frac (normally 0.1)</span>
+0038 <a name="_sub1" href="#_subfunctions" class="code">function filt= calc_Gaussian_HPF( fmdl, diam_frac)</a>
+0039   ELEM= fmdl.elems';
+0040   NODE= fmdl.nodes';
+0041 
+0042 
+0043   e= size(ELEM, 2);
+0044   np= 128;
+0045   [x,xc,y,yc] = <a href="#_sub2" class="code" title="subfunction [x,xc,y,yc] = interp_points(NODE,ELEM,np);">interp_points</a>(NODE,ELEM,np);
+0046 
+0047   v_yx= [-y,x];
+0048   o= ones(np*np,1);
+0049   filt= zeros(e);
+0050   tourne= [0 -1 1;1 0 -1;-1 1 0];
+0051 
+0052   <span class="keyword">for</span> j= 1:e
+0053 <span class="comment">%   if ~rem(j,20); fprintf('.'); end</span>
+0054     xy= NODE(:,ELEM(:,j))';
+0055     a= xy([2;3;1],1).*xy([3;1;2],2) <span class="keyword">...</span>
+0056          -xy([3;1;2],1).*xy([2;3;1],2);
+0057     aire=abs(sum(a));
+0058     endr=find(y&lt;=max(xy(:,2)) &amp; y&gt;=min(xy(:,2)) <span class="keyword">...</span>
+0059             &amp; x&lt;=max(xy(:,1)) &amp; x&gt;=min(xy(:,1)) )';
+0060     aa= sum(abs(ones(length(endr),1)*a' <span class="keyword">...</span>
+0061          +v_yx(endr,:)*xy'*tourne)');
+0062     endr( find( abs(1 - aa / aire) &gt; 1e-8 ) )=[];
+0063     ll=length(endr); endr=endr-1;
+0064 
+0065     yp= rem(endr,np)/(np-1) - .5; <span class="comment">% (rem(endr,np) corresponde a y</span>
+0066     ym= ones(e,1)*yp -yc*ones(1,ll);
+0067     xp= floor(endr/np)/(np-1) - .5; <span class="comment">% (floor(endr/np)) corresponde a x</span>
+0068     xm= ones(e,1)*xp -xc*ones(1,ll);
+0069 
+0070     beta=2.769/diam_frac.^2;
+0071 <span class="comment">%   filt(:,j)=-aire/2*beta/pi*mean(...</span>
+0072     filt(:,j)=-beta/pi*sum( exp(-beta*(ym.^2+xm.^2))')';
+0073   <span class="keyword">end</span> <span class="comment">%for j=1:ELEM</span>
+0074 <span class="comment">% filt=filt/taille(1)/taille(2)+eye(e);</span>
+0075   filt=filt/np^2+eye(e);
+0076   filt= ( filt+filt' )/ 2;
+0077   filt= <a href="../../../eidors/overloads/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(filt.*(abs(filt)&gt;.003)); 
+0078 
+0079 <a name="_sub2" href="#_subfunctions" class="code">function [x,xc,y,yc] = interp_points(NODE,ELEM,np);</a>
+0080   taille=max(NODE')-min(NODE');
+0081   e= size(ELEM, 2);
+0082 
+0083 <span class="comment">% Triangles of each shape</span>
+0084   xt= reshape(NODE(1,ELEM(:)),3,e)';
+0085   yt= reshape(NODE(2,ELEM(:)),3,e)';
+0086 
+0087 <span class="comment">% We want center [1,1,1]/3 and edges [4,1,1]/6</span>
+0088   pts= [2,2,2;4,1,1;1,4,1;1,1,4]'/6;
+0089   xp= xt*pts;
+0090   yp= yt*pts;
+0091   
+0092   [x y]=meshgrid( <span class="keyword">...</span>
+0093       linspace( min(NODE(1,:)), max(NODE(1,:)) ,np ), <span class="keyword">...</span>
+0094       linspace( min(NODE(2,:)), max(NODE(2,:)) ,np )  ); 
+0095 <span class="comment">% Add the basic interpolation points to those based on the</span>
+0096 <span class="comment">%  elements</span>
+0097   x= [x(:);xp(:)]; 
+0098   y= [y(:);yp(:)]; 
+0099 
+0100   xc= mean(xt,2)/taille(1);
+0101   yc= mean(yt,2)/taille(2);</pre></div>
+<hr><address>Generated on Tue 12-May-2015 16:08:56 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>
